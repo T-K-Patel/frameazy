@@ -7,7 +7,7 @@ import AddArtwork from "@/components/AddArtwork";
 export default function Home() {
   return (
     <div className="flex justify-center items-center">
-      <AddArtwork/>
+      <AddArtwork />
     </div>
   );
 }

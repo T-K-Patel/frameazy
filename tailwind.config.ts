@@ -3,11 +3,8 @@ import type { Config } from "tailwindcss"
 const config = {
   darkMode: ["class"],
   content: [
-    './pages/**/*.{ts,tsx}',
-    './components/**/*.{ts,tsx}',
-    './app/**/*.{ts,tsx}',
     './src/**/*.{ts,tsx}',
-	],
+  ],
   prefix: "",
   theme: {
     container: {
@@ -19,16 +16,16 @@ const config = {
     },
     extend: {
       colors: {
-        blue:{
-          1:"#225378"
+        blue: {
+          1: "#225378"
         },
-        gray:{
-          1:"#E5E5E5",
-          2:"#D2D1D1",
-          3:"#0000004D"
+        gray: {
+          1: "#E5E5E5",
+          2: "#D2D1D1",
+          3: "#0000004D"
         },
-        black:{
-          1:"#1E1E1E"
+        black: {
+          1: "#1E1E1E"
         },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

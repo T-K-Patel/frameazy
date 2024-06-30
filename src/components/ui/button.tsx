@@ -10,15 +10,15 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: "text-white bg-blue-1 rounded-[12px] overflow-hidden flex gap-x-3 border-white border-1 hover:bg-blue-1/80",
-        light:"text-black bg-white rounded-[12px] overflow-hidden flex gap-x-3 border-black border-1",
+        light: "text-black bg-white rounded-[12px] overflow-hidden flex gap-x-3 border-black border-1",
       },
       size: {
         default: "w-[325px] h-[60px] px-6 py-10 md:[425px]",
-        sm:"w-[197.11px] h-[60px] px-6 py-10 md:[259.11px]",
-        md:"w-[223.11px] h-[60px] px-6 py-8",
-        lg:"w-[335px] h-[60px] px-3 py-5",
-        smm:"w-[123.62px] h-[32px] rounded-[7.42px] overflow-hidden",
-        icon:"w-[66px] h-[48px] rounded-[9.73px] overflow-hidden p-[12.17px] flex justify-center md:w-[60px] md:h-[44px] md:p-[10.97px]"
+        sm: "w-[197.11px] h-[60px] px-6 py-10 md:[259.11px]",
+        md: "w-[223.11px] h-[60px] px-6 py-8",
+        lg: "w-[335px] h-[60px] px-3 py-5",
+        smm: "w-[123.62px] h-[32px] rounded-[7.42px] overflow-hidden",
+        icon: "w-[66px] h-[48px] rounded-[9.73px] overflow-hidden p-[12.17px] flex justify-center md:w-[60px] md:h-[44px] md:p-[10.97px]"
       },
     },
     defaultVariants: {
@@ -30,7 +30,7 @@ const buttonVariants = cva(
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
+  VariantProps<typeof buttonVariants> {
   asChild?: boolean
 }
 
