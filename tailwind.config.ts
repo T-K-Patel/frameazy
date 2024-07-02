@@ -15,6 +15,9 @@ const config = {
       },
     },
     extend: {
+      screens: {
+        "xs": "320px"
+      },
       colors: {
         blue: {
           1: "#225378"
@@ -25,6 +28,7 @@ const config = {
           3: "#0000004D"
         },
         black: {
+          DEFAULT: "#000",
           1: "#1E1E1E"
         },
         border: "hsl(var(--border))",

@@ -1,0 +1,131 @@
+'use client'
+// import { cookies } from 'next/headers';
+import Image from 'next/image';
+import Link from 'next/link';
+import { redirect, usePathname } from 'next/navigation';
+import React, { useCallback, useEffect, useState } from 'react'
+import { BsCart3 } from 'react-icons/bs';
+import { RxHamburgerMenu } from 'react-icons/rx';
+import Logo from '@/assets/frameasy-logo.png';
+import Sidebar from '@/components/SideBar';
+import { Button } from '@/components/ui/button';
+import { signOutAction } from '@/serverActions/auth/signout';
+
+const Navbar = ({ cookie }: { cookie: string }) => {
+  // const cookie = cookies().get("session_id");
+  const [showSideBar, setShowSideBar] = useState(false);
+  const pathname = usePathname();
+  const sideBarRef = React.useRef<HTMLDivElement>(null);
+
+  const handleOutSideClick = useCallback((e: MouseEvent) => {
+    if (sideBarRef.current && !sideBarRef.current.contains(e.target as Node) && showSideBar) {
+      setShowSideBar(false);
+    } else {
+      console.log(sideBarRef.current, e.target, showSideBar)
+    }
+  }, [showSideBar])
+  useEffect(() => {
+    document.body.classList.toggle('overflow-hidden', showSideBar);
+  }, [showSideBar])
+
+  useEffect(() => {
+    setShowSideBar(false);
+  }, [pathname])
+
+  useEffect(() => {
+    document.addEventListener('click', handleOutSideClick);
+    return () => {
+      document.removeEventListener('click', handleOutSideClick);
+    }
+  }, [handleOutSideClick])
+
+  const toggleSidebar = () => {
+    setShowSideBar(s => !s);
+  };
+
+  const links = [
+    {
+      id: "1",
+      name: "Home",
+      path: "/",
+    },
+    {
+      id: "2",
+      name: "Frames",
+      path: "/frames",
+    },
+    {
+      id: "3",
+      name: "Contacts",
+      path: "/contact",
+    },
+  ];
+  return (
+    <>
+      <nav className="flex justify-between items-center w-[89%] mx-auto h-[100px]">
+        <a href="/">
+          <Image src={Logo} alt="logo" loading="lazy" />
+        </a>
+        <ul className="md:flex gap-5 hidden">
+          {links.map((link) => (
+            <li
+              key={link.id}
+              className={
+                pathname === link.path
+                  ? "font-bold text-dark-blue"
+                  : "text-[#00000084] hover:text-black"
+              }
+            >
+              <Link href={link.path}>{link.name}</Link>
+            </li>
+          ))}
+        </ul>
+        {!cookie && (
+          <div className="md:flex hidden items-center gap-5 text-dark-blue font-bold">
+            <Link href="/login" className="hover:underline">
+              Log in
+            </Link>
+            <Link
+              href="/signup"
+            >
+              <Button size={'sm'} className='py-1 w-min'>
+                Get Started
+              </Button>
+            </Link>
+          </div>
+        )}
+        {cookie && (
+          <div className="hidden md:flex w-min gap-5 items-center">
+            <Link href="/cart" className="flex gap-3 items-center text-dark-blue">
+              <BsCart3 size={30} />
+              <p className=" text-xl font-semibold">Cart</p>
+            </Link>
+            <form action={signOutAction}>
+              <Button size={'sm'} className='w-fit p-3 px-5'>
+                Sign Out
+              </Button>
+            </form>
+          </div>
+        )}
+        <div
+          className="flex md:hidden cursor-pointer"
+          onClick={() => {
+            setShowSideBar(!showSideBar);
+          }}
+        >
+          <RxHamburgerMenu size="24px" />
+        </div>
+      </nav>
+      <Sidebar
+        barRef={sideBarRef}
+        toggle={toggleSidebar}
+        showSideBar={showSideBar}
+        links={links}
+        currentUser={cookie}
+        pathname={pathname}
+      />
+    </>
+  )
+}
+
+export default Navbar
