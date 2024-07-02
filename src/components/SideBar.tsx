@@ -22,7 +22,9 @@ const Sidebar = ({ toggle, links, showSideBar, currentUser, pathname, barRef }: 
     return (
         <>
             {/* OverLay */}
-            {showSideBar && <div className="fixed left-0 top-0 z-10 h-screen w-screen bg-black bg-opacity-15" />}
+            {showSideBar && (
+                <div className="fixed left-0 top-0 z-10 h-screen w-screen bg-black bg-opacity-15 md:hidden" />
+            )}
             <div
                 ref={barRef}
                 className={`fixed top-0 z-30 h-screen w-48 bg-white px-5 text-right shadow-xl duration-300 ease-in-out md:hidden ${
@@ -52,11 +54,10 @@ const Sidebar = ({ toggle, links, showSideBar, currentUser, pathname, barRef }: 
                             <Link href="login" className="hover:underline">
                                 Log in
                             </Link>
-                            <Link
-                                href="/signup"
-                                className="border-dark-blue hover:bg-dark-blue rounded-xl border border-solid px-5 py-3 hover:text-white"
-                            >
-                                Get Started
+                            <Link href="/signup">
+                                <Button size={"sm"} className="w-min py-1 transition-all duration-200 active:scale-90">
+                                    Get Started
+                                </Button>
                             </Link>
                         </div>
                     )}
@@ -67,7 +68,10 @@ const Sidebar = ({ toggle, links, showSideBar, currentUser, pathname, barRef }: 
                                 <p className="text-xl font-semibold">Cart</p>
                             </Link>
                             <form action={signOutAction}>
-                                <Button size={"sm"} className="h-min w-min py-5">
+                                <Button
+                                    size={"sm"}
+                                    className="h-min w-min py-5 transition-all duration-200 active:scale-90"
+                                >
                                     Sign Out
                                 </Button>
                             </form>
