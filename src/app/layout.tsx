@@ -1,10 +1,9 @@
+
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
 import Footer from "@/components/Footer";
 import Navbar from "../components/Navbar";
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 
 const inter = Poppins({ weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"], subsets: ["latin"] });
 
@@ -18,15 +17,12 @@ export default function RootLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    const cookie = cookies();
 
     return (
         <html lang="en">
             <body className={inter.className}>
                 <div className="_next">
-                    <Navbar cookie={cookie.get("session_id")?.value as string} />
                     {children}
-                    <Footer />
                 </div>
             </body>
         </html>
