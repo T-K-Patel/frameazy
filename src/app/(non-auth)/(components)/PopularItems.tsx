@@ -62,4 +62,4 @@ const PopularItems = () => {
     );
 };
 
-export default PopularItems
+export default PopularItems;

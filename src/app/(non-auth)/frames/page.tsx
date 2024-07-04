@@ -2,9 +2,7 @@ import React from "react";
 import { FaBarsProgress } from "react-icons/fa6";
 
 function Frames() {
-    return <>
-
-    </>;
+    return <></>;
 }
 
 export default Frames;

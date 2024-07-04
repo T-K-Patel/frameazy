@@ -15,7 +15,13 @@ type PersonalArtItemProps = {
 const PersonalArtItem = ({ img, title, desc }: PersonalArtItemProps) => {
     return (
         <div className="w-[387px] text-black">
-            <Image src={img} alt="" width={img.width} height={img.height} className="h-[191px] w-[387px] rounded-t-xl" />
+            <Image
+                src={img}
+                alt=""
+                width={img.width}
+                height={img.height}
+                className="h-[191px] w-[387px] rounded-t-xl"
+            />
             <div className="rounded-b-xl bg-white px-5 py-5">
                 <h2 className="pb-3 text-2xl font-semibold">{title}</h2>
                 <p className="font-light">{desc}</p>

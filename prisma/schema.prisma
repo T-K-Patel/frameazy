@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,32 +8,13 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  email     String   @unique
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  email     String     @unique
   name      String?
   password  String?
   auth_type AuthType
-  orders    Order[]
-}
-
-model Frame {
-  id    String @id @map("_id")
-  name  String @unique
-  price Float
-}
-
-model Order {
-  id     String @id @map("_id")
-  userId String @db.ObjectId
-  user   User   @relation(fields: [userId], references: [id])
-  price  Int
-}
-
-model Message {
-  id      String @id @map("_id")
-  message String
-  name    String
-  email   String
+  CartItem  CartItem[]
+  Order     Order[]
 }
 
 enum AuthType {
@@ -47,4 +22,98 @@ enum AuthType {
   Credentials
 }
 
-// Frames, Orders, Cart, Transactions, Temp Images
+model Frame {
+  id         String      @id @default(auto()) @map("_id") @db.ObjectId
+  name       String      @unique
+  price      Float
+  image      String
+  category   Category
+  color      Color
+  collection Collection
+  width      Int
+  height     Int
+  CartItem   CartItem[]
+  OrderItem  OrderItem[]
+}
+
+enum Category {
+  Art
+  Photography
+  Illustration
+  Digital
+}
+
+enum Color {
+  Black
+  White
+  Gold
+  Silver
+  Blue
+  Red
+  Green
+  Yellow
+  Pink
+  Purple
+  Brown
+  Orange
+}
+
+enum Collection {
+  Classic
+  Modern
+}
+
+model Message {
+  id      String  @id @default(auto()) @map("_id") @db.ObjectId
+  message String
+  name    String
+  email   String
+  userId  String? @db.ObjectId
+}
+
+// TODO: add fields for dimensions and other properties required
+model CartItem {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  userId   String @db.ObjectId
+  user     User   @relation(fields: [userId], references: [id])
+  frameId  String @db.ObjectId
+  frame    Frame  @relation(fields: [frameId], references: [id])
+  image    String
+  quantity Int    @default(1)
+}
+
+model Order {
+  id             String        @id @default(auto()) @map("_id") @db.ObjectId
+  userId         String        @db.ObjectId
+  user           User          @relation(fields: [userId], references: [id])
+  price          Int
+  payment_status PaymentStatus @default(UnInitiated)
+  pay_order_id   String?
+  pay_time       DateTime?
+  order_status   OrderStatus   @default(Received)
+  OrderItem      OrderItem[]
+}
+
+enum OrderStatus {
+  Received
+  Processing
+  Delivered
+}
+
+enum PaymentStatus {
+  UnInitiated
+  Pending
+  Paid
+  Failed
+}
+
+// TODO: add fields for dimensions and other properties required
+model OrderItem {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  frameId  String @db.ObjectId
+  frame    Frame  @relation(fields: [frameId], references: [id])
+  image    String
+  quantity Int
+  orderId  String @db.ObjectId
+  order    Order  @relation(fields: [orderId], references: [id])
+}

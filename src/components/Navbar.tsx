@@ -62,8 +62,8 @@ const Navbar = () => {
         },
     ];
     return (
-        <header className="max-w-screen-2xl mx-auto">
-            <nav className="w-11/12 mx-auto flex h-[100px] items-center justify-between">
+        <header className="mx-auto max-w-screen-2xl">
+            <nav className="mx-auto flex h-[100px] w-11/12 items-center justify-between">
                 <a href="/">
                     <Image src={Logo} alt="logo" priority />
                 </a>
@@ -100,7 +100,13 @@ const Navbar = () => {
                             <p className="text-xl font-semibold">Cart</p>
                         </Link>
                         <>
-                            <Button size={"sm"} onClick={async () => { await signOut({ redirect: true }); }} className="w-fit p-3 px-5 transition-all duration-200 active:scale-90">
+                            <Button
+                                size={"sm"}
+                                onClick={async () => {
+                                    await signOut({ redirect: true });
+                                }}
+                                className="w-fit p-3 px-5 transition-all duration-200 active:scale-90"
+                            >
                                 Sign Out
                             </Button>
                         </>
