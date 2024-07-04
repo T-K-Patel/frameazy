@@ -23,7 +23,7 @@ function Hero() {
                             src={heroImage}
                             alt="hero"
                             loading="lazy"
-                            className="max-md:h-[375px] w-full md:max-h-screen object-cover"
+                            className="w-full object-cover max-md:h-[375px] md:max-h-screen"
                         />
                     </div>
                 </div>

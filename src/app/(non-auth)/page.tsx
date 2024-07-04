@@ -12,7 +12,7 @@ export default function Home() {
         <>
             <Hero />
             <FrameArt />
-            <Suspense fallback={<div>Loading...</div>} >
+            <Suspense fallback={<div>Loading...</div>}>
                 <PopularItems />
             </Suspense>
             <EnhanceArt />

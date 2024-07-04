@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useEffect } from "react";
 import { CartItem, CartItemType } from "./CartItem";
 import { Button } from "@/components/ui/button";
@@ -6,12 +6,12 @@ import Image from "next/image";
 import RazorpayLogo from "@/assets/Razorpay_logo.svg";
 import { useSession } from "next-auth/react";
 
-export const Cart = ({ cartItems }: { cartItems: CartItemType['item'][] }) => {
+export const Cart = ({ cartItems }: { cartItems: CartItemType["item"][] }) => {
     const session = useSession();
 
     return (
-        <div className="mx-auto w-11/12 max-w-full grid lg:grid-cols-3 gap-6 p-0 m-0">
-            <div className="w-full lg:col-span-2 rounded-2xl border border-solid border-[#f1f1f1]  px-4 pb-14">
+        <div className="m-0 mx-auto grid w-11/12 max-w-full gap-6 p-0 lg:grid-cols-3">
+            <div className="w-full rounded-2xl border border-solid border-[#f1f1f1] px-4 pb-14 lg:col-span-2">
                 <div className="py-10">
                     <h2 className="mb-5 text-3xl font-semibold">My Cart</h2>
                     <div className="h-[1px] w-full bg-[#f1f1f1]" />

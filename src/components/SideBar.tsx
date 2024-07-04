@@ -28,8 +28,9 @@ const Sidebar = ({ toggle, links, showSideBar, currentUser, pathname, barRef }: 
             )}
             <div
                 ref={barRef}
-                className={`fixed top-0 z-30 h-screen w-48 bg-white px-5 text-right shadow-xl duration-300 ease-in-out md:hidden ${showSideBar ? "right-0" : "right-[-100%]"
-                    }`}
+                className={`fixed top-0 z-30 h-screen w-48 bg-white px-5 text-right shadow-xl duration-300 ease-in-out md:hidden ${
+                    showSideBar ? "right-0" : "right-[-100%]"
+                }`}
             >
                 <div className="flex h-full flex-col justify-between pb-7">
                     <div>
@@ -70,7 +71,9 @@ const Sidebar = ({ toggle, links, showSideBar, currentUser, pathname, barRef }: 
                             <>
                                 <Button
                                     size={"sm"}
-                                    onClick={async () => { await signOut({ redirect: true }); }}
+                                    onClick={async () => {
+                                        await signOut({ redirect: true });
+                                    }}
                                     className="h-min w-min py-5 transition-all duration-200 active:scale-90"
                                 >
                                     Sign Out
