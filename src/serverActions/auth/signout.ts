@@ -1,7 +1,8 @@
 "use server";
-import { cookies } from "next/headers";
+import { signOut } from "next-auth/react";
+import { redirect } from "next/dist/server/api-utils";
 
 export const signOutAction = async () => {
-    cookies().delete("session_id");
-    // redirect("/");
+    signOut();
+    //redirect("/")
 };

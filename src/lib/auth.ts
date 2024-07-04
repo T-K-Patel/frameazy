@@ -1,9 +1,8 @@
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcrypt";
 import Google from "next-auth/providers/google";
-import { PrismaClient } from "@prisma/client";
+import { db } from "../../prisma/db";
 
-const db: PrismaClient = new PrismaClient();
 export const authOptions = {
     providers: [
         CredentialsProvider({
@@ -36,6 +35,7 @@ export const authOptions = {
                 try {
                     const user = await db.user.create({
                         data: {
+                            id: Math.random().toString(),
                             email: credentials.email,
                             password: hashedPassword,
                             auth_type: "Credentials",

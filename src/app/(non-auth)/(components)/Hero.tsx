@@ -3,6 +3,7 @@ import React from "react";
 import heroImage from "@/assets/hero_img.png";
 import { BsArrowRight } from "react-icons/bs";
 import { Button } from "@/components/ui/button";
+import SelectFrame from "@/components/SelectFrame";
 
 function Hero() {
     return (
@@ -15,14 +16,7 @@ function Hero() {
                             Frameazy Where Your Imagination Meets Our Craftsmanship. Our Passion is Crafting Beautiful
                             Frames, Personalized Just for You. Explore Endless Possibilities
                         </p>
-                        <Button
-                            size={"sm"}
-                            variant={"light"}
-                            className="mt-8 h-min w-min px-8 py-4 text-xl font-semibold transition-all duration-200 active:scale-90"
-                        >
-                            Start Framing
-                            <BsArrowRight />
-                        </Button>
+                        <SelectFrame/>
                     </div>
                     <div className="flex w-full flex-1 justify-center md:justify-end">
                         <Image
