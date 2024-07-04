@@ -9,20 +9,18 @@ import Logo from "@/assets/frameasy-logo.png";
 import Sidebar from "@/components/SideBar";
 import { Button } from "@/components/ui/button";
 import { signOutAction } from "@/serverActions/auth/signout";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 
 const Navbar = () => {
     const [showSideBar, setShowSideBar] = useState(false);
     const pathname = usePathname();
     const sideBarRef = React.useRef<HTMLDivElement>(null);
-    const session=useSession();
+    const session = useSession();
 
     const handleOutSideClick = useCallback(
         (e: MouseEvent) => {
             if (sideBarRef.current && !sideBarRef.current.contains(e.target as Node) && showSideBar) {
                 setShowSideBar(false);
-            } else {
-                console.log(sideBarRef.current, e.target, showSideBar);
             }
         },
         [showSideBar],
@@ -64,10 +62,10 @@ const Navbar = () => {
         },
     ];
     return (
-        <>
-            <nav className="mx-auto flex h-[100px] w-[89%] items-center justify-between">
+        <header className="max-w-screen-2xl mx-auto">
+            <nav className="w-11/12 mx-auto flex h-[100px] items-center justify-between">
                 <a href="/">
-                    <Image src={Logo} alt="logo" loading="lazy" />
+                    <Image src={Logo} alt="logo" priority />
                 </a>
                 <ul className="hidden gap-5 md:flex">
                     {links.map((link) => (
@@ -101,11 +99,11 @@ const Navbar = () => {
                             <BsCart3 size={30} />
                             <p className="text-xl font-semibold">Cart</p>
                         </Link>
-                        <form action={signOutAction}>
-                            <Button size={"sm"} className="w-fit p-3 px-5 transition-all duration-200 active:scale-90">
+                        <>
+                            <Button size={"sm"} onClick={async () => { await signOut({ redirect: true }); }} className="w-fit p-3 px-5 transition-all duration-200 active:scale-90">
                                 Sign Out
                             </Button>
-                        </form>
+                        </>
                     </div>
                 )}
                 <div
@@ -125,7 +123,7 @@ const Navbar = () => {
                 currentUser={session.data?.user}
                 pathname={pathname}
             />
-        </>
+        </header>
     );
 };
 

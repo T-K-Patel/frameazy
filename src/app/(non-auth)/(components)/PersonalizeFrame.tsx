@@ -15,7 +15,7 @@ type PersonalArtItemProps = {
 const PersonalArtItem = ({ img, title, desc }: PersonalArtItemProps) => {
     return (
         <div className="w-[387px] text-black">
-            <Image src={img} alt="" className="h-[191px] w-[387px] rounded-t-xl" />
+            <Image src={img} alt="" width={img.width} height={img.height} className="h-[191px] w-[387px] rounded-t-xl" />
             <div className="rounded-b-xl bg-white px-5 py-5">
                 <h2 className="pb-3 text-2xl font-semibold">{title}</h2>
                 <p className="font-light">{desc}</p>
@@ -27,7 +27,7 @@ const PersonalArtItem = ({ img, title, desc }: PersonalArtItemProps) => {
 const PersonalizeFrame = () => {
     return (
         <section className="bg-blue-1 py-20 text-white">
-            <div className="mx-auto w-[89%]">
+            <div className="mx-auto w-11/12 max-w-screen-2xl">
                 <div className="mx-auto max-w-[880px] text-center">
                     <h2 className="mb-5 text-4xl">Personalize your Frame</h2>
                     <p>

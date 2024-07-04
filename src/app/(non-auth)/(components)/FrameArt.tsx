@@ -5,7 +5,7 @@ import { BsArrowRight } from "react-icons/bs";
 
 const FrameArt = () => {
     return (
-        <div className="mx-auto my-20 flex w-[89%] flex-col gap-5 md:flex-row">
+        <div className="mx-auto my-20 flex w-11/12 max-w-screen-2xl flex-col gap-5 md:flex-row">
             <div className="mb-5 flex flex-1 flex-col items-start justify-center md:mb-0">
                 <h2 className="mb-6 text-4xl font-semibold lg:w-[450px]">The Art of Framing with Frameazy</h2>
                 <p>

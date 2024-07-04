@@ -4,6 +4,7 @@ import { BsCart3 } from "react-icons/bs";
 import Link from "next/link";
 import { signOutAction } from "@/serverActions/auth/signout";
 import { Button } from "./ui/button";
+import { signOut } from "next-auth/react";
 
 type SideBarPropType = {
     toggle: () => void;
@@ -27,9 +28,8 @@ const Sidebar = ({ toggle, links, showSideBar, currentUser, pathname, barRef }: 
             )}
             <div
                 ref={barRef}
-                className={`fixed top-0 z-30 h-screen w-48 bg-white px-5 text-right shadow-xl duration-300 ease-in-out md:hidden ${
-                    showSideBar ? "right-0" : "right-[-100%]"
-                }`}
+                className={`fixed top-0 z-30 h-screen w-48 bg-white px-5 text-right shadow-xl duration-300 ease-in-out md:hidden ${showSideBar ? "right-0" : "right-[-100%]"
+                    }`}
             >
                 <div className="flex h-full flex-col justify-between pb-7">
                     <div>
@@ -67,14 +67,15 @@ const Sidebar = ({ toggle, links, showSideBar, currentUser, pathname, barRef }: 
                                 <BsCart3 size={30} />
                                 <p className="text-xl font-semibold">Cart</p>
                             </Link>
-                            <form action={signOutAction}>
+                            <>
                                 <Button
                                     size={"sm"}
+                                    onClick={async () => { await signOut({ redirect: true }); }}
                                     className="h-min w-min py-5 transition-all duration-200 active:scale-90"
                                 >
                                     Sign Out
                                 </Button>
-                            </form>
+                            </>
                         </div>
                     )}
                 </div>

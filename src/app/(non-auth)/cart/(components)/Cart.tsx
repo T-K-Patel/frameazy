@@ -1,26 +1,17 @@
-import React from "react";
-import { CartItem } from "./CartItem";
+"use client"
+import React, { useEffect } from "react";
+import { CartItem, CartItemType } from "./CartItem";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import RazorpayLogo from "@/assets/Razorpay_logo.svg";
+import { useSession } from "next-auth/react";
 
-export const Cart = () => {
-    const [cartItems, onAdd, onRemove] = [
-        [
-            {
-                id: "string",
-                productName: "Product Name",
-                productImage: "helloimage",
-                productPrice: 983,
-                qty: 5,
-            },
-        ],
-        () => {},
-        () => {},
-    ];
+export const Cart = ({ cartItems }: { cartItems: CartItemType['item'][] }) => {
+    const session = useSession();
+
     return (
-        <div className="mx-auto flex w-[89%] flex-col gap-6 xl:flex-row">
-            <div className="flex-1 rounded-2xl border border-solid border-[#f1f1f1] px-8 pb-14">
+        <div className="mx-auto w-11/12 max-w-full grid lg:grid-cols-3 gap-6 p-0 m-0">
+            <div className="w-full lg:col-span-2 rounded-2xl border border-solid border-[#f1f1f1]  px-4 pb-14">
                 <div className="py-10">
                     <h2 className="mb-5 text-3xl font-semibold">My Cart</h2>
                     <div className="h-[1px] w-full bg-[#f1f1f1]" />
@@ -28,12 +19,12 @@ export const Cart = () => {
                 {cartItems.length === 0 && <p className="font-semi-bold text-center text-2xl">Your cart is empty!</p>}
                 <div className="flex flex-col gap-4">
                     {cartItems.map((item) => (
-                        <CartItem key={item.id} item={item} onAdd={onAdd} onRemove={onRemove} />
+                        <CartItem key={item.id} item={item} />
                     ))}
                 </div>
                 <button className="mt-10 px-6 py-4 text-xl font-semibold">Cancel Orders</button>
             </div>
-            <div className="w-[425px]">
+            <div className="w-full">
                 <h1 className="mb-2 text-3xl font-semibold">Payment Details</h1>
                 <p>Complete your purchase item by providing your payment details order.</p>
                 <form action="" className="mt-5 flex flex-col gap-5">

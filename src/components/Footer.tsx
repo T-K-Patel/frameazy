@@ -1,12 +1,36 @@
+"use client"
 import Logo from "../assets/frameasy-logo.png";
 import { BsFacebook, BsInstagram, BsTelephoneFill, BsTwitter } from "react-icons/bs";
 import { FaEnvelope, FaLocationDot } from "react-icons/fa6";
 import Image from "next/image";
 import { Button } from "./ui/button";
+import { useFormState, useFormStatus } from "react-dom";
+import { subscribeNewsLetterAction } from "@/serverActions/subscribe-news-letter";
+import { useRef } from "react";
+
+const SubscribeButton = () => {
+    const { pending } = useFormStatus();
+    return (
+        <Button size={"sm"} className="h-12 w-max p-4 px-8 uppercase max-xs:w-full lg:h-14" disabled={pending}>
+            Subscribe
+        </Button>
+    )
+}
 
 const Footer = () => {
+
+
+    const formRef = useRef<HTMLFormElement>(null);
+    const [state, action] = useFormState(subscribeNewsLetterAction, { data: null, error: null });
+
+    if (state.data) {
+        alert(state.data);
+        formRef.current?.reset();
+    }
+    if (state.error) alert(state.error);
+
     return (
-        <>
+        <footer className="max-w-screen-2xl mx-auto">
             <div className="mx-auto mt-20 w-11/12">
                 <div className="flex flex-col items-start justify-between gap-5 md:flex-row md:items-center">
                     <div className="flex-1">
@@ -15,16 +39,14 @@ const Footer = () => {
                             We’ll send you a nice letter once per week. No spam
                         </p>
                     </div>
-                    <form className="flex w-fit rounded-xl bg-black bg-opacity-[0.1] max-md:w-full max-xs:flex-col">
+                    <form ref={formRef} action={action} className="flex w-fit rounded-xl bg-black bg-opacity-[0.1] max-md:w-full max-xs:flex-col">
                         <input
                             type="email"
+                            required
                             placeholder="Enter your email"
                             className="h-12 w-full bg-transparent px-5 py-4 outline-none md:w-fit lg:h-14"
                         />
-                        {/* <Button */}
-                        <Button size={"sm"} className="h-12 w-max p-4 px-8 uppercase max-xs:w-full lg:h-14">
-                            Subscribe
-                        </Button>
+                        <SubscribeButton />
                     </form>
                 </div>
                 <div className="my-16 flex flex-col items-start justify-between gap-10 md:flex-row md:items-center">
@@ -58,14 +80,14 @@ const Footer = () => {
                     </div>
                 </div>
             </div>
-            <div className="border-t-2 border-solid border-[#f1f1f1]">
-                <div className="mx-auto my-9 flex w-[89%] flex-col justify-start gap-5 font-semibold md:flex-row md:justify-between">
+            <div className="w-11/12  mx-auto border-t-2 border-solid border-[#f1f1f1]">
+                <div className="mx-auto my-9 flex flex-col justify-start gap-5 font-semibold md:flex-row md:justify-between">
                     <p>&copy;{new Date().getFullYear()} Copyright by Frameazy</p>
-                    <Image src={Logo} alt="logo" loading="lazy" className="w-[132px]" />
+                    <Image src={Logo} alt="logo" loading="lazy" className="w-36" />
                     <p>Terms, Privacy policy</p>
                 </div>
             </div>
-        </>
+        </footer>
     );
 };
 

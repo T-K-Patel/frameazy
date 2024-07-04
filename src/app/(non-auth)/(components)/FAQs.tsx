@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useState } from "react";
 import { BsPlus } from "react-icons/bs";
 import { BiMinus } from "react-icons/bi";
@@ -81,7 +81,7 @@ const FAQ = () => {
     };
 
     return (
-        <div className="mx-auto mt-10 w-[89%] lg:mt-16">
+        <div className="mx-auto mt-10 w-5/6 max-w-screen-2xl max-md:w-11/12 lg:mt-16">
             <h2 className="mb-6 text-center text-xl font-semibold md:text-3xl lg:text-[40px]">
                 Frequently Asked Questions
             </h2>

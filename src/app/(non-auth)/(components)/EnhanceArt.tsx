@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 
 const EnhanceArt = () => {
     return (
-        <div className="mx-auto my-20 flex w-[89%] flex-col gap-5 md:flex-row">
+        <div className="mx-auto my-20 flex w-11/12 max-w-screen-2xl flex-col gap-5 md:flex-row">
             <div className="flex flex-1 justify-end">
                 <Image src={ArtImg} alt="frame" loading="lazy" className="rounded-xl object-cover" />
             </div>
