@@ -9,11 +9,13 @@ import Logo from "@/assets/frameasy-logo.png";
 import Sidebar from "@/components/SideBar";
 import { Button } from "@/components/ui/button";
 import { signOutAction } from "@/serverActions/auth/signout";
+import { useSession } from "next-auth/react";
 
-const Navbar = ({ cookie }: { cookie: string }) => {
+const Navbar = () => {
     const [showSideBar, setShowSideBar] = useState(false);
     const pathname = usePathname();
     const sideBarRef = React.useRef<HTMLDivElement>(null);
+    const session=useSession();
 
     const handleOutSideClick = useCallback(
         (e: MouseEvent) => {
@@ -81,7 +83,7 @@ const Navbar = ({ cookie }: { cookie: string }) => {
                         </li>
                     ))}
                 </ul>
-                {!cookie && (
+                {!session.data?.user && (
                     <div className="text-dark-blue hidden items-center gap-5 font-bold md:flex">
                         <Link href="/login" className="hover:underline">
                             Log in
@@ -93,7 +95,7 @@ const Navbar = ({ cookie }: { cookie: string }) => {
                         </Link>
                     </div>
                 )}
-                {cookie && (
+                {session.data?.user && (
                     <div className="hidden w-min items-center gap-5 md:flex">
                         <Link href="/cart" className="text-dark-blue flex items-center gap-3">
                             <BsCart3 size={30} />
@@ -120,7 +122,7 @@ const Navbar = ({ cookie }: { cookie: string }) => {
                 toggle={toggleSidebar}
                 showSideBar={showSideBar}
                 links={links}
-                currentUser={cookie}
+                currentUser={session.data?.user}
                 pathname={pathname}
             />
         </>

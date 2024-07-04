@@ -1,6 +1,4 @@
 "use client";
-import AddArtwork from "@/components/AddArtwork";
-import Navbar from "@/components/Navbar";
 import FAQ from "@/components/FAQs";
 import Hero from "./(components)/Hero";
 import FrameArt from "@/app/(components)/FrameArt";

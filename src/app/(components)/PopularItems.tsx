@@ -10,7 +10,7 @@ import Link from "next/link";
 
 const PopularItems = () => {
     return (
-        <div className="mx-auto w-[89%]" id="explore">
+        <div className="mx-auto w-[89%] items-center" id="explore">
             <div className="flex items-center justify-between font-semibold">
                 <h2 className="text-2xl md:text-4xl">Popular Items</h2>
                 <Link href="/frames" className="text-dark-blue hover:underline md:text-xl">
@@ -21,7 +21,7 @@ const PopularItems = () => {
                 slidesPerView={1}
                 spaceBetween={10}
                 navigation={true}
-                autoplay={{ delay: 1500 }}
+                autoplay={{ delay: 3000 }}
                 modules={[Navigation, Autoplay]}
                 breakpoints={{
                     640: {

@@ -55,7 +55,7 @@ const LoginPage = () => {
                 <Link className='w-auto h-auto font-semibold text-xs leading-[21px]' href={"/forgotPassword"}>Forgot Password?</Link>
             </div>
             <div className='w-full h-auto flex flex-col gap-y-5'>
-                <Button size={"lg"} className='w-full' onClick={async()=>{signIn("credentials",{email:email,password:password})}}>Login</Button>
+                <Button size={"lg"} className='w-full' onClick={async()=>{await signIn("credentials",{email:email,password:password}); redirect("/")}}>Login</Button>
                 <div className='w-auto h-auto flex gap-x-2'>
                     <div className='w-auto h-full text-sm leading-auto text-black'>
                     New User? 

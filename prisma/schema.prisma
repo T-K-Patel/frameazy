@@ -35,6 +35,13 @@ model Order {
   price  Int
 }
 
+model Message {
+  id      String @id @map("_id")
+  message String
+  name    String
+  email   String
+}
+
 enum AuthType {
   Google
   Credentials
