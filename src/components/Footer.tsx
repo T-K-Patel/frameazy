@@ -40,11 +40,12 @@ const Footer = () => {
                     <form
                         ref={formRef}
                         action={action}
-                        className="flex w-fit rounded-xl bg-black bg-opacity-[0.1] max-md:w-full max-xs:flex-col"
+                        className="flex w-fit overflow-hidden rounded-xl bg-black bg-opacity-[0.1] max-md:w-full max-xs:flex-col"
                     >
                         <input
                             type="email"
                             required
+                            name="email"
                             placeholder="Enter your email"
                             className="h-12 w-full bg-transparent px-5 py-4 outline-none md:w-fit lg:h-14"
                         />

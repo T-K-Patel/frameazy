@@ -49,20 +49,39 @@ const ContactPage = () => {
                     <form ref={formRef} action={action} className="flex h-auto w-full flex-col gap-y-7">
                         <div className="flex h-auto w-full flex-col gap-y-4">
                             <div className="flex h-auto w-full flex-col gap-y-2">
-                                <Label>Name *</Label>
-                                <Input placeholder="Jane doe" type="text" className="w-full p-4" required />
+                                <Label htmlFor="cu-name">Name *</Label>
+                                <Input
+                                    id="cu-name"
+                                    maxLength={100}
+                                    placeholder="Jane doe"
+                                    name="name"
+                                    type="text"
+                                    className="w-full p-4"
+                                    required
+                                />
                             </div>
                             <div className="flex h-auto w-full flex-col gap-y-2">
-                                <Label>Email *</Label>
-                                <Input placeholder="Mail@simple.com" type="email" className="w-full p-4" required />
+                                <Label htmlFor="cu-email">Email *</Label>
+                                <Input
+                                    id="cu-email"
+                                    maxLength={100}
+                                    placeholder="Mail@simple.com"
+                                    name="email"
+                                    type="email"
+                                    className="w-full p-4"
+                                    required
+                                />
                             </div>
                             <div className="flex h-auto w-full flex-col gap-y-2">
-                                <Label>Message *</Label>
+                                <Label htmlFor="cu-message">Message *</Label>
                                 <Textarea
+                                    id="cu-message"
+                                    name="message"
                                     placeholder="Your message goes here"
                                     className="w-full p-4 md:p-4"
                                     rows={5}
                                     required
+                                    maxLength={1000}
                                 />
                             </div>
                             {state?.error && (
