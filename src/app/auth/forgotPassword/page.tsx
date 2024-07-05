@@ -56,7 +56,7 @@ const ForgotPage = () => {
                                     Click to resend
                                 </button>
                             </div>
-                            <Link className="flex h-auto w-auto justify-center gap-x-3" href="/login">
+                            <Link className="flex h-auto w-auto justify-center gap-x-3" href="/auth/login">
                                 <ArrowLeft />
                                 <div className="h-auto w-[155px] font-semibold leading-[24px]">Back to Sign in</div>
                             </Link>
@@ -108,7 +108,7 @@ const ForgotPage = () => {
                         >
                             Reset Password
                         </Button>
-                        <Link className="flex h-auto w-auto justify-center gap-x-3" href="/login">
+                        <Link className="flex h-auto w-auto justify-center gap-x-3" href="/auth/login">
                             <ArrowLeft />
                             <div className="h-auto w-[155px] font-semibold leading-[24px]">Back to Sign in</div>
                         </Link>

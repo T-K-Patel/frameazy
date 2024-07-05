@@ -1,10 +1,9 @@
-"use client";
-import { SessionProvider } from "next-auth/react";
 import Image from "next/image";
 import React from "react";
 import AuthImage from "@/assets/frame-sign.png";
 
-const layout = ({ children }: { children: React.ReactNode }) => {
+const layout = async ({ children }: { children: React.ReactNode }) => {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     return (
         <div className="grid h-screen md:grid-cols-2">
             <div className="h-screen">{children}</div>
