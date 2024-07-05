@@ -15,7 +15,6 @@ const NewPassword = () => {
     const session = useSession();
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
-    const [match, setMatch] = useState(false);
     const [success, setSuccess] = useState(false);
 
     useEffect(() => {
@@ -23,13 +22,6 @@ const NewPassword = () => {
             redirect("/", RedirectType.replace);
         }
     }, [session]);
-
-    useEffect(() => {
-        if (password === confirmPassword) setMatch(true);
-        else {
-            setMatch(false);
-        }
-    }, [confirmPassword, password]);
 
     if (success)
         return (
@@ -78,6 +70,7 @@ const NewPassword = () => {
                             <div className="flex h-auto w-full flex-col gap-y-2">
                                 <Label htmlFor="password">Password</Label>
                                 <Input
+                                    id="password"
                                     type="password"
                                     value={password}
                                     onChange={(e) => {
@@ -88,8 +81,9 @@ const NewPassword = () => {
                                 />
                             </div>
                             <div className="flex h-auto w-full flex-col gap-y-2">
-                                <Label htmlFor="confirmPassword">Password</Label>
+                                <Label htmlFor="confirmPassword">Confirm Password</Label>
                                 <Input
+                                    id="confirmPassword"
                                     type="text"
                                     value={confirmPassword}
                                     onChange={(e) => {
@@ -100,14 +94,6 @@ const NewPassword = () => {
                                 />
                             </div>
                         </div>
-                        {!match && (
-                            <Link
-                                className="h-auto w-auto text-xs font-semibold leading-[21px] text-red-600"
-                                href={"/forgotPassword"}
-                            >
-                                Password does not Match
-                            </Link>
-                        )}
                     </div>
                     <div className="flex h-auto w-full flex-col gap-y-8">
                         <Button
@@ -119,7 +105,7 @@ const NewPassword = () => {
                         >
                             Confirm
                         </Button>
-                        <Link className="flex h-auto w-auto justify-center gap-x-3" href="/login">
+                        <Link className="flex h-auto w-auto justify-center gap-x-3" href="/auth/login">
                             <ArrowLeft />
                             <div className="h-auto w-[155px] font-semibold leading-[24px]">Back to Sign in</div>
                         </Link>

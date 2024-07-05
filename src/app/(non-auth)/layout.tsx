@@ -4,7 +4,7 @@ import { Metadata } from "next";
 import React from "react";
 
 export const metadata: Metadata = {
-    title: "Frameazy | You dream, we deliver",
+    title: "Frameazy | You Choose, We deliver",
     description: "Customise your own frames with Frameazy. We deliver your dream frames to your doorstep.",
     keywords: [
         "frameazy",

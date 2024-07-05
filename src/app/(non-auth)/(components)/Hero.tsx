@@ -1,9 +1,7 @@
 import Image from "next/image";
 import React from "react";
 import heroImage from "@/assets/hero_img.png";
-import { BsArrowRight } from "react-icons/bs";
-import { Button } from "@/components/ui/button";
-import SelectFrame from "@/components/SelectFrame";
+import SelectFrame from "@/components/customizing/SelectFrame";
 
 function Hero() {
     return (
@@ -16,7 +14,7 @@ function Hero() {
                             Frameazy Where Your Imagination Meets Our Craftsmanship. Our Passion is Crafting Beautiful
                             Frames, Personalized Just for You. Explore Endless Possibilities
                         </p>
-                        <SelectFrame/>
+                        <SelectFrame />
                     </div>
                     <div className="flex w-full flex-1 justify-center md:justify-end">
                         <Image

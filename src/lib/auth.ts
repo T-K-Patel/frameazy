@@ -2,8 +2,13 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcrypt";
 import Google from "next-auth/providers/google";
 import { db } from "../../prisma/db";
+import { AuthOptions } from "next-auth";
 
-export const authOptions = {
+if (!process.env.NEXTAUTH_SECRET) {
+    throw new Error("NEXTAUTH_SECRET is not defined");
+}
+
+export const authOptions: AuthOptions = {
     providers: [
         CredentialsProvider({
             name: "Credentials",
@@ -25,7 +30,7 @@ export const authOptions = {
                     const passwordValidation = await bcrypt.compare(credentials.password, existingUser.password);
                     if (passwordValidation) {
                         return {
-                            id: existingUser.id.toString(),
+                            id: existingUser.id,
                             name: existingUser.name,
                             email: existingUser.email,
                         };
@@ -35,7 +40,6 @@ export const authOptions = {
                 try {
                     const user = await db.user.create({
                         data: {
-                            id: Math.random().toString(),
                             email: credentials.email,
                             password: hashedPassword,
                             auth_type: "Credentials",
@@ -43,7 +47,7 @@ export const authOptions = {
                     });
 
                     return {
-                        id: user.id.toString(),
+                        id: user.id,
                         name: user.name,
                         email: user.email,
                     };
@@ -57,9 +61,9 @@ export const authOptions = {
             clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
         }),
     ],
-    secret: process.env.NEXTAUTH_SECRET || "secret",
+    secret: process.env.NEXTAUTH_SECRET,
     pages: {
-        signIn: "/login",
-        signUp: "/signup",
+        signIn: "/auth/login",
+        signOut: "/",
     },
 };

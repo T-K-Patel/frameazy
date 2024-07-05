@@ -52,10 +52,10 @@ const Sidebar = ({ toggle, links, showSideBar, currentUser, pathname, barRef }: 
                     </div>
                     {!currentUser && (
                         <div className="text-dark-blue flex h-[300px] flex-col items-center justify-end gap-5 font-bold">
-                            <Link href="login" className="hover:underline">
+                            <Link href="/auth/login" className="hover:underline">
                                 Log in
                             </Link>
-                            <Link href="/signup">
+                            <Link href="/auth/signup">
                                 <Button size={"sm"} className="w-min py-1 transition-all duration-200 active:scale-90">
                                     Get Started
                                 </Button>

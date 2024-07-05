@@ -83,10 +83,10 @@ const Navbar = () => {
                 </ul>
                 {!session.data?.user && (
                     <div className="text-dark-blue hidden items-center gap-5 font-bold md:flex">
-                        <Link href="/login" className="hover:underline">
+                        <Link href="/auth//login" className="hover:underline">
                             Log in
                         </Link>
-                        <Link href="/signup">
+                        <Link href="auth//signup">
                             <Button size={"sm"} className="w-min py-1 transition-all duration-200 active:scale-90">
                                 Get Started
                             </Button>

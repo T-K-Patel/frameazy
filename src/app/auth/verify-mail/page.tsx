@@ -7,7 +7,8 @@ import Logo from "../../../assets/Logo.svg";
 import Arrow from "../../../assets/arrow.svg";
 import { ArrowLeft } from "lucide-react";
 
-const MailVerify = () => {
+const Page = ({ searchParams }: { searchParams: any }) => {
+    console.log("Search Params", searchParams);
     const email = ""; //TODO extract email
     return (
         <div>
@@ -41,7 +42,7 @@ const MailVerify = () => {
                                     Click to resend
                                 </button>
                             </div>
-                            <Link className="flex h-auto w-auto justify-center gap-x-3" href="/login">
+                            <Link className="flex h-auto w-auto justify-center gap-x-3" href="/auth/login">
                                 <ArrowLeft />
                                 <div className="h-auto w-[155px] font-semibold leading-[24px]">Back to Sign in</div>
                             </Link>
@@ -53,4 +54,4 @@ const MailVerify = () => {
     );
 };
 
-export default MailVerify;
+export default Page;

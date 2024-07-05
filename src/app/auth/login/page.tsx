@@ -80,7 +80,7 @@ const LoginPage = () => {
                                 />
                             </div>
                         </div>
-                        <Link className="w-auto text-xs font-semibold leading-[21px]" href={"/forgotPassword"}>
+                        <Link className="w-auto text-xs font-semibold leading-[21px]" href={"forgotPassword"}>
                             Forgot Password?
                         </Link>
                     </div>
@@ -89,6 +89,7 @@ const LoginPage = () => {
                             size={"lg"}
                             className="w-full"
                             onClick={async () => {
+                                console.log("email", email, "password", password);
                                 await signIn("credentials", { email: email, password: password });
                                 redirect("/");
                             }}
@@ -99,7 +100,7 @@ const LoginPage = () => {
                             <div className="leading-auto h-full w-auto text-sm text-black">New User?</div>
                             <Link
                                 className="leading-auto h-full w-auto text-sm font-semibold text-blue-1"
-                                href={"/signup"}
+                                href={"/auth/signup"}
                             >
                                 Create an Account
                             </Link>
