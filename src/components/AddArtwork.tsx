@@ -4,12 +4,13 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import Upload from "../assets/upload.svg";
 import Image from "next/image";
+import { Label } from "./ui/label";
 
 const AddArtwork = () => {
     return (
         <Dialog>
             <DialogTrigger>
-                <p className="md: border-[1px] border-blue-1 bg-white py-3 text-black hover:bg-blue-1/20">
+                <p className="border-[1px] border-opacity-5 rounded-lg overflow-hidden border-blue-1 bg-white p-3 text-blue-1 hover:bg-gray-1">
                     Add Artwork
                 </p>
             </DialogTrigger>
@@ -43,7 +44,10 @@ const AddArtwork = () => {
                             <div className="h-[15px] w-auto align-middle text-xs/[10px] font-semibold leading-[15px] md:h-[30px] md:text-xl md:leading-[30px]">
                                 Add Artwork
                             </div>
-                            <Image src={Upload} alt="upload" className="h-[91.68px] w-full md:h-[185px]" />
+                            <Label>
+                                <Image src={Upload} alt="upload" className="h-[91.68px] w-full md:h-[185px] cursor-pointer" />
+                                <Input type="file" accept="image/*" className="hidden"/>
+                            </Label>
                         </div>
                     </div>
                     <Button
