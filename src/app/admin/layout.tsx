@@ -1,12 +1,7 @@
-import { Poppins } from "next/font/google";
-import "./globals.css";
-import ContextProviders from "@/context/ContextProviders";
+import Navbar from "@/components/Navbar";
 import { Metadata } from "next";
+import React from "react";
 
-const poppins = Poppins({
-    weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
-    subsets: ["latin"],
-});
 export const metadata: Metadata = {
     title: "Frameazy | You Choose, We deliver",
     description: "Customise your own frames with Frameazy. We deliver your dream frames to your doorstep.",
@@ -95,18 +90,12 @@ export const metadata: Metadata = {
         creator: "@frameazy",
     },
 };
-export default function RootLayout({
-    children,
-}: Readonly<{
-    children: React.ReactNode;
-}>) {
+
+export default function Layout({ children }: { children: React.ReactNode }) {
     return (
-        <html lang="en">
-            <body className={poppins.className}>
-                <ContextProviders>
-                    <div className="_next">{children}</div>
-                </ContextProviders>
-            </body>
-        </html>
+        <>
+            <Navbar />
+            {children}
+        </>
     );
 }

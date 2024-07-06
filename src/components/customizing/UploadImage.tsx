@@ -3,7 +3,7 @@ import React, { ChangeEvent, DragEvent, useState } from "react";
 import UploadIcon from "@/assets/upload.svg";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
-import { useFrames } from "../frames-context";
+import { useFrames } from "@/context/frames-context";
 
 function UploadImage() {
     const [error, setError] = useState(null as string | null);

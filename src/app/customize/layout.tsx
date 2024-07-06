@@ -1,6 +1,6 @@
 "use client";
-import { useFrames } from "@/components/frames-context";
-import { redirect, RedirectType, usePathname, useRouter } from "next/navigation";
+import { useFrames } from "@/context/frames-context";
+import { redirect, RedirectType, usePathname } from "next/navigation";
 import React from "react";
 import CNavBar from "./CNavBar";
 import { useSession } from "next-auth/react";
@@ -9,7 +9,6 @@ function Layout({ children }: { children: React.ReactNode }) {
     const session = useSession();
 
     const { frameOptions: framing } = useFrames();
-    const router = useRouter();
     const pathname = usePathname();
     if (session.status == "loading") {
         return <></>;

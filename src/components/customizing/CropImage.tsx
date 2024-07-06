@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useFrames } from "../frames-context";
+import { useFrames } from "@/context/frames-context";
 import NextImage from "next/image";
 
 function CropImage() {

@@ -9,7 +9,7 @@ import Empty from "@/assets/empty.svg";
 import Mirror from "@/assets/mirror.svg";
 import Canvas from "@/assets/canvas.svg";
 import Paper from "@/assets/paper.svg";
-import { useFrames } from "../frames-context";
+import { useFrames } from "@/context/frames-context";
 import { BiRepeat } from "react-icons/bi";
 import { cn } from "@/lib/utils";
 import UploadImage from "./UploadImage";
