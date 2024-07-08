@@ -14,14 +14,8 @@ type PersonalArtItemProps = {
 
 const PersonalArtItem = ({ img, title, desc }: PersonalArtItemProps) => {
     return (
-        <div className="w-[387px] text-black">
-            <Image
-                src={img}
-                alt=""
-                width={img.width}
-                height={img.height}
-                className="h-[191px] w-[387px] rounded-t-xl"
-            />
+        <div className="h-full w-full max-w-[350px] text-black">
+            <Image src={img} alt="" className="w-full rounded-t-xl" />
             <div className="rounded-b-xl bg-white px-5 py-5">
                 <h2 className="pb-3 text-2xl font-semibold">{title}</h2>
                 <p className="font-light">{desc}</p>
@@ -42,7 +36,7 @@ const PersonalizeFrame = () => {
                         personalization options to make your frames truly yours.
                     </p>
                 </div>
-                <div className="mt-10 flex flex-wrap justify-center gap-14 lg:flex-nowrap">
+                <div className="mx-auto mt-10 grid w-5/6 justify-center gap-14 lg:grid-cols-3">
                     <PersonalArtItem
                         img={Personal1}
                         title="Custom Placement"
@@ -59,14 +53,16 @@ const PersonalizeFrame = () => {
                         desc="Matting can enhance the presentation of your framed art. We provide options for you to select the matting that best complements your artwork and frames. This simple touch can make a world of difference."
                     />
                 </div>
-                <Button
-                    size={"sm"}
-                    variant={"light"}
-                    className="mx-auto mt-8 h-min w-min border border-white bg-transparent px-8 py-4 text-xl font-semibold text-white transition-all duration-200 active:scale-90"
-                >
-                    Get Started
-                    <BsArrowRight />
-                </Button>
+                <div className="flex justify-center pt-8">
+                    <Button
+                        size={"sm"}
+                        variant={"outline"}
+                        className="h-auto bg-transparent !px-8 !py-4 text-xl font-semibold text-white transition-all duration-200 active:scale-90"
+                    >
+                        Get Started
+                        <BsArrowRight />
+                    </Button>
+                </div>
             </div>
         </section>
     );

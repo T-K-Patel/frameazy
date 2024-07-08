@@ -1,95 +1,165 @@
-"use client"
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import React from 'react'
-import NextImage from "next/image"
-import Upload from "../../assets/upload.svg"
-import { Button } from '@/components/ui/button'
-import Checkbox from '@/components/Checkbox'
+"use client";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import React, { useEffect } from "react";
+import NextImage from "next/image";
+import Upload from "../../assets/upload.svg";
+import { Button } from "@/components/ui/button";
+import Checkbox from "@/components/Checkbox";
+import { useFormState, useFormStatus } from "react-dom";
+import { addProduct } from "@/serverActions/admin/addProduct.action";
 
-const FramseCategory=["Frame + single mat","Frame + double mats","Picture frames","Collages + single mat","Collages + double mats","Diplomas frames"];
-const FrameColors=["Aqua","Barnwood","Black","Blonde burl","Brown","Bronze","Burgundy","Charcoal","Clear Stain","Cherry","Gold","Coffee","Green","Grey","12x12","Honey"];
-const Collections=["Natural Wood Collection","Cloaseout pictures frames"];
+const FramseCategory = [
+    "Frame + single mat",
+    "Frame + double mats",
+    "Picture frames",
+    "Collages + single mat",
+    "Collages + double mats",
+    "Diplomas frames",
+];
+const FrameColors = [
+    "Aqua",
+    "Barnwood",
+    "Black",
+    "Blonde burl",
+    "Brown",
+    "Bronze",
+    "Burgundy",
+    "Charcoal",
+    "Clear Stain",
+    "Cherry",
+    "Gold",
+    "Coffee",
+    "Green",
+    "Grey",
+    "12x12",
+    "Honey",
+];
+const Collections = ["Natural Wood Collection", "Cloaseout pictures frames"];
+
+const SubmitButton = () => {
+    const { pending } = useFormStatus();
+    return (
+        <Button size={"lg"} className="h-auto w-full py-3 text-lg" disabled={pending}>
+            {pending ? "Uploading" : "Upload"}
+        </Button>
+    );
+};
 
 const AdminDashboard = () => {
+    const formRef = React.useRef<HTMLFormElement>(null);
+    const [state, action] = useFormState(addProduct, null);
 
-  return (
-    <section className='w-full h-full flex justify-center'>
-        <div className='w-4/5 h-auto flex flex-col gap-y-8 py-[1.5rem]'>
-           <h1 className='font-semibold text-3xl/[48px] leading-auto'>Admin Dashboard</h1>
-           <div className='w-full h-auto flex flex-col gap-y-11 lg:flex-row lg:gap-x-20'>
-            <section className='flex flex-col gap-y-7 w-full'>
-                <div className='flex flex-col gap-y-4 w-full'>
-                    <div className='flex flex-col gap-y-2'>
-                        <Label className='font-semibold text-xl leading-auto'>Product Name</Label>
-                        <Input className='w-full h-14' placeholder='Wooden frame'/>
-                    </div>
-                    <div className='flex flex-col gap-y-2'>
-                        <Label className='font-semibold text-xl leading-auto'>Price</Label>
-                        <Input className='w-full h-14' placeholder='$1,000,000'/>
-                    </div>
-                    <div className='flex flex-col gap-y-2'>
-                        <Label className='font-semibold text-xl leading-auto'>Product Image</Label>
-                        <Label className='cursor-pointer'>
-                            <NextImage src={Upload} alt='upload' className='w-[28rem]'/>
-                            <Input type='file' accept='image/*' className='hidden' onChange={()=>{}}/>
-                        </Label>
-                    </div>
-                </div>
-                <div>
-                    `<Button size={"lg"} className='w-full'>Upload</Button>
-                </div>
-            </section>
-            <section className='w-full flex flex-col gap-y-3'>
-                <h1 className='w-auto font-semibold text-2xl/10'>Product Attributes</h1>
-                <div className='w-full gap-y-12'>
-                   <section className='w-full grid grid-cols-2 justify-between'>
-                        <div className='flex flex-col gap-y-1 w-auto'>
-                            <Label className='font-semibold text-xl leading-auto'>Frames Category</Label>
-                            <ul className='flex flex-col gap-y-3 col-span-1'>
-                                {FramseCategory.map((item,index)=><Checkbox key={index} title={item}/>)}
-                            </ul>
-                        </div>
-                        <div className='flex flex-col gap-y-1 w-auto'>
-                            <Label className='font-semibold text-xl leading-auto'>Frames Colors</Label>
-                            <ul className='grid grid-cols-2 justify-between gap-y-2 col-span-1'>
-                                {FrameColors.map((item,index)=><Checkbox key={index} title={item}/>)}
-                            </ul>
-                        </div>
-                   </section>
-                   <section className='w-full flex justify-between mt-5'>
-                        <div className='flex flex-col gap-y-1'>
-                            <Label className='font-semibold text-xl leading-auto'>Product size</Label>
-                            <ul className='flex flex-col gap-y-5'>
-                                <a className='flex gap-x-11 items-center'>
-                                    <p>Width:</p>
-                                    <div className='flex gap-x-4 items-center'>
-                                        <Input className='w-[52px] h-8 rounded-lg overflow-hidden bg-[#F5F4F4] text-center' placeholder="0"/>
-                                        <h3 className='font-semibold'>In</h3>
-                                    </div>
-                                </a>
-                                <a className='flex gap-x-10 items-center'>
-                                    <p>Height:</p>
-                                    <div className='flex gap-x-4 items-center'>
-                                        <Input className='w-[52px] h-8 rounded-lg overflow-hidden bg-[#F5F4F4] text-center' placeholder="0"/>
-                                        <h3 className='font-semibold align-center'>In</h3>
-                                    </div>
-                                </a>
-                            </ul>    
-                        </div>  
-                        <div className='flex flex-col gap-y-1'>
-                            <Label className='font-semibold text-xl leading-auto'>Collections</Label>
-                            <ul className='flex flex-col gap-y-2'>
-                                {Collections.map((item,index)=><Checkbox key={index} title={item}/>)}
-                            </ul>    
-                        </div>  
-                   </section>
-                </div>
-            </section>
-           </div>
-        </div>
-    </section>
-  )
-}
+    if (state?.success) {
+        // Redirect to the product page
+        formRef.current?.reset();
+    }
 
-export default AdminDashboard
+    return (
+        <section className="mx-auto flex max-w-screen-2xl justify-center">
+            <div className="flex w-5/6 flex-col gap-y-8 py-6">
+                <h1 className="text-3xl font-semibold">Admin Dashboard</h1>
+                <form action={action} ref={formRef} className="grid grid-cols-1 gap-10 md:grid-cols-5">
+                    <div className="flex flex-col gap-y-7 md:col-span-2">
+                        <div className="flex flex-col gap-y-4">
+                            <div className="flex flex-col gap-y-2">
+                                <Label className="text-xl font-semibold">Product Name</Label>
+                                <Input className="h-14" name="productName" placeholder="Wooden frame" />
+                            </div>
+                            <div className="flex flex-col gap-y-2">
+                                <Label className="text-xl font-semibold">Price</Label>
+                                <Input
+                                    className="relative h-14"
+                                    name="productPrice"
+                                    placeholder="$1,000,000"
+                                    type="number"
+                                />
+                            </div>
+                            <div className="flex flex-col gap-y-2">
+                                <Label className="text-xl font-semibold">Product Image</Label>
+                                <Label className="cursor-pointer">
+                                    <NextImage src={Upload} alt="upload" className="w-full" />
+                                    <Input type="file" name="productImage" accept="image/*" className="hidden" />
+                                </Label>
+                            </div>
+                        </div>
+                        <div className="max-md:hidden">
+                            <SubmitButton />
+                        </div>
+                    </div>
+                    <div className="flex flex-col gap-y-3 md:col-span-3">
+                        <h1 className="text-2xl font-semibold">Product Attributes</h1>
+                        <div className="grid gap-5">
+                            <div className="grid grid-cols-1 justify-between gap-y-5 md:grid-cols-2">
+                                <div className="flex flex-col gap-y-1">
+                                    <Label className="text-xl font-semibold">Frames Category</Label>
+                                    <ul className="flex flex-col gap-3">
+                                        {FramseCategory.map((item, index) => (
+                                            <li key={index}>
+                                                <Checkbox title={item} props={{ name: "frameCategories" }} />
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                                <div className="">
+                                    <Label className="text-xl font-semibold">Frames Colors</Label>
+                                    <ul className="grid grid-cols-2 gap-2">
+                                        {FrameColors.map((item, index) => (
+                                            <li key={index}>
+                                                <Checkbox title={item} props={{ name: "frameColors" }} />
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </div>
+                            <div className="mt-5 grid grid-cols-1 gap-y-5 md:grid-cols-2">
+                                <div className="flex flex-col gap-y-1">
+                                    <span className="text-xl font-semibold">Product size</span>
+                                    <ul className="flex flex-col gap-y-5">
+                                        <li className="flex items-center gap-x-11">
+                                            <p>Width:</p>
+                                            <div className="flex items-center gap-x-4">
+                                                <Input
+                                                    name="width"
+                                                    className="h-8 w-14 overflow-hidden rounded-lg bg-[#F5F4F4] text-center"
+                                                    placeholder="0"
+                                                />
+                                                <span className="font-semibold">In</span>
+                                            </div>
+                                        </li>
+                                        <li className="flex items-center gap-x-10">
+                                            <p>Height:</p>
+                                            <div className="flex items-center gap-x-4">
+                                                <Input
+                                                    name="height"
+                                                    className="h-8 w-14 overflow-hidden rounded-lg bg-[#F5F4F4] text-center"
+                                                    placeholder="0"
+                                                />
+                                                <span className="align-center font-semibold">In</span>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div className="flex flex-col gap-y-1">
+                                    <span className="text-xl font-semibold">Collections</span>
+                                    <ul className="flex flex-col gap-2">
+                                        {Collections.map((item, index) => (
+                                            <li key={index}>
+                                                <Checkbox title={item} props={{ name: "collections" }} />
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="md:hidden">
+                            <SubmitButton />
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+    );
+};
+
+export default AdminDashboard;

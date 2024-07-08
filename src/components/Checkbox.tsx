@@ -1,14 +1,16 @@
-import React from 'react'
-import { Input } from './ui/input'
-import { Label } from './ui/label'
+import React, { InputHTMLAttributes } from "react";
+import { Input, InputProps } from "./ui/input";
+import { Label } from "./ui/label";
 
-const Checkbox = ({title}:{title:string}) => {
-  return (
-    <a className='flex gap-x-2 pb-1 justify-start'>
-        <Input type='checkbox' className='min-w-[16px] max-w-[16px] h-[20px] mt-[3px] bg-[#E6E6E6] border-[#B3B3B3] border-[1px]'/>
-        <Label  className='font-normal leading-4 mt-1'>{title}</Label>
-    </a>
-  )
-}
+const Checkbox = ({ title, props }: { title: string; props?: InputProps & React.RefAttributes<HTMLInputElement> }) => {
+    return (
+        <>
+            <Label className="flex cursor-pointer gap-2 font-normal">
+                <Input type="checkbox" className="w-4 flex-shrink-0" {...props} id={props?.name} value={title} />
+                <span className="text-[1rem]">{title}</span>
+            </Label>
+        </>
+    );
+};
 
-export default Checkbox
+export default Checkbox;

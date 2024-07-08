@@ -10,7 +10,8 @@ export async function subscribeNewsLetterAction(
     try {
         const email = formData.get("email")?.toString();
         if (!email) throw new CustomError("Email is required");
-        if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) throw new CustomError("Invalid email address");
+        if (!email.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/))
+            throw new CustomError("Invalid email address");
 
         if (await db.subscription.findFirst({ where: { email } }))
             throw new CustomError("You have already subscribed to our newsletter");

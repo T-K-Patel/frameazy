@@ -56,7 +56,10 @@ const Sidebar = ({ toggle, links, showSideBar, currentUser, pathname, barRef }: 
                                 Log in
                             </Link>
                             <Link href="/auth/signup">
-                                <Button size={"sm"} className="w-min py-1 transition-all duration-200 active:scale-90">
+                                <Button
+                                    size={"lg"}
+                                    className="h-auto w-min py-4 transition-all duration-200 active:scale-90"
+                                >
                                     Get Started
                                 </Button>
                             </Link>
@@ -70,11 +73,11 @@ const Sidebar = ({ toggle, links, showSideBar, currentUser, pathname, barRef }: 
                             </Link>
                             <>
                                 <Button
-                                    size={"sm"}
+                                    size={"lg"}
                                     onClick={async () => {
                                         await signOut({ redirect: true });
                                     }}
-                                    className="h-min w-min py-5 transition-all duration-200 active:scale-90"
+                                    className="h-min w-min py-4 transition-all duration-200 active:scale-90"
                                 >
                                     Sign Out
                                 </Button>

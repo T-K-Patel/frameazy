@@ -7,11 +7,16 @@ import { Button } from "./ui/button";
 import { useFormState, useFormStatus } from "react-dom";
 import { subscribeNewsLetterAction } from "@/serverActions/subscribe-news-letter";
 import { useRef } from "react";
+import Link from "next/link";
 
 const SubscribeButton = () => {
     const { pending } = useFormStatus();
     return (
-        <Button size={"sm"} className="h-12 w-max p-4 px-8 uppercase max-xs:w-full lg:h-14" disabled={pending}>
+        <Button
+            size={"lg"}
+            className="h-12 w-max rounded-l-none p-4 px-8 uppercase max-xs:w-full lg:h-14"
+            disabled={pending}
+        >
             Subscribe
         </Button>
     );
@@ -70,15 +75,21 @@ const Footer = () => {
                     <div className="flex flex-1 flex-col md:items-end">
                         <h3 className="mb-4 text-xl font-bold md:text-2xl">Our Social media</h3>
                         <div className="flex gap-6">
-                            <Button size={"icon"} className="rounded-md p-3 text-white sm:p-4">
-                                <BsInstagram size={20} />
-                            </Button>
-                            <Button size={"icon"} className="rounded-md p-3 text-white sm:p-4">
-                                <BsFacebook size={20} />
-                            </Button>
-                            <Button size={"icon"} className="rounded-md p-3 text-white sm:p-4">
-                                <BsTwitter size={20} />
-                            </Button>
+                            <Link href={"https://instagram.com/"} target="_blank">
+                                <Button size={"icon"} className="rounded-md text-white">
+                                    <BsInstagram size={20} />
+                                </Button>
+                            </Link>
+                            <Link href={"https://facebook.com/"} target="_blank">
+                                <Button size={"icon"} className="rounded-md text-white">
+                                    <BsFacebook size={20} />
+                                </Button>
+                            </Link>
+                            <Link href={"https://twitter.com/"} target="_blank">
+                                <Button size={"icon"} className="rounded-md text-white">
+                                    <BsTwitter size={20} />
+                                </Button>
+                            </Link>
                         </div>
                     </div>
                 </div>

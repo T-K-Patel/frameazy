@@ -10,7 +10,7 @@ const AddArtwork = () => {
     return (
         <Dialog>
             <DialogTrigger>
-                <p className="border-[1px] border-opacity-5 rounded-lg overflow-hidden border-blue-1 bg-white p-3 text-blue-1 hover:bg-gray-1">
+                <p className="overflow-hidden rounded-lg border-[1px] border-blue-1 border-opacity-5 bg-white p-3 text-blue-1 hover:bg-gray-1">
                     Add Artwork
                 </p>
             </DialogTrigger>
@@ -45,13 +45,17 @@ const AddArtwork = () => {
                                 Add Artwork
                             </div>
                             <Label>
-                                <Image src={Upload} alt="upload" className="h-[91.68px] w-full md:h-[185px] cursor-pointer" />
-                                <Input type="file" accept="image/*" className="hidden"/>
+                                <Image
+                                    src={Upload}
+                                    alt="upload"
+                                    className="h-[91.68px] w-full cursor-pointer md:h-[185px]"
+                                />
+                                <Input type="file" accept="image/*" className="hidden" />
                             </Label>
                         </div>
                     </div>
                     <Button
-                        size="md"
+                        size="lg"
                         className="h-[40px] w-full rounded-[12px] border-[1px] text-xl font-semibold leading-[30px] md:h-[60px]"
                     >
                         Add

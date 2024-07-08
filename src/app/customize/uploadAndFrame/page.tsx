@@ -1,148 +1,193 @@
+"use client";
 import AddArtwork from "@/components/AddArtwork";
-import CustomizeDropDown from "@/components/CustomizeDropDown";
+import CustomizeDropDown from "../CustomizeDropDown";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import React from "react";
+import { useFrames } from "@/context/frames-context";
+import InputField from "../InputField";
 
-type CustomizeOptionsProps={
-    title:string,
-    items:string[]
-}
+type CustomizeOptionsProps = {
+    title: string;
+    items: string[];
+};
 
-const matOptions=["White Mat"];
-const matWidths=["3"];
+const matOptions = ["White Mat"];
+const matWidths = ["3"];
 
-type ContentType={title:string,mat:boolean,options:CustomizeOptionsProps[]}
+type ContentType = { title: string; mat: boolean; options: CustomizeOptionsProps[] };
 function Page() {
-    let customizeOptions="withMat";//TODO Must implement a context here
-    let content:ContentType={
-        title:"Framed print with mat & glazing",
-        mat:true,
-        options:[{
-            title:"Frame",
-            items:["0.75inch black frame"]
-        },{
-            title:"Glazing",
-            items:["Regular"]
-        },{
-            title:"Printing",
-            items:["Photo Paper","Canvas"]
-        },{
-            title:"Backing",
-            items:["Pine Mdf Hardboard"]
-        }]
-    }
+    const { frameOptions } = useFrames();
+    if (frameOptions.framingStyle != "uploadAndFrame") return <></>;
+    let customizeOptions = frameOptions.data.frameType; //TODO Must implement a context here
+    let content: ContentType = {
+        title: "Framed print with mat & glazing",
+        mat: true,
+        options: [
+            {
+                title: "Frame",
+                items: ["0.75inch black frame"],
+            },
+            {
+                title: "Glazing",
+                items: ["Regular"],
+            },
+            {
+                title: "Printing",
+                items: ["Photo Paper", "Canvas"],
+            },
+            {
+                title: "Backing",
+                items: ["Pine Mdf Hardboard"],
+            },
+        ],
+    };
 
-    if(customizeOptions==="withoutMat"){
-        content={
-            title:"Framed print without mat and glazing",
-            mat:false,
-            options:[{
-                title:"Frame",
-                items:["0.75inch black frame"]
-            },{
-                title:"Printing",
-                items:["Photo paper","Canvas"]
-            },{
-                title:"Streching",
-                items:["Photo paper"]
-            }]
-        }
-    } else if(customizeOptions==="printOnly"){
-        content={
-            title:"Print only",
-            mat:false,
-            options:[{
-                title:"Printing",
-                items:["Photo paper","Canvas"]
-            }]
-        }
-    } else if(customizeOptions==="Stretched"){
-        content={
-            title:"Stretched canvas print",
-            mat:false,
-            options:[{
-                title:"Printing",
-                items:["Photo paper","Canvas"]
-            },{
-                title:"Stretching",
-                items:["regular-0.75 inch thick"]
-            },{
-                title:"sides",
-                items:["Image mirrored"]
-            }]
-        }
+    if (customizeOptions === "framedWithoutMG") {
+        content = {
+            title: "Framed print without mat and glazing",
+            mat: false,
+            options: [
+                {
+                    title: "Frame",
+                    items: ["0.75inch black frame"],
+                },
+                {
+                    title: "Printing",
+                    items: ["Photo paper", "Canvas"],
+                },
+                {
+                    title: "Streching",
+                    items: ["Photo paper"],
+                },
+            ],
+        };
+    } else if (customizeOptions === "printOnly") {
+        content = {
+            title: "Print only",
+            mat: false,
+            options: [
+                {
+                    title: "Printing",
+                    items: ["Photo paper", "Canvas"],
+                },
+            ],
+        };
+    } else if (customizeOptions === "canvasPrint") {
+        content = {
+            title: "Stretched canvas print",
+            mat: false,
+            options: [
+                {
+                    title: "Printing",
+                    items: ["Photo paper", "Canvas"],
+                },
+                {
+                    title: "Stretching",
+                    items: ["regular-0.75 inch thick"],
+                },
+                {
+                    title: "sides",
+                    items: ["Image mirrored"],
+                },
+            ],
+        };
     }
 
     return (
-        <section className="w-full flex justify-center">
-            <div className="w-5/6 h-auto flex flex-col gap-5 lg:flex-row">
-                <div className="w-[630px] h-[500px] bg-gray-2"/>
-                <section className="flex flex-col gap-6">
-                    <h1 className="font-semibold text-3xl leading-auto">{content.title}</h1>
-                    <div className="flex flex-col gap-y-20">
-                        <ul className="flex flex-col gap-y-8">
-                            <a className="w-full flex justify-between items-center">
-                                <p className="font-semibold">Image size</p>
-                                <div className="flex gap-4 items-center">
-                                    <Input className="w-[60px] h-[50px] border-gray-2 border-[1px] text-center" placeholder="0"/>
-                                    <p>X</p>
-                                    <Input className="w-[60px] h-[50px] border-gray-2 border-[1px] text-center" placeholder="0"/>
-                                    <p className="font-semibold pr-2">In</p>
-                                    <AddArtwork/>
-                                </div>
-                            </a>
-                            {content.mat && 
-                                <a className="flex flex-col gap-y-3 text-center">
-                                    <div className="flex gap-x-20 justify-between items-center w-full">
-                                        <p className="font-semibold">Mat</p>
-                                        <div className="grid grid-cols-5 gap-x-4 w-full items-center">
-                                           <a className="flex gap-x-2 items-center col-span-2">
-                                            <p>Total width:</p>
-                                            <CustomizeDropDown items={matWidths}/>
-                                           </a>
-                                            <a className="flex col-span-3 gap-x-2 items-center">
-                                            <p>Top:</p>
-                                            <CustomizeDropDown items={matOptions}/>
-                                            </a>
-                                        </div>
+        <>
+            <div className="grid min-h-[calc(100vh-150px)] gap-5 pb-4 pt-10 md:grid-cols-2">
+                <div className="bg-gray-2" />
+                <div className="mx-auto flex w-11/12 flex-col gap-6">
+                    <h1 className="leading-auto text-3xl font-semibold">{content.title}</h1>
+                    <div className="mb-3 flex flex-col gap-y-5">
+                        <div className="flex flex-col gap-y-8">
+                            <InputField
+                                label={<strong>Size</strong>}
+                                field={
+                                    <div className="flex items-center gap-4">
+                                        <Input
+                                            type="number"
+                                            min={1}
+                                            step={1}
+                                            className="w-20 border border-gray-2 p-3 px-2 text-center"
+                                            placeholder="0"
+                                        />
+                                        <p>X</p>
+                                        <Input
+                                            type="number"
+                                            min={1}
+                                            step={1}
+                                            className="w-20 border border-gray-2 p-3 px-2 text-center"
+                                            placeholder="0"
+                                        />
+                                        <span className="pr-2 font-semibold">In</span>
                                     </div>
-                                    Add more mat
-                                </a>
-                            }
-                            <a className="flex flex-col gap-y-8">
-                                {content.options.map((option,index)=>{
-                                    return (
-                                        <div key={index} className="w-full flex gap-x-20  justify-between items-center">
-                                        <p className="font-semibold">{option.title}</p>
-                                        <CustomizeDropDown items={option.items}/>
+                                }
+                            />
+                            {content.mat && (
+                                <InputField
+                                    label={<strong>Mat</strong>}
+                                    field={
+                                        <div>
+                                            <div className="mb-3 grid w-full items-center gap-4 md:grid-cols-2">
+                                                <div className="flex items-center gap-x-2">
+                                                    <p className="">Total width:</p>
+                                                    <CustomizeDropDown items={matWidths} />
+                                                    <span>
+                                                        <strong>In</strong>
+                                                    </span>
+                                                </div>
+                                                <div className="flex items-center gap-x-2">
+                                                    <p>Top:</p>
+                                                    <CustomizeDropDown items={matOptions} />
+                                                </div>
+                                            </div>
+                                            <button className="text-blue-1">Add More Mat</button>
                                         </div>
+                                    }
+                                />
+                            )}
+                            <div className="flex flex-col gap-y-5">
+                                {content.options.map((option, index) => {
+                                    return (
+                                        <InputField
+                                            key={index}
+                                            label={<strong>{option.title}</strong>}
+                                            field={<CustomizeDropDown items={option.items} />}
+                                        />
                                     );
                                 })}
-                            </a>
-                            <a className="flex gap-x-20">
-                                <p className="font-semibold">Total Size</p>
-                                <div className="flex gap-x-2">
-                                    <p>13</p>
-                                    <p>X</p>
-                                    <p>13</p>
-                                    <p className="font-semibold">In</p>
-                                </div>
-                            </a>
-                        </ul>
-                        <div className="flex gap-x-14 w-full">
-                            <div className="flex gap-x-10">
-                                <p className="font-semibold">Price</p>
-                                <h1 className="font-bold text-3xl w-[148px]">$ 2,00.00</h1>
+                                {/* <InputField
+                                    label={<strong>Printing</strong>}
+                                    field={<span>No Printing</span>}
+                                /> */}
                             </div>
-                            <div className="max-w-[325px]">
-                                <Button size={"lg"} className="max-w-[325px]">Add to Cart</Button>
+                            <InputField
+                                label={<strong>Total Size</strong>}
+                                field={
+                                    <p>
+                                        <span>13</span> <span>X</span> <span>13</span>{" "}
+                                        <span className="font-semibold">In</span>
+                                    </p>
+                                }
+                            />
+                        </div>
+                        <div className="grid items-center gap-4 md:grid-cols-2">
+                            <div className="grid justify-between max-md:grid-cols-3 md:flex">
+                                <span>
+                                    <strong>Price</strong>
+                                </span>
+                                <span className="text-2xl font-bold max-md:col-span-2">$ 2,00.00</span>
                             </div>
+                            <Button size={"lg"} className="h-auto w-full py-4">
+                                Add to Cart
+                            </Button>
                         </div>
                     </div>
-                </section>
+                </div>
             </div>
-        </section>
+        </>
     );
 }
 

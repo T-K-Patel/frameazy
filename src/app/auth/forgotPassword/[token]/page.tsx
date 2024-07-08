@@ -10,12 +10,23 @@ import { Input } from "@/components/ui/input";
 import Arrow from "../../../../assets/arrow.svg";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { useFormState, useFormStatus } from "react-dom";
+import { resetPasswordAction } from "@/serverActions/auth/auth.action";
 
-const NewPassword = () => {
+const ConfirmButton = () => {
+    const { pending } = useFormStatus();
+    return (
+        <Button size={"lg"} disabled={pending} className="h-auto w-full py-4">
+            {pending ? "Confirming" : "Confirm"}
+        </Button>
+    );
+};
+
+const NewPassword = ({ params, searchParams }: { params: { token: string }; searchParams: { email: string } }) => {
     const session = useSession();
-    const [password, setPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
     const [success, setSuccess] = useState(false);
+
+    const [state, action] = useFormState(resetPasswordAction, null);
 
     useEffect(() => {
         if (session.data?.user) {
@@ -23,10 +34,18 @@ const NewPassword = () => {
         }
     }, [session]);
 
+    useEffect(() => {
+        if (state?.success) {
+            setSuccess(true);
+        }
+    }, [state]);
+
     if (success)
         return (
             <div className="no-scrollbar flex h-full flex-col gap-y-5 overflow-y-auto px-5 py-4">
-                <Image src={Logo} alt="logo" className="md:h-31 md:w-32" />
+                <Link href={"/"}>
+                    <Image src={Logo} alt="logo" className="md:h-31 md:w-32" />
+                </Link>
                 <div className="mx-auto flex h-full max-w-[25rem] flex-col gap-y-5 px-2">
                     <div className="flex w-full flex-col gap-y-5">
                         <div className="flex w-full flex-col items-center gap-y-2 text-black">
@@ -41,7 +60,7 @@ const NewPassword = () => {
                     <div className="flex h-auto w-full flex-col gap-y-8 pt-2">
                         <div className="flex h-auto w-full flex-col gap-y-8">
                             <Link href={"/"}>
-                                <Button size={"lg"} className="w-full">
+                                <Button size={"lg"} className="h-auto w-full py-4">
                                     Continue
                                 </Button>
                             </Link>
@@ -52,7 +71,9 @@ const NewPassword = () => {
         );
     return (
         <div className="no-scrollbar flex h-full flex-col gap-y-5 overflow-y-auto px-5 py-4">
-            <Image src={Logo} alt="logo" className="md:h-31 md:w-32" />
+            <Link href={"/"}>
+                <Image src={Logo} alt="logo" className="md:h-31 md:w-32" />
+            </Link>
             <div className="mx-auto flex h-full max-w-[25rem] flex-col gap-y-5 px-2">
                 <div className="flex w-full flex-col gap-y-5">
                     <div className="flex w-full flex-col items-center gap-y-2 text-black">
@@ -64,18 +85,22 @@ const NewPassword = () => {
                         </div>
                     </div>
                 </div>
-                <div className="flex h-auto w-full flex-col gap-y-8 pt-2">
+                <form action={action} className="flex h-auto w-full flex-col gap-y-4 pt-2">
                     <div className="flex h-auto w-full flex-col gap-y-2">
+                        <div className="hidden">
+                            <input type="text" name="token" value={params.token} />
+                            <input type="text" name="email" value={searchParams.email} />
+                        </div>
                         <div className="flex h-auto w-full flex-col gap-y-3">
                             <div className="flex h-auto w-full flex-col gap-y-2">
                                 <Label htmlFor="password">Password</Label>
                                 <Input
                                     id="password"
                                     type="password"
-                                    value={password}
-                                    onChange={(e) => {
-                                        setPassword(e.target.value);
-                                    }}
+                                    name="password"
+                                    required
+                                    minLength={8}
+                                    pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
                                     className="h-[60px] w-full border-[1px] px-[18px] py-[20px]"
                                     placeholder="Mail@simple.com"
                                 />
@@ -85,32 +110,25 @@ const NewPassword = () => {
                                 <Input
                                     id="confirmPassword"
                                     type="text"
-                                    value={confirmPassword}
-                                    onChange={(e) => {
-                                        setConfirmPassword(e.target.value);
-                                    }}
+                                    name="confirmPassword"
+                                    required
+                                    minLength={8}
+                                    pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
                                     className="h-[60px] w-full border-[1px] px-[18px] py-[20px]"
                                     placeholder="Mail@simple.com"
                                 />
                             </div>
                         </div>
                     </div>
+                    {state?.success == false && <div className="text-red-500">{state.error}</div>}
                     <div className="flex h-auto w-full flex-col gap-y-8">
-                        <Button
-                            size={"lg"}
-                            className="w-full"
-                            onClick={async () => {
-                                setSuccess(true);
-                            }}
-                        >
-                            Confirm
-                        </Button>
+                        <ConfirmButton />
                         <Link className="flex h-auto w-auto justify-center gap-x-3" href="/auth/login">
                             <ArrowLeft />
                             <div className="h-auto w-[155px] font-semibold leading-[24px]">Back to Sign in</div>
                         </Link>
                     </div>
-                </div>
+                </form>
             </div>
         </div>
     );

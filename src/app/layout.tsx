@@ -86,14 +86,6 @@ export const metadata: Metadata = {
         "frameazy frameazy custom frames",
         "frameazy frameazy customise frames",
     ],
-    robots: "index, follow",
-    // @ts-ignore
-    lang: "en",
-    twitter: {
-        card: "summary",
-        site: "@frameazy",
-        creator: "@frameazy",
-    },
 };
 export default function RootLayout({
     children,

@@ -1,5 +1,5 @@
 "use client";
-import React, { ReactNode, useEffect, useState } from "react";
+import React, { ReactNode, useEffect, useRef, useState } from "react";
 import { Button } from "../ui/button";
 import { BsArrowRight } from "react-icons/bs";
 import { DialogContent, Dialog, DialogTrigger, DialogHeader } from "../ui/dialog";
@@ -10,7 +10,7 @@ import Mirror from "@/assets/mirror.svg";
 import Canvas from "@/assets/canvas.svg";
 import Paper from "@/assets/paper.svg";
 import { useFrames } from "@/context/frames-context";
-import { BiRepeat } from "react-icons/bi";
+import { BiArrowBack, BiRepeat } from "react-icons/bi";
 import { cn } from "@/lib/utils";
 import UploadImage from "./UploadImage";
 import { useRouter } from "next/navigation";
@@ -40,10 +40,20 @@ const SelectFrame = () => {
 
     const router = useRouter();
     const session = useSession();
+    const contentDivRef = useRef<HTMLDivElement>(null);
     if (isOpen && session.status == "unauthenticated") {
         router.push("/auth/login");
         setIsOpen(false);
     }
+
+    const framingString = JSON.stringify(framing);
+
+    useEffect(() => {
+        // on re-render, scroll content div to top
+        contentDivRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+    }, [framingString]);
+
+    let onBack = () => {};
 
     let content: ContentType = {
         title: "Select your style of frame",
@@ -110,6 +120,9 @@ const SelectFrame = () => {
                 },
             ],
         };
+        onBack = () => {
+            setFrameOptions({ framingStyle: "none" });
+        };
     } else if (framing.framingStyle == "uploadAndFrame") {
         let comp: null | ReactNode = null;
         if (!framing.data.image) {
@@ -118,11 +131,17 @@ const SelectFrame = () => {
                 desc: "Please select the image file to be uploaded",
                 component: <UploadImage />,
             };
+            onBack = () => {
+                setFrameOptions({ framingStyle: "none" });
+            };
         } else if (!framing.data.croppedImage) {
             content = {
                 title: "Adjustment of image",
                 desc: "What is the desired size of the printed image (inches)?",
                 component: <CropImage />,
+            };
+            onBack = () => {
+                setFrameOptions({ framingStyle: "uploadAndFrame", data: { ...framing.data, image: undefined } });
             };
         } else {
             content = {
@@ -187,6 +206,9 @@ const SelectFrame = () => {
                     },
                 ],
             };
+            onBack = () => {
+                setFrameOptions({ framingStyle: "uploadAndFrame", data: { ...framing.data, croppedImage: undefined } });
+            };
         }
     }
 
@@ -195,9 +217,9 @@ const SelectFrame = () => {
             <DialogTrigger asChild>
                 <Button
                     size={"sm"}
-                    variant={"light"}
+                    variant={"outline"}
                     onClick={() => setIsOpen(true)}
-                    className="mt-8 h-min w-min px-8 py-4 text-xl font-semibold transition-all duration-200 active:scale-90"
+                    className="mt-8 h-min w-min bg-transparent px-8 py-4 text-xl font-semibold transition-all duration-200 active:scale-90"
                 >
                     Start Framing
                     <BsArrowRight />
@@ -205,15 +227,25 @@ const SelectFrame = () => {
             </DialogTrigger>
             <DialogContent
                 className={cn(
-                    "no-scrollbar flex max-h-[90%] min-h-[70%] w-5/6 flex-col overflow-y-auto px-5 max-md:w-11/12 md:max-h-[85%] md:px-10",
-                    framing.framingStyle != "none" ? "pb-6 md:pb-14" : "py-6 pt-10 md:py-14",
+                    "flex max-h-[90%] min-h-[70%] w-5/6 flex-col px-5 max-md:w-11/12 md:max-h-[85%] md:px-10",
+                    framing.framingStyle != "none" && framing.framingStyle != "mirrorFrame"
+                        ? "pb-6 md:pb-14"
+                        : "py-6 pt-10 md:py-14",
                 )}
             >
-                {framing.framingStyle != "none" && (
-                    <DialogHeader className="block h-min space-y-0 text-center">
+                {framing.framingStyle != "none" && framing.framingStyle != "mirrorFrame" && (
+                    <DialogHeader className="flex h-min flex-row gap-4 space-y-0 text-center">
                         <Button
                             size={"sm"}
-                            variant={"light"}
+                            variant={"outline"}
+                            onClick={onBack}
+                            className="h-min w-min border border-black p-2 text-lg font-semibold transition-all duration-200 active:scale-90 md:text-xl"
+                        >
+                            <BiArrowBack /> Back
+                        </Button>
+                        <Button
+                            size={"sm"}
+                            variant={"outline"}
                             onClick={resetFrames}
                             className="h-min w-min border border-black p-2 text-lg font-semibold transition-all duration-200 active:scale-90 md:text-xl"
                         >
@@ -221,7 +253,10 @@ const SelectFrame = () => {
                         </Button>
                     </DialogHeader>
                 )}
-                <div className="flex h-auto w-auto flex-col items-center justify-start gap-y-5 md:gap-y-6">
+                <div
+                    ref={contentDivRef}
+                    className="flex h-auto w-auto flex-col items-center justify-start gap-y-5 overflow-y-auto md:gap-y-6"
+                >
                     <div className="h-auto w-auto items-center gap-y-4">
                         <h1 className="leading-12 text-center text-xl font-semibold md:text-3xl">{content.title}</h1>
                         <p className="text-center text-lg md:leading-[30px] lg:text-xl">{content.desc}</p>

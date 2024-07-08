@@ -13,7 +13,8 @@ export async function contactUsAction(state: any, formData: FormData) {
 
         if (!name || !email || !message) throw new CustomError("All fields are required");
         if (name.length > 100 || email.length > 100 || message.length > 1000) throw new CustomError("Too long input");
-        if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) throw new CustomError("Invalid email address");
+        if (!email.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/))
+            throw new CustomError("Invalid email address");
         if (!name.match(/^[a-zA-Z\s]*$/)) throw new CustomError("Invalid name");
         let userId;
         if (session?.user && session.user.email?.toString()) {

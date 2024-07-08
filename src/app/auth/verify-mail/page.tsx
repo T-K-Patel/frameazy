@@ -4,16 +4,18 @@ import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import Logo from "../../../assets/Logo.svg";
-import Arrow from "../../../assets/arrow.svg";
 import { ArrowLeft } from "lucide-react";
+import { redirect } from "next/navigation";
 
 const Page = ({ searchParams }: { searchParams: any }) => {
-    console.log("Search Params", searchParams);
-    const email = ""; //TODO extract email
+    const email = searchParams.email; //TODO extract email
+    if (!email) redirect("/auth/login");
     return (
         <div>
             <div className="flex h-auto flex-col gap-y-8 px-5 py-4">
-                <Image src={Logo} alt="logo" className="md:h-31 md:w-32" />
+                <Link href={"/"}>
+                    <Image src={Logo} alt="logo" className="md:h-31 md:w-32" />
+                </Link>
                 <div className="flex h-auto w-auto flex-col gap-y-8">
                     <div className="flex h-auto w-full flex-col gap-y-5">
                         <div className="flex h-auto w-full flex-col items-center gap-y-2 text-black">
@@ -28,20 +30,31 @@ const Page = ({ searchParams }: { searchParams: any }) => {
                     </div>
                     <div className="flex h-auto w-full flex-col gap-y-8 pt-2">
                         <div className="flex h-auto w-full flex-col gap-y-8">
-                            <Button size={"lg"} className="w-full" onClick={async () => {}}>
-                                Open Email App
+                            <Button
+                                size={"lg"}
+                                className="h-auto w-full py-4"
+                                onClick={async (e) => {
+                                    const button = e.currentTarget;
+                                    button.disabled = true;
+                                    button.innerText = "Sending...";
+                                    await new Promise((resolve) => setTimeout(resolve, 2000)); // simulate resend email //TODO: implement serveraction to resend email
+                                    button.innerText = "Resend Email (60s)";
+                                    console.log("Resend email");
+                                    const interval = setInterval(() => {
+                                        if (button.innerText === "Resend Email (1s)") {
+                                            clearInterval(interval);
+                                            button.disabled = false;
+                                            button.innerText = "Resend Email";
+                                        } else {
+                                            button.innerText = button.innerText.replace(/\d+/, (match) => {
+                                                return String(Number(match) - 1);
+                                            });
+                                        }
+                                    }, 1000);
+                                }}
+                            >
+                                Resend Email
                             </Button>
-                            <div className="flex h-auto w-auto justify-center gap-x-2">
-                                <div className="leading-auto h-full w-auto text-sm text-black">
-                                    Didn’t receive the email
-                                </div>
-                                <button
-                                    className="leading-auto h-full w-auto text-sm font-semibold text-blue-1"
-                                    onClick={() => {}}
-                                >
-                                    Click to resend
-                                </button>
-                            </div>
                             <Link className="flex h-auto w-auto justify-center gap-x-3" href="/auth/login">
                                 <ArrowLeft />
                                 <div className="h-auto w-[155px] font-semibold leading-[24px]">Back to Sign in</div>

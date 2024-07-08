@@ -8,7 +8,6 @@ async function CartPage() {
     const cartItems = await fetch("https://6603bf872393662c31cf89fb.mockapi.io/api/v1/cart", {
         cache: "no-cache",
     }).then((res) => res.json() as Promise<CartItemType["item"][]>);
-    console.log(cartItems);
     return (
         <section className="mx-auto my-5 max-w-screen-2xl">
             <Cart cartItems={cartItems} />

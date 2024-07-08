@@ -10,13 +10,22 @@ import { Input } from "@/components/ui/input";
 import Google from "../../../assets/google.svg";
 import Password from "../../../assets/password.svg";
 import Link from "next/link";
+import { useFormState, useFormStatus } from "react-dom";
+import { signUpAction } from "@/serverActions/auth/auth.action";
+
+const SignUpButton = () => {
+    const { pending } = useFormStatus();
+    return (
+        <Button size={"lg"} disabled={pending} className="h-auto w-full py-4">
+            {pending ? "Signing Up" : "Signup"}
+        </Button>
+    );
+};
 
 const SignupPage = () => {
     const session = useSession();
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
-    const [match, setMatch] = useState(false);
+
+    const [state, action] = useFormState(signUpAction, null);
 
     useEffect(() => {
         if (session.data?.user) {
@@ -24,16 +33,16 @@ const SignupPage = () => {
         }
     }, [session]);
 
-    useEffect(() => {
-        if (password === confirmPassword) setMatch(true);
-        else {
-            setMatch(false);
-        }
-    }, [confirmPassword]);
+    if (state?.success) {
+        redirect(`/auth/verify-mail?email=${state.data.email}`, RedirectType.replace);
+    }
+
     return (
-        <div className="no-scrollbar flex h-full flex-col gap-y-5 overflow-y-auto px-5 py-4">
-            <Image src={Logo} alt="logo" className="md:h-31 md:w-32" />
-            <div className="mx-auto flex h-full max-w-[25rem] flex-col gap-y-5 px-2">
+        <div className="no-scrollbar flex h-full max-w-full flex-col gap-y-5 overflow-y-auto px-5 py-4">
+            <Link href={"/"}>
+                <Image src={Logo} alt="logo" className="md:h-31 md:w-32" />
+            </Link>
+            <div className="mx-auto flex h-full w-[25rem] max-w-full flex-col gap-y-5 px-2">
                 <div className="flex w-full flex-col gap-y-5">
                     <div className="flex w-full flex-col items-center gap-y-2 text-black">
                         <div className="h-auto w-auto text-2xl font-semibold leading-[36px] md:text-4xl md:leading-[54px]">
@@ -44,8 +53,8 @@ const SignupPage = () => {
                         </div>
                     </div>
                     <Button
-                        variant={"light"}
-                        className="flex w-full gap-x-3 overflow-hidden rounded-xl border border-black px-3 py-5"
+                        variant={"outline"}
+                        className="flex h-auto w-full gap-x-3 overflow-hidden rounded-xl border border-black px-3 py-3"
                         onClick={async () => {
                             await signIn("google");
                         }}
@@ -59,19 +68,28 @@ const SignupPage = () => {
                 <div className='before:content-["] relative flex w-full select-none justify-center before:absolute before:left-0 before:top-1/2 before:-z-10 before:h-[2px] before:w-full before:bg-black before:bg-opacity-25'>
                     <p className="w-auto bg-white px-3 font-semibold md:text-xl">or</p>
                 </div>
-                <div className="flex h-auto w-full flex-col gap-y-5">
+                <form action={action} className="flex h-auto w-full flex-col gap-y-5">
                     <div className="flex h-auto w-full flex-col gap-y-2">
                         <div className="flex h-auto w-full flex-col gap-y-3">
                             <div className="flex h-auto w-full flex-col gap-y-2">
+                                <Label htmlFor="Name">Name</Label>
+                                <Input
+                                    name="name"
+                                    id="Name"
+                                    type="text"
+                                    required
+                                    minLength={3}
+                                    className="w-full border p-4"
+                                    placeholder="Mail@simple.com"
+                                />
+                            </div>
+                            <div className="flex h-auto w-full flex-col gap-y-2">
                                 <Label htmlFor="Email">Email</Label>
                                 <Input
-                                    name="Email"
+                                    name="email"
                                     id="Email"
-                                    type="text"
-                                    value={email}
-                                    onChange={(e) => {
-                                        setEmail(e.target.value);
-                                    }}
+                                    type="email"
+                                    required
                                     className="w-full border p-4"
                                     placeholder="Mail@simple.com"
                                 />
@@ -81,10 +99,10 @@ const SignupPage = () => {
                                 <Input
                                     id="Password"
                                     type="password"
-                                    value={password}
-                                    onChange={(e) => {
-                                        setPassword(e.target.value);
-                                    }}
+                                    name="password"
+                                    required
+                                    minLength={8}
+                                    pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
                                     className="w-full border p-4"
                                     placeholder="Min. 8 Characters"
                                 />
@@ -94,47 +112,32 @@ const SignupPage = () => {
                                 <Input
                                     id="Confirm Password"
                                     type="password"
-                                    value={confirmPassword}
-                                    onChange={(e) => {
-                                        setConfirmPassword(e.target.value);
-                                    }}
+                                    name="confirmPassword"
+                                    required
+                                    minLength={8}
+                                    pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
                                     className="w-full border p-4"
                                     placeholder="Min. 8 Characters"
                                 />
                             </div>
                         </div>
-                        {!match && (
-                            <Link
-                                className="h-auto w-auto text-xs font-semibold leading-[21px] text-red-600"
-                                href={"/forgotPassword"}
-                            >
-                                Password does not Match
-                            </Link>
-                        )}
+                        {state?.error && <span className="text-red-500">{state.error}</span>}
                     </div>
                     <div className="flex h-auto w-full flex-col gap-y-5">
-                        <Button
-                            size={"lg"}
-                            className="w-full"
-                            onClick={async () => {
-                                signIn("credentials", { email: email, password: password });
-                            }}
-                        >
-                            Signup
-                        </Button>
+                        <SignUpButton />
                         <div className="flex h-auto w-auto gap-x-2">
                             <div className="leading-auto h-full w-auto text-sm text-black">
                                 Already have an account?
                             </div>
                             <Link
                                 className="leading-auto h-full w-auto text-sm font-semibold text-blue-1"
-                                href={"/login"}
+                                href={"/auth/login"}
                             >
                                 Sign In
                             </Link>
                         </div>
                     </div>
-                </div>
+                </form>
             </div>
         </div>
     );

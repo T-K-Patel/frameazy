@@ -12,7 +12,7 @@ function NotFound() {
                 <h1 className="text-2xl">Bhai kya kar raha hai.</h1>
                 <h1 className="text-xl">Yaha kuch nahi rakha, wapas chala jaa</h1>
                 <Link href={"/"}>
-                    <Button size={"sm"} className="p-1 transition-all duration-200 active:scale-90">
+                    <Button size={"lg"} className="h-auto py-4 transition-all duration-200 active:scale-90">
                         Mujhe ghar jana hai
                     </Button>
                 </Link>

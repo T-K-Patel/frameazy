@@ -87,7 +87,10 @@ const Navbar = () => {
                             Log in
                         </Link>
                         <Link href="auth//signup">
-                            <Button size={"sm"} className="w-min py-1 transition-all duration-200 active:scale-90">
+                            <Button
+                                size={"sm"}
+                                className="h-auto w-min py-4 transition-all duration-200 active:scale-90"
+                            >
                                 Get Started
                             </Button>
                         </Link>
@@ -101,11 +104,11 @@ const Navbar = () => {
                         </Link>
                         <>
                             <Button
-                                size={"sm"}
+                                size={"lg"}
                                 onClick={async () => {
                                     await signOut({ redirect: true });
                                 }}
-                                className="w-fit p-3 px-5 transition-all duration-200 active:scale-90"
+                                className="h-auto w-fit px-5 py-4 transition-all duration-200 active:scale-90"
                             >
                                 Sign Out
                             </Button>

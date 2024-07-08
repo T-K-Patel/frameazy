@@ -81,17 +81,17 @@
     -ms-overflow-style: none;
 }
 
-body::-webkit-scrollbar {
+::-webkit-scrollbar {
     width: 6px;
     height: 6px;
 }
 
-body::-webkit-scrollbar-thumb {
+::-webkit-scrollbar-thumb {
     @apply bg-blue-1;
     border-radius: 10px;
 }
 
-body::-webkit-scrollbar-track {
+::-webkit-scrollbar-track {
     background: hsl(var(--background));
     border-radius: 10px;
 }

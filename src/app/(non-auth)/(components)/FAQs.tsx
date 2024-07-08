@@ -20,7 +20,7 @@ const Accordion = ({ index, title, isOpen, data }: AccordionProps) => {
                 <span className="font-medium md:text-xl">{title}</span>
                 {isOpen ? (
                     <span
-                        className={`float-right transform ${
+                        className={`float-right my-auto transform ${
                             isOpen ? "rotate-180" : "rotate-0"
                         } transition-transform duration-300`}
                     >
@@ -28,7 +28,7 @@ const Accordion = ({ index, title, isOpen, data }: AccordionProps) => {
                     </span>
                 ) : (
                     <span
-                        className={`float-right transform ${
+                        className={`float-right my-auto transform ${
                             isOpen ? "rotate-180" : "rotate-0"
                         } transition-transform duration-300`}
                     >

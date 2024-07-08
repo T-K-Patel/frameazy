@@ -21,7 +21,7 @@ const EnhanceArt = () => {
                 <Link href="/frames">
                     <Button
                         size={"sm"}
-                        variant={"light"}
+                        variant={"outline"}
                         className="mt-8 h-min w-min border border-black bg-transparent px-8 py-4 text-xl font-semibold text-black transition-all duration-200 active:scale-90"
                     >
                         Get Framing

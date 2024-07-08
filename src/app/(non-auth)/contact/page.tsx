@@ -12,7 +12,7 @@ import { contactUsAction } from "@/serverActions/contact-us";
 const SubmitButton = () => {
     const { pending } = useFormStatus();
     return (
-        <Button size={"lg"} className="w-full" type="submit" disabled={pending}>
+        <Button size={"lg"} className="h-auto w-full py-3 text-lg" type="submit" disabled={pending}>
             {pending ? "Submitting..." : "Submit"}
         </Button>
     );

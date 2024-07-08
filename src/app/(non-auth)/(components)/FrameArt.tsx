@@ -15,8 +15,8 @@ const FrameArt = () => {
                 </p>
                 <Button
                     size={"sm"}
-                    variant={"light"}
-                    className="mt-8 h-min w-min border border-black bg-transparent px-8 py-4 text-xl font-semibold text-black transition-all duration-200 active:scale-90"
+                    variant={"outline"}
+                    className="mt-8 h-auto border border-black bg-transparent px-8 py-4 text-xl font-semibold text-black transition-all duration-200 active:scale-90"
                 >
                     Get Started
                     <BsArrowRight />
