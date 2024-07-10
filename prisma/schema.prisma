@@ -1,0 +1,187 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String          @id @default(auto()) @map("_id") @db.ObjectId
+  name          String?
+  email         String?         @unique
+  emailVerified DateTime?       @map("email_verified")
+  password      String?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+  // Optional for WebAuthn support
+  Authenticator Authenticator[]
+
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  CartItem  CartItem[]
+  Order     Order[]
+}
+
+model Account {
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String  @db.ObjectId
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.String
+  access_token      String? @db.String
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.String
+  session_state     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  sessionToken String   @unique
+  userId       String   @db.ObjectId
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model VerificationToken {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// Optional for WebAuthn support
+model Authenticator {
+  credentialID         String  @id @map("_id")
+  userId               String  @db.ObjectId
+  providerAccountId    String
+  credentialPublicKey  String
+  counter              Int
+  credentialDeviceType String
+  credentialBackedUp   Boolean
+  transports           String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, credentialID])
+}
+
+model Frame {
+  id         String      @id @default(auto()) @map("_id") @db.ObjectId
+  name       String      @unique
+  price      Float
+  image      String
+  category   Category
+  color      Color
+  collection Collection
+  width      Int
+  height     Int
+  CartItem   CartItem[]
+  OrderItem  OrderItem[]
+}
+
+enum Category {
+  Art
+  Photography
+  Illustration
+  Digital
+}
+
+enum Color {
+  Black
+  White
+  Gold
+  Silver
+  Blue
+  Red
+  Green
+  Yellow
+  Pink
+  Purple
+  Brown
+  Orange
+}
+
+enum Collection {
+  Classic
+  Modern
+}
+
+model Message {
+  id      String  @id @default(auto()) @map("_id") @db.ObjectId
+  message String
+  name    String
+  email   String
+  userId  String? @db.ObjectId
+}
+
+// TODO: add fields for dimensions and other properties required
+model CartItem {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  userId   String @db.ObjectId
+  user     User   @relation(fields: [userId], references: [id])
+  frameId  String @db.ObjectId
+  frame    Frame  @relation(fields: [frameId], references: [id])
+  image    String
+  quantity Int    @default(1)
+}
+
+model Order {
+  id             String        @id @default(auto()) @map("_id") @db.ObjectId
+  userId         String        @db.ObjectId
+  user           User          @relation(fields: [userId], references: [id])
+  price          Int
+  payment_status PaymentStatus @default(UnInitiated)
+  pay_order_id   String?
+  pay_time       DateTime?
+  order_status   OrderStatus   @default(Received)
+  OrderItem      OrderItem[]
+}
+
+enum OrderStatus {
+  Received
+  Processing
+  Delivered
+}
+
+enum PaymentStatus {
+  UnInitiated
+  Pending
+  Paid
+  Failed
+}
+
+// TODO: add fields for dimensions and other properties required
+model OrderItem {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  frameId  String @db.ObjectId
+  frame    Frame  @relation(fields: [frameId], references: [id])
+  image    String
+  quantity Int
+  orderId  String @db.ObjectId
+  order    Order  @relation(fields: [orderId], references: [id])
+}
+
+model Subscription {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
