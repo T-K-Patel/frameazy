@@ -22,6 +22,7 @@ const LoginPage = ({ searchParams }: { searchParams: Record<string, any> }) => {
             redirect("/", RedirectType.replace);
         }
     }, [session]);
+
     return (
         <div className="no-scrollbar flex h-full flex-col gap-y-5 overflow-y-auto px-5 py-4">
             <Link href={"/"}>
@@ -103,7 +104,6 @@ const LoginPage = ({ searchParams }: { searchParams: Record<string, any> }) => {
                                     password: password,
                                     redirect: false,
                                 });
-                                console.log("loginData", loginData);
                                 if (loginData?.error) {
                                     setError(loginData.error);
                                 }

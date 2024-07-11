@@ -3,12 +3,20 @@ import Link from "next/link";
 import { BsArrowRight } from "react-icons/bs";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { getImagePlaceholder } from "@/components/imagePlaceholder";
 
 const EnhanceArt = () => {
     return (
         <div className="mx-auto my-20 flex w-11/12 max-w-screen-2xl flex-col gap-5 md:flex-row">
             <div className="flex flex-1 justify-end">
-                <Image src={ArtImg} alt="frame" loading="lazy" className="rounded-xl object-cover" />
+                <Image
+                    src={ArtImg}
+                    alt="frame"
+                    loading="lazy"
+                    placeholder="blur"
+                    blurDataURL={getImagePlaceholder(ArtImg.width, ArtImg.height)}
+                    className="rounded-xl object-cover"
+                />
             </div>
             <div className="mb-5 flex flex-1 flex-col items-start justify-center md:mb-0">
                 <h2 className="mb-6 text-4xl font-semibold lg:w-[450px]">Enhance Your Frames with Stock Images</h2>

@@ -1,24 +1,12 @@
 "use server";
 import * as bcrypt from "bcrypt";
-import { validateEmail, validatePassword } from "../utils/auth";
-import { db } from "../../../prisma/db";
+import { validateEmail, validatePassword } from "../utils/validators";
+import { db } from "../../lib/db";
 import { sendPasswordResetEmail, sendVerificationEmail } from "@/helpers/mailer";
 import { randomBytes } from "crypto";
+import { ServerActionReturnType } from "@/types/serverActionReturnType";
 
-type signUpActionStateType =
-    | {
-          error: string;
-          success: false;
-      }
-    | {
-          success: true;
-          data: {
-              email: string;
-          };
-      };
-
-export async function signUpAction(state: any, formData: FormData): Promise<signUpActionStateType> {
-    console.log("signUpAction", state, formData);
+export async function signUpAction(state: any, formData: FormData): Promise<ServerActionReturnType<{ email: string }>> {
     try {
         const name = formData.get("name")?.toString().trim();
         const email = formData.get("email")?.toString().trim().toLowerCase();
@@ -40,7 +28,6 @@ export async function signUpAction(state: any, formData: FormData): Promise<sign
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        console.log("hashedPassword", hashedPassword);
         const existingUser = await db.user.findUnique({
             where: {
                 email,
@@ -74,23 +61,13 @@ export async function signUpAction(state: any, formData: FormData): Promise<sign
             },
         });
         sendVerificationEmail(email, verificationToken.token);
-        console.log("user", user);
         return { success: true, data: { email: user.email! } };
     } catch (error) {
         return { error: "Something went wrong", success: false };
     }
 }
 
-type verifyEmailActionStateType =
-    | {
-          error: string;
-          success: false;
-      }
-    | {
-          success: true;
-      };
-
-export async function verifyEmailAction(state: any, formData: FormData): Promise<verifyEmailActionStateType> {
+export async function verifyEmailAction(state: any, formData: FormData): Promise<ServerActionReturnType<undefined>> {
     try {
         const email = formData.get("email")?.toString().trim().toLowerCase();
         const token = formData.get("token")?.toString().trim();
@@ -130,28 +107,16 @@ export async function verifyEmailAction(state: any, formData: FormData): Promise
                 emailVerified: new Date(),
             },
         });
-        return { success: true };
+        return { success: true, data: undefined };
     } catch (error) {
         return { error: "Something went wrong", success: false };
     }
 }
 
-type forgotPasswordSendMailActionStateType =
-    | {
-          error: string;
-          success: false;
-      }
-    | {
-          success: true;
-          data: {
-              email: string;
-          };
-      };
-
 export async function forgotPasswordSendMailAction(
     state: any,
     formData: FormData,
-): Promise<forgotPasswordSendMailActionStateType> {
+): Promise<ServerActionReturnType<{ email: string }>> {
     try {
         const email = formData.get("email")?.toString().trim().toLowerCase();
         if (!email) {
@@ -191,16 +156,7 @@ export async function forgotPasswordSendMailAction(
     }
 }
 
-type resetPasswordActionStateType =
-    | {
-          error: string;
-          success: false;
-      }
-    | {
-          success: true;
-      };
-
-export async function resetPasswordAction(state: any, formData: FormData): Promise<resetPasswordActionStateType> {
+export async function resetPasswordAction(state: any, formData: FormData): Promise<ServerActionReturnType<undefined>> {
     try {
         const email = formData.get("email")?.toString().trim().toLowerCase();
         const password = formData.get("password")?.toString().trim();
@@ -254,7 +210,7 @@ export async function resetPasswordAction(state: any, formData: FormData): Promi
                 password: hashedPassword,
             },
         });
-        return { success: true }; // TODO: send magic link to login
+        return { success: true, data: undefined }; // TODO: send magic link to login
     } catch (error) {
         return { error: "Something went wrong", success: false };
     }

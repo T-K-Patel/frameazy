@@ -7,6 +7,7 @@ const poppins = Poppins({
     weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
     subsets: ["latin"],
 });
+
 export const metadata: Metadata = {
     title: "Frameazy | You Choose, We deliver",
     description: "Customise your own frames with Frameazy. We deliver your dream frames to your doorstep.",
@@ -95,9 +96,9 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body className={poppins.className}>
-                <ContextProviders>
-                    <div className="_next">{children}</div>
-                </ContextProviders>
+                <div className="_next">
+                    <ContextProviders>{children}</ContextProviders>
+                </div>
             </body>
         </html>
     );

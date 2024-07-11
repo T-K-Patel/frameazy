@@ -39,7 +39,6 @@ const Page = ({ searchParams }: { searchParams: any }) => {
                                     button.innerText = "Sending...";
                                     await new Promise((resolve) => setTimeout(resolve, 2000)); // simulate resend email //TODO: implement serveraction to resend email
                                     button.innerText = "Resend Email (60s)";
-                                    console.log("Resend email");
                                     const interval = setInterval(() => {
                                         if (button.innerText === "Resend Email (1s)") {
                                             clearInterval(interval);

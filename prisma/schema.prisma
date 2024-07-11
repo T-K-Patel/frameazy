@@ -141,6 +141,8 @@ model CartItem {
   frame    Frame  @relation(fields: [frameId], references: [id])
   image    String
   quantity Int    @default(1)
+
+  @@unique([userId, frameId])
 }
 
 model Order {
@@ -177,6 +179,8 @@ model OrderItem {
   quantity Int
   orderId  String @db.ObjectId
   order    Order  @relation(fields: [orderId], references: [id])
+
+  @@index([frameId])
 }
 
 model Subscription {

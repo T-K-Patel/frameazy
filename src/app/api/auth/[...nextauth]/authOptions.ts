@@ -1,6 +1,6 @@
 import CredentialsProvider from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
-import { db } from "@/../prisma/db";
+import { db } from "@/lib/db";
 import * as bcrypt from "bcrypt";
 import { NextAuthOptions } from "next-auth";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
@@ -52,7 +52,6 @@ export const authOptions: NextAuthOptions = {
     callbacks: {
         // @ts-ignore
         async signIn({ user, account, profile, email, credentials }) {
-            console.log("signIn Callback: ", { user, account, profile, email, credentials });
             if (account?.provider === "google") {
                 return profile?.email_verified;
             }
@@ -60,6 +59,18 @@ export const authOptions: NextAuthOptions = {
                 return user?.emailVerified;
             }
             return true; // Do different verification for other providers that don't have `email_verified`
+        },
+        jwt: async ({ token, user, account, profile }) => {
+            if (user) {
+                token.id = user.id;
+            }
+            return token;
+        },
+        session: async ({ session, token }) => {
+            if (token.id) {
+                session.user.id = token.id;
+            }
+            return session;
         },
     },
     secret: process.env.NEXTAUTH_SECRET,

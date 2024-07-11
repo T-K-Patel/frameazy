@@ -1,14 +1,33 @@
-import React from "react";
-import Item from "./Item";
+import React, { useEffect, useState } from "react";
+import Item, { FrameLoading } from "./Item";
 import { Swiper, SwiperSlide } from "swiper/react";
 
 import "swiper/css";
 import "swiper/css/navigation";
 
-import { Navigation, Autoplay, Keyboard, Lazy } from "swiper/modules";
+import { Navigation, Autoplay } from "swiper/modules";
 import Link from "next/link";
+import { FramesDataType, getPopularFramesAction } from "@/serverActions/frames/frame.action";
 
 const PopularItems = () => {
+    const [popularFrames, setPopularFrames] = useState<FramesDataType[]>([]);
+    const [loading, setLoading] = useState(true);
+    useEffect(() => {
+        setLoading(true);
+        getPopularFramesAction()
+            .then((data) => {
+                if (data.success) {
+                    setPopularFrames(data.data);
+                }
+            })
+            .catch((error) => {
+                console.log(error);
+            })
+            .finally(() => {
+                setLoading(false);
+            });
+    }, []);
+
     return (
         <div className="mx-auto w-11/12 max-w-screen-2xl items-center" id="explore">
             <div className="flex items-center justify-between font-semibold">
@@ -26,37 +45,42 @@ const PopularItems = () => {
                 breakpoints={{
                     640: {
                         slidesPerView: 1,
-                        spaceBetween: 20,
+                        spaceBetween: 15,
                     },
                     800: {
                         slidesPerView: 2,
-                        spaceBetween: 20,
+                        spaceBetween: 15,
                     },
                     1200: {
                         slidesPerView: 3,
                         spaceBetween: 20,
                     },
+                    1400: {
+                        slidesPerView: 4,
+                        spaceBetween: 20,
+                    },
                 }}
                 className="mt-10 md:pl-20 lg:pl-10"
             >
-                <SwiperSlide>
-                    <Item />
-                </SwiperSlide>
-                <SwiperSlide>
-                    <Item />
-                </SwiperSlide>
-                <SwiperSlide>
-                    <Item />
-                </SwiperSlide>
-                <SwiperSlide>
-                    <Item />
-                </SwiperSlide>
-                <SwiperSlide>
-                    <Item />
-                </SwiperSlide>
-                <SwiperSlide>
-                    <Item />
-                </SwiperSlide>
+                {loading
+                    ? Array.from({ length: 6 }).map((_, ind) => {
+                          return (
+                              <React.Fragment key={ind}>
+                                  <SwiperSlide>
+                                      <FrameLoading />
+                                  </SwiperSlide>
+                              </React.Fragment>
+                          );
+                      })
+                    : popularFrames.map((item, ind) => {
+                          return (
+                              <React.Fragment key={ind}>
+                                  <SwiperSlide>
+                                      <Item item={item} />
+                                  </SwiperSlide>
+                              </React.Fragment>
+                          );
+                      })}
             </Swiper>
         </div>
     );

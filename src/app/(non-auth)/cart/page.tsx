@@ -1,16 +1,15 @@
 "use server";
 import React from "react";
 import { Cart } from "./(components)/Cart";
-import { CartItemType } from "./(components)/CartItem";
+import { getCartItems } from "@/serverActions/cart/cart.actions";
 
 async function CartPage() {
-    // Simulate data fetching from server functions
-    const cartItems = await fetch("https://6603bf872393662c31cf89fb.mockapi.io/api/v1/cart", {
-        cache: "no-cache",
-    }).then((res) => res.json() as Promise<CartItemType["item"][]>);
+    let cartItems = await getCartItems();
     return (
         <section className="mx-auto my-5 max-w-screen-2xl">
-            <Cart cartItems={cartItems} />
+            {cartItems.success ?
+                <Cart cartItems={cartItems.data} /> :
+                <Cart cartItems={[]} error={"Internal server Error occured"}></Cart>}
         </section>
     );
 }

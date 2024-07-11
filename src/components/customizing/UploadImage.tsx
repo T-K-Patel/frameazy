@@ -20,7 +20,6 @@ function UploadImage() {
             img.onerror = () => {
                 // Image is invalid
                 setError("Image file is required");
-                console.error("Invalid image");
             };
             img.src = URL.createObjectURL(imageBlob);
         };
