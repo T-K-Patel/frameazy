@@ -15,7 +15,7 @@ function Item({ item }: { item: FramesDataType }) {
         <div className="mx-auto w-fit rounded-2xl border border-solid p-3">
             <div className="flex items-center justify-center">
                 <Image
-                    src={item.image}
+                    src={Frame.src}
                     width={300}
                     height={400}
                     alt="frame"
