@@ -6,7 +6,7 @@ import React from "react";
 import InputField from "../InputField";
 
 const MirrorOptions: string[] = ["Regular"];
-const FrameOptions: string[] = ["0.75inch black frame"];
+const frames: string[] = ["0.75inch black frame"];
 
 const Page = () => {
     return (
@@ -44,10 +44,7 @@ const Page = () => {
                                 label={<strong>Mirror type</strong>}
                                 field={<CustomizeDropDown items={MirrorOptions} />}
                             />
-                            <InputField
-                                label={<strong>Frame</strong>}
-                                field={<CustomizeDropDown items={FrameOptions} />}
-                            />
+                            <InputField label={<strong>Frame</strong>} field={<CustomizeDropDown items={frames} />} />
                             <InputField
                                 label={<strong>Total Size</strong>}
                                 field={

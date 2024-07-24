@@ -26,10 +26,11 @@ function Item({ item }: { item: FramesDataType }) {
             </div>
             <h2 className="mt-3 text-xl">{item.name}</h2>
             <p className="mb-5">{item.price}</p>
-            <div className="flex gap-5">
+            <form className="flex gap-5">
+                {/* // TODO: Change this implementation to handle disabling button */}
                 <Button
                     size={"sm"}
-                    onClick={async () => await addCartItem()}
+                    formAction={async () => await addCartItem({ frameId: item.id, image: "", quantity: 1, userId: "" })}
                     className="h-min w-min border border-transparent px-4 py-3 text-xl font-semibold transition-all duration-200 active:scale-90"
                 >
                     <BsCart3 size={24} />
@@ -38,11 +39,12 @@ function Item({ item }: { item: FramesDataType }) {
                 <Button
                     size={"sm"}
                     variant={"outline"}
+                    type="button"
                     className="h-min w-min border border-black bg-transparent px-4 py-3 text-lg font-semibold text-black transition-all duration-200 active:scale-90"
                 >
                     <AiFillEdit size={24} />
                 </Button>
-            </div>
+            </form>
         </div>
     );
 }
@@ -68,7 +70,7 @@ export function FrameLoading() {
             <div className="flex gap-5">
                 <Button
                     size={"sm"}
-                    onClick={() => { }}
+                    onClick={() => {}}
                     disabled
                     className="h-min w-min border border-transparent px-4 py-3 text-xl font-semibold transition-all duration-200 active:scale-90"
                 >
@@ -78,7 +80,7 @@ export function FrameLoading() {
                 <Button
                     size={"sm"}
                     disabled
-                    onClick={() => { }}
+                    onClick={() => {}}
                     variant={"outline"}
                     className="h-min w-min border border-black bg-transparent px-4 py-3 text-lg font-semibold text-black transition-all duration-200 active:scale-90"
                 >

@@ -6,6 +6,7 @@ import Personal3 from "@/assets/personal3.png";
 import Image, { StaticImageData } from "next/image";
 import { Button } from "@/components/ui/button";
 import { getImagePlaceholder } from "@/components/imagePlaceholder";
+import SelectFrame from "@/components/customizing/SelectFrame";
 
 type PersonalArtItemProps = {
     img: StaticImageData;
@@ -61,14 +62,15 @@ const PersonalizeFrame = () => {
                     />
                 </div>
                 <div className="flex justify-center pt-8">
-                    <Button
+                    {/* <Button
                         size={"sm"}
                         variant={"outline"}
                         className="h-auto bg-transparent !px-8 !py-4 text-xl font-semibold text-white transition-all duration-200 active:scale-90"
                     >
-                        Get Started
+                        Get Started&nbsp;
                         <BsArrowRight />
-                    </Button>
+                    </Button> */}
+                    <SelectFrame />
                 </div>
             </div>
         </section>

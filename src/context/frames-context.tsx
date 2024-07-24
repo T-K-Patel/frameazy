@@ -2,7 +2,6 @@
 import { useSession } from "next-auth/react";
 import React, { createContext, ReactNode, useEffect, useState } from "react";
 
-// Define the shape of the frame options data
 type FrameOptions =
     | { framingStyle: "none"; data?: null }
     | {

@@ -11,8 +11,9 @@ export type CartItemCompType = {
     item: CartItemType;
     updateState: (qty: number, itemId: string) => void;
     deleteItem: (itemId: string) => void;
+    fetchCartItems: () => void;
 };
-export const CartItem = ({ item, updateState, deleteItem }: CartItemCompType) => {
+export const CartItem = ({ item, updateState, deleteItem, fetchCartItems }: CartItemCompType) => {
     const [qty, setQty] = React.useState<number>(item.quantity);
     const [updating, setUpdating] = React.useState<boolean>(false);
 
@@ -32,13 +33,15 @@ export const CartItem = ({ item, updateState, deleteItem }: CartItemCompType) =>
                 const updatedData = await updateCartItemQty(qty, item.id, "1");
                 if (updatedData.success) {
                     updateState(updatedData.data, item.id);
+                } else {
+                    fetchCartItems();
                 }
                 setUpdating(false);
             }
         }
         const timeout = setTimeout(updateQty, 500);
         return () => clearTimeout(timeout);
-    }, [qty, item.id, item.quantity, updateState]);
+    }, [qty, item.id, item.quantity, updateState, fetchCartItems]);
 
     return (
         <div className="flex flex-wrap items-center justify-between rounded-xl border border-solid border-[#f1f1f1] p-2">
@@ -53,7 +56,7 @@ export const CartItem = ({ item, updateState, deleteItem }: CartItemCompType) =>
                     className="aspect-square w-10 flex-shrink-0 rounded-lg border border-black object-contain md:w-20"
                 />
                 <p className="leading-auto w-[75%] flex-shrink-0 text-sm font-semibold md:text-base">
-                    {item.frame?.name || "Frame Name"}
+                    {item.frame.name}
                 </p>
             </div>
             <div className="flex items-center justify-between gap-5 md:gap-8">
@@ -78,17 +81,18 @@ export const CartItem = ({ item, updateState, deleteItem }: CartItemCompType) =>
                         </button>
                     </>
                 </div>
-                <p className="text-end font-semibold">
-                    {" "}
-                    &#8377; {Math.round(Math.random() * 100 + 25) * item.quantity}
-                </p>
+                <p className="text-end font-semibold"> &#8377; {(item.frame?.price || 0) * item.quantity}</p>
                 <>
-                    <Button variant={"ghost"} size={"icon"}
+                    <Button
+                        variant={"ghost"}
+                        size={"icon"}
                         onClick={async () => {
                             setUpdating(true);
                             const deletData = await deleteCartItem(item.id);
                             if (deletData.success) {
                                 deleteItem(item.id);
+                            } else {
+                                fetchCartItems();
                             }
                             setUpdating(false);
                         }}

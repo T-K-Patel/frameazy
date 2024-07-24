@@ -4,6 +4,9 @@ import { db } from "@/lib/db";
 import * as bcrypt from "bcrypt";
 import { NextAuthOptions } from "next-auth";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import { signOut } from "next-auth/react";
+import { redisClient } from "@/lib/redis.client";
+import { cookies } from "next/headers";
 
 if (!process.env.NEXTAUTH_SECRET) {
     throw new Error("NEXTAUTH_SECRET is not defined");
@@ -35,7 +38,12 @@ export const authOptions: NextAuthOptions = {
                 if (!existingUser.emailVerified) throw new Error("Email not verified. Please verify your email first.");
 
                 if (await bcrypt.compare(credentials.password, existingUser.password)) {
-                    return existingUser;
+                    return {
+                        id: existingUser.id,
+                        email: existingUser.email,
+                        emailVerified: existingUser.emailVerified,
+                        name: existingUser.name,
+                    };
                 }
                 throw new Error("User with given credentials not found");
             },
@@ -51,16 +59,17 @@ export const authOptions: NextAuthOptions = {
     },
     callbacks: {
         // @ts-ignore
-        async signIn({ user, account, profile, email, credentials }) {
+        async signIn({ user, account, profile }) {
+            console.log("Signin called");
             if (account?.provider === "google") {
                 return profile?.email_verified;
             }
             if (account?.provider === "credentials") {
                 return user?.emailVerified;
             }
-            return true; // Do different verification for other providers that don't have `email_verified`
+            return false;
         },
-        jwt: async ({ token, user, account, profile }) => {
+        jwt: async ({ token, user, profile }) => {
             if (user) {
                 token.id = user.id;
             }

@@ -2,6 +2,7 @@ import { Poppins } from "next/font/google";
 import "./globals.css";
 import ContextProviders from "@/context/ContextProviders";
 import { Metadata } from "next";
+import Script from "next/script";
 
 const poppins = Poppins({
     weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
@@ -25,67 +26,6 @@ export const metadata: Metadata = {
         "frameazy customise frames",
         "frameazy custom",
         "frameazy frame",
-        "frameazy frames",
-        "frameazy frameazy",
-        "frameazy frameazy frames",
-        "frameazy frameazy custom frames",
-        "frameazy frameazy customise frames",
-        "frameazy frameazy custom",
-        "frameazy frameazy frame",
-        "frameazy frameazy frames",
-        "frameazy frameazy",
-        "frameazy frameazy frames",
-        "frameazy frameazy custom frames",
-        "frameazy frameazy customise frames",
-        "frameazy frameazy custom",
-        "frameazy frameazy frame",
-        "frameazy frameazy frames",
-        "frameazy frameazy",
-        "frameazy frameazy frames",
-        "frameazy frameazy custom frames",
-        "frameazy frameazy customise frames",
-        "frameazy frameazy custom",
-        "frameazy frameazy frame",
-        "frameazy frameazy frames",
-        "frameazy frameazy",
-        "frameazy frameazy frames",
-        "frameazy frameazy custom frames",
-        "frameazy frameazy customise frames",
-        "frameazy frameazy custom",
-        "frameazy frameazy frame",
-        "frameazy frameazy frames",
-        "frameazy frameazy",
-        "frameazy frameazy frames",
-        "frameazy frameazy custom frames",
-        "frameazy frameazy customise frames",
-        "frameazy frameazy custom",
-        "frameazy frameazy frame",
-        "frameazy frameazy frames",
-        "frameazy frameazy",
-        "frameazy frameazy frames",
-        "frameazy frameazy custom frames",
-        "frameazy frameazy customise frames",
-        "frameazy frameazy custom",
-        "frameazy frameazy frame",
-        "frameazy frameazy frames",
-        "frameazy frameazy",
-        "frameazy frameazy frames",
-        "frameazy frameazy custom frames",
-        "frameazy frameazy customise frames",
-        "frameazy frameazy custom",
-        "frameazy frameazy frame",
-        "frameazy frameazy frames",
-        "frameazy frameazy",
-        "frameazy frameazy frames",
-        "frameazy frameazy custom frames",
-        "frameazy frameazy customise frames",
-        "frameazy frameazy custom",
-        "frameazy frameazy frame",
-        "frameazy frameazy frames",
-        "frameazy frameazy",
-        "frameazy frameazy frames",
-        "frameazy frameazy custom frames",
-        "frameazy frameazy customise frames",
     ],
 };
 export default function RootLayout({
@@ -95,6 +35,9 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
+            <head>
+                <Script src="https://checkout.razorpay.com/v1/checkout.js" async></Script>
+            </head>
             <body className={poppins.className}>
                 <div className="_next">
                     <ContextProviders>{children}</ContextProviders>

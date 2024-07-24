@@ -1,2 +1,1 @@
-import Loading from "@/app/loading";
-export default Loading;
+export { default } from "./(components)/LoadingCart";
