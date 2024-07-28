@@ -9,9 +9,23 @@ import { subscribeNewsLetterAction } from "@/serverActions/subscribe-news-letter
 import { useEffect, useRef } from "react";
 import Link from "next/link";
 
+const SubscribeButton = () => {
+    const { pending } = useFormStatus();
+
+    return (
+        <Button
+            size={"lg"}
+            className="h-12 w-max rounded-l-none p-4 px-8 uppercase max-xs:w-full lg:h-14"
+            disabled={pending}
+        >
+            Subscribe
+        </Button>
+    );
+};
+
 const Footer = () => {
     const formRef = useRef<HTMLFormElement>(null);
-    const [state, action, pending] = useFormState(subscribeNewsLetterAction, null);
+    const [state, action] = useFormState(subscribeNewsLetterAction, null);
 
     useEffect(() => {
         if (!state) return;
@@ -45,13 +59,7 @@ const Footer = () => {
                             placeholder="Enter your email"
                             className="h-12 w-full bg-transparent px-5 py-4 outline-none md:w-fit lg:h-14"
                         />
-                        <Button
-                            size={"lg"}
-                            className="h-12 w-max rounded-l-none p-4 px-8 uppercase max-xs:w-full lg:h-14"
-                            disabled={pending}
-                        >
-                            Subscribe
-                        </Button>
+                        <SubscribeButton />
                     </form>
                 </div>
                 <div className="my-16 flex flex-col items-start justify-between gap-10 md:flex-row md:items-center">

@@ -10,7 +10,7 @@ import { getServerSession } from "next-auth";
 export type CartItemType = {
     id: string;
     frameId?: string;
-    frame?: {
+    frame: {
         id: string;
         name: string;
         price: number;
@@ -34,12 +34,14 @@ export async function getCartItems(): Promise<ServerActionReturnType<CartItemTyp
             .get(`user:cart:${user.user.id}`)
             .then((res) => (res ? (JSON.parse(res) as CartItemType[]) : null));
 
-        if (cart) return { success: true, data: cart };
+        if (cart) {
+            return { success: true, data: cart };
+        }
 
         cart = await db.user
             .findUnique({
                 where: {
-                    id: user.user.id
+                    id: user.user.id,
                 },
                 select: {
                     CartItem: {
@@ -47,9 +49,10 @@ export async function getCartItems(): Promise<ServerActionReturnType<CartItemTyp
                             id: true,
                             image: true,
                             quantity: true,
-                            frame: true
-                        }
-                    }
+                            frame: true,
+                            frameId: true,
+                        },
+                    },
                 },
             })
             .then((user) => user?.CartItem || null);
@@ -69,7 +72,14 @@ export async function getCartItems(): Promise<ServerActionReturnType<CartItemTyp
     }
 }
 
-export async function addCartItem(): Promise<ServerActionReturnType<string>> {
+type AddCartItemData = {
+    frameId: string;
+    image: string;
+    quantity: number;
+    userId: string;
+};
+
+export async function addCartItem(data: AddCartItemData): Promise<ServerActionReturnType<string>> {
     try {
         const user = await getServerSession(authOptions);
 
@@ -81,13 +91,13 @@ export async function addCartItem(): Promise<ServerActionReturnType<string>> {
 
         const exists =
             cart?.some((c) => {
-                c.frameId == "668d2ffc8482cf9a0fd4d843";
+                c.frameId == data.frameId;
             }) ||
             (await db.cartItem.findUnique({
                 where: {
                     userId_frameId: {
                         userId: user.user.id,
-                        frameId: "668d2ffc8482cf9a0fd4d843",
+                        frameId: data.frameId,
                     },
                 },
             }));
@@ -96,7 +106,7 @@ export async function addCartItem(): Promise<ServerActionReturnType<string>> {
                 where: {
                     userId_frameId: {
                         userId: user.user.id,
-                        frameId: "668d2ffc8482cf9a0fd4d843",
+                        frameId: data.frameId,
                     },
                 },
                 data: {
@@ -105,25 +115,41 @@ export async function addCartItem(): Promise<ServerActionReturnType<string>> {
             });
             cart =
                 cart?.map((c) => {
-                    if (c.frameId == "668d2ffc8482cf9a0fd4d843") {
+                    if (c.frameId == data.frameId) {
                         c.quantity += 1;
                     }
                     return c;
                 }) || null;
             if (cart) {
                 await redisClient.set(`user:cart:${user.user.id}`, JSON.stringify(cart));
+                await redisClient.expire(`user:cart:${user.user.id}`, 60 * 5); // 5 Minutes
             }
         } else {
             await db.cartItem.create({
                 data: {
-                    frameId: "668d2ffc8482cf9a0fd4d843",
+                    frameId: data.frameId,
                     image: "http://localhost:3000/frame-1.png",
                     quantity: 1,
                     userId: user.user.id,
                 },
             });
             cart = await db.user
-                .findUnique({ where: { id: user.user.id }, include: { CartItem: true } })
+                .findUnique({
+                    where: {
+                        id: user.user.id,
+                    },
+                    select: {
+                        CartItem: {
+                            select: {
+                                id: true,
+                                image: true,
+                                quantity: true,
+                                frame: true,
+                                frameId: true,
+                            },
+                        },
+                    },
+                })
                 .then((user) => user?.CartItem || null);
             if (cart) {
                 await redisClient.set(`user:cart:${user.user.id}`, JSON.stringify(cart));
@@ -132,10 +158,11 @@ export async function addCartItem(): Promise<ServerActionReturnType<string>> {
         }
         return { success: true, data: "Item added to cart" };
     } catch (error) {
+        console.log(error);
         if (error instanceof CustomError) {
             return { success: false, error: error.message };
         }
-        console.error("getCartItems error", error);
+        console.error("addCartItem error", error);
         return { success: false, error: "Something went wrong" };
     }
 }
@@ -154,7 +181,22 @@ export async function updateCartItemQty(
                 .get(`user:cart:${user.user.id}`)
                 .then((res) => (res ? (JSON.parse(res) as CartItemType[]) : null))) ??
             (await db.user
-                .findUnique({ where: { id: user.user.id }, include: { CartItem: true } })
+                .findUnique({
+                    where: {
+                        id: user.user.id,
+                    },
+                    select: {
+                        CartItem: {
+                            select: {
+                                id: true,
+                                image: true,
+                                quantity: true,
+                                frame: true,
+                                frameId: true,
+                            },
+                        },
+                    },
+                })
                 .then((user) => user?.CartItem || null));
 
         if (!cart) throw new CustomError("Cart not found");
@@ -173,9 +215,9 @@ export async function updateCartItemQty(
         return { success: true, data: qty };
     } catch (error) {
         if (error instanceof CustomError) {
-            console.error("updateCartItemQty error", error);
             return { success: false, error: error.message };
         }
+        console.error("updateCartItemQty error", error);
         return { success: false, error: "Something went wrong" };
     }
 }
@@ -191,7 +233,7 @@ export async function deleteCartItem(itemId: string): Promise<ServerActionReturn
                 .then((res) => (res ? (JSON.parse(res) as CartItemType[]) : []))) ??
             (await db.user
                 .findUnique({ where: { id: user.user.id }, include: { CartItem: true } })
-                .then((user) => user?.CartItem || []))
+                .then((user) => user?.CartItem || []));
 
         if (!cart) throw new CustomError("Item not found in cart");
 
@@ -205,12 +247,29 @@ export async function deleteCartItem(itemId: string): Promise<ServerActionReturn
         await redisClient.expire(`user:cart:${user.user.id}`, 60 * 15); // 15 Minutes
 
         return { success: true, data: "Item deleted from cart" };
-
     } catch (error: any) {
         if (error instanceof CustomError) {
-            console.error("updateCartItemQty error", error);
             return { success: false, error: error.message };
         }
+        console.error("deleteCartItem error", error);
+        return { success: false, error: "Something went wrong" };
+    }
+}
+
+export async function clearCartAction(): Promise<ServerActionReturnType<string>> {
+    try {
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+        const user = await getServerSession(authOptions);
+        if (!user?.user.id) throw new CustomError("You need to be logged in to clear cart items");
+
+        await db.cartItem.deleteMany({ where: { userId: user.user.id } });
+        await redisClient.del(`user:cart:${user.user.id}`);
+        return { success: true, data: "Cart cleared" };
+    } catch (error) {
+        if (error instanceof CustomError) {
+            return { success: false, error: error.message };
+        }
+        console.error("clearCartAction error", error);
         return { success: false, error: "Something went wrong" };
     }
 }
@@ -227,15 +286,70 @@ export async function placeOrderAction(
     formData: FormData,
 ): Promise<ServerActionReturnType<PlaceOrderReturnType>> {
     // SECURITY: Validate that the user has permission to place the order
-    const user = await getServerSession();
-    await new Promise((resolve) => setTimeout(resolve, 1000));
     try {
+        const user = await getServerSession(authOptions);
+        if (!user?.user.id) throw new CustomError("You need to be logged in to place an order");
+
+        const name = formData.get("name") as string;
+        const addressL1 = formData.get("address-line-1") as string;
+        const addressL2 = formData.get("address-line-2") as string;
+        const city = formData.get("city") as string;
+        const pincode = formData.get("pin-code") as string;
+        const state = formData.get("state") as string;
+        const phone = formData.get("phone") as string;
+
+        // IMPORTANT: Validate the form data here
+
+        const cartItems = await db.cartItem.findMany({
+            where: {
+                userId: user.user.id,
+            },
+            include: {
+                frame: { select: { price: true } },
+            },
+        });
+
+        if (cartItems.length == 0) throw new CustomError("Cart is empty");
+
+        const totalPrice = cartItems.reduce((acc, item) => acc + item.frame.price * item.quantity, 0); // TODO: Add shipping cost.
+
+        const order = await db.order.create({
+            data: {
+                userId: user.user.id,
+                price: totalPrice,
+                name,
+                addressL1,
+                addressL2,
+                city,
+                pincode,
+                state,
+                phone,
+            },
+        });
+
+        // Create orderItems for each cartItem
+        await db.orderItem.createMany({
+            data: cartItems.map((item) => ({
+                orderId: order.id,
+                image: item.image,
+                frameId: item.frameId,
+                quantity: item.quantity,
+            })),
+        });
+
+        await db.cartItem.deleteMany({ where: { userId: user.user.id } });
+        await redisClient.del(`user:cart:${user.user.id}`);
+
+        await new Promise((resolve) => setTimeout(resolve, 1000));
         return {
             success: true,
-            data: { orderId: "123", orderTotal: 100, paymentIntentId: "123", paymentMethodId: "123" },
+            data: { orderId: order.id, orderTotal: totalPrice, paymentIntentId: "123", paymentMethodId: "123" },
         };
-    } catch (error) {
-        console.error("placeOrderAction error", error);
+    } catch (error: any) {
+        if (error instanceof CustomError) {
+            return { success: false, error: error.message };
+        }
+        console.log("placeOrderAction error", error);
         return { success: false, error: "Something went wrong" };
     }
 }

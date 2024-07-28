@@ -33,11 +33,11 @@ export async function contactUsAction(state: any, formData: FormData): Promise<S
         if (!success) throw new CustomError("Failed to send message");
 
         return { data: "Your message has been sent successfully. We will get back to you soon.", success: true };
-    } catch (e: any) {
-        if (!(e instanceof CustomError)) console.error(e);
-        return {
-            success: false,
-            error: e instanceof CustomError ? e.message : "Something went wrong. Please try again later.",
-        };
+    } catch (error: any) {
+        if (error instanceof CustomError) {
+            return { success: false, error: error.message };
+        }
+        console.error("contactUsAction error", error);
+        return { success: false, error: "Something went wrong" };
     }
 }

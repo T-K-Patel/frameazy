@@ -112,6 +112,7 @@ function Page() {
                                             step={1}
                                             className="w-20 border border-gray-2 p-3 px-2 text-center"
                                             placeholder="0"
+                                            disabled
                                         />
                                         <p>X</p>
                                         <Input
@@ -120,6 +121,7 @@ function Page() {
                                             step={1}
                                             className="w-20 border border-gray-2 p-3 px-2 text-center"
                                             placeholder="0"
+                                            disabled
                                         />
                                         <span className="pr-2 font-semibold">In</span>
                                     </div>

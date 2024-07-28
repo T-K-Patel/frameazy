@@ -81,6 +81,17 @@
     -ms-overflow-style: none;
 }
 
+.no-buttons-input::-webkit-outer-spin-button,
+.no-buttons-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+.no-buttons-input {
+    -moz-appearance: textfield;
+}
+
 ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
