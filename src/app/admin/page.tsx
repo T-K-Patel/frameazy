@@ -96,7 +96,7 @@ const AdminDashboard = () => {
                                     <ul className="flex flex-col gap-3">
                                         {FramseCategory.map((item, index) => (
                                             <li key={index}>
-                                                <Checkbox title={item} props={{ name: "frameCategories" }} />
+                                                <Checkbox title={item} props={{ name: "frameCategories" }} onChange={undefined} checked={false} />
                                             </li>
                                         ))}
                                     </ul>
@@ -106,7 +106,7 @@ const AdminDashboard = () => {
                                     <ul className="grid grid-cols-2 gap-2">
                                         {FrameColors.map((item, index) => (
                                             <li key={index}>
-                                                <Checkbox title={item} props={{ name: "frameColors" }} />
+                                                <Checkbox title={item} props={{ name: "frameColors" }} onChange={undefined} checked={false} />
                                             </li>
                                         ))}
                                     </ul>
@@ -145,7 +145,7 @@ const AdminDashboard = () => {
                                     <ul className="flex flex-col gap-2">
                                         {Collections.map((item, index) => (
                                             <li key={index}>
-                                                <Checkbox title={item} props={{ name: "collections" }} />
+                                                <Checkbox title={item} props={{ name: "collections" }} onChange={undefined} checked={false} />
                                             </li>
                                         ))}
                                     </ul>
