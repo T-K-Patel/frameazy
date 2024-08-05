@@ -11,14 +11,14 @@ const Dashboard = () => {
     }; // getUserAction(); // TODO get user action
 
     return (
-        <div className="mx-auto w-11/12 max-w-screen-2xl py-12">
+        <div className="mx-auto w-5/6 max-w-screen-2xl py-12">
             <section className="rounded-lg border border-[#F1F1F1] p-3 mb-12">
                 <header>
                     <h1 className="font-semibold text-3xl leading-12 border-[#F1F1F1] border-b pb-3">User</h1>
                 </header>
                 <div className="mt-6">
-                    <div className="flex flex-col md:flex-row items-center justify-center">
-                        <Image src={user.image || DefaultImage} alt={user.name} className="w-16 h-16 md:w-[171px] md:h-[171px] mb-6 md:mb-0 md:mr-6" />
+                    <div className="grid grid-cols-1 md:grid-cols-3 place-items-center">
+                        <Image src={user.image || DefaultImage} alt={user.name} className="w-16 h-16 md:w-1/2 md:h-1/2 mb-6 md:mb-0 md:mr-6 col-span-1 max-h-3/4 max-w-43" />
                         <div className="p-5 rounded-md">
                             <div className="mb-5 flex">
                                 <div className="flex justify-between ">
@@ -45,7 +45,7 @@ const Dashboard = () => {
                     </div>
                 </div>
             </section>
-            <section className="w-11/12 rounded-md mb-12">
+            <section className="rounded-md mb-12 border border-[#F1F1F1] p-3">
                 <header>
                     <h1 className="font-semibold text-3xl leading-12 mb-6">Orders</h1>
                 </header>
