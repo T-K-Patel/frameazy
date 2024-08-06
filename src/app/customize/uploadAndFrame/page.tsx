@@ -1,11 +1,12 @@
 "use client";
 import AddArtwork from "@/components/AddArtwork";
-import CustomizeDropDown from "../CustomizeDropDown";
+import CustomizeDropDown from "@/components/CustomizeDropDown";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import React from "react";
 import { useFrames } from "@/context/frames-context";
 import InputField from "../InputField";
+import FrameCanvas from "../FrameCanvas";
 
 type CustomizeOptionsProps = {
     title: string;
@@ -97,7 +98,7 @@ function Page() {
     return (
         <>
             <div className="grid min-h-[calc(100vh-150px)] gap-5 pb-4 pt-10 md:grid-cols-2">
-                <div className="bg-gray-2" />
+                <FrameCanvas image={{ src: frameOptions.data.croppedImage as string, width: 100, height: 100 }} />
                 <div className="mx-auto flex w-11/12 flex-col gap-6">
                     <h1 className="leading-auto text-3xl font-semibold">{content.title}</h1>
                     <div className="mb-3 flex flex-col gap-y-5">

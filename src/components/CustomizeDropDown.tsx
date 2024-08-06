@@ -1,13 +1,8 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import { RiArrowDropDownLine } from "react-icons/ri";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "../../components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
 
-const CustomizeDropDown = ({ items }: { items: string[] }) => {
+const CustomizeDropDown = ({ items }: { items: (string | ReactNode)[] }) => {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger

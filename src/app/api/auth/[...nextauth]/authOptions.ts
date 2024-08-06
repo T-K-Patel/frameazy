@@ -14,7 +14,7 @@ if (!process.env.NEXTAUTH_SECRET) {
 
 export const authOptions: NextAuthOptions = {
     adapter: PrismaAdapter(db),
-    debug: process.env.NODE_ENV === "development",
+    debug: true,
     providers: [
         CredentialsProvider({
             name: "Credentials",
@@ -60,7 +60,6 @@ export const authOptions: NextAuthOptions = {
     callbacks: {
         // @ts-ignore
         async signIn({ user, account, profile }) {
-            console.log("Signin called");
             if (account?.provider === "google") {
                 return profile?.email_verified;
             }

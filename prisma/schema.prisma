@@ -186,6 +186,7 @@ enum OrderStatus {
   Received
   Approved
   Processing
+  Shipped
   Delivered
 }
 

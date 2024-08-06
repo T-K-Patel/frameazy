@@ -1,5 +1,5 @@
 import AddArtwork from "@/components/AddArtwork";
-import CustomizeDropDown from "../CustomizeDropDown";
+import CustomizeDropDown from "@/components/CustomizeDropDown";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import React from "react";
