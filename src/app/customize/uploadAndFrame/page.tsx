@@ -136,14 +136,22 @@ function Page() {
                                             <div className="mb-3 grid w-full items-center gap-4 md:grid-cols-2">
                                                 <div className="flex items-center gap-x-2">
                                                     <p className="">Total width:</p>
-                                                    <CustomizeDropDown items={matWidths} />
+                                                    <CustomizeDropDown
+                                                        value="something"
+                                                        onChange={() => {}}
+                                                        items={matWidths}
+                                                    />
                                                     <span>
                                                         <strong>In</strong>
                                                     </span>
                                                 </div>
                                                 <div className="flex items-center gap-x-2">
                                                     <p>Top:</p>
-                                                    <CustomizeDropDown items={matOptions} />
+                                                    <CustomizeDropDown
+                                                        value="something"
+                                                        onChange={() => {}}
+                                                        items={matOptions}
+                                                    />
                                                 </div>
                                             </div>
                                             <button className="text-blue-1">Add More Mat</button>
@@ -157,7 +165,13 @@ function Page() {
                                         <InputField
                                             key={index}
                                             label={<strong>{option.title}</strong>}
-                                            field={<CustomizeDropDown items={option.items} />}
+                                            field={
+                                                <CustomizeDropDown
+                                                    value="something"
+                                                    onChange={() => {}}
+                                                    items={option.items}
+                                                />
+                                            }
                                         />
                                     );
                                 })}

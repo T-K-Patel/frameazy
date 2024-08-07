@@ -42,9 +42,14 @@ const Page = () => {
                             />
                             <InputField
                                 label={<strong>Mirror type</strong>}
-                                field={<CustomizeDropDown items={MirrorOptions} />}
+                                field={
+                                    <CustomizeDropDown value="something" onChange={() => {}} items={MirrorOptions} />
+                                }
                             />
-                            <InputField label={<strong>Frame</strong>} field={<CustomizeDropDown items={frames} />} />
+                            <InputField
+                                label={<strong>Frame</strong>}
+                                field={<CustomizeDropDown value="something" onChange={() => {}} items={frames} />}
+                            />
                             <InputField
                                 label={<strong>Total Size</strong>}
                                 field={

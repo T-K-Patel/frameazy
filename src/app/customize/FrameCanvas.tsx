@@ -43,7 +43,11 @@ const FrameCanvas = ({ image, totalSize }: FrameCanvasProps) => {
      * SF*th<ch
      * SF*tw<cw
      */
-    const SCALE_FACTOR = 1 / (Math.max((((totalSize?.width || 0)) / CANVAS_WIDTH), (((totalSize?.height || 0)) / CANVAS_HEIGHT),) * SIZE_FACTOR * INCH_TO_PIXEL);
+    const SCALE_FACTOR =
+        1 /
+        (Math.max((totalSize?.width || 0) / CANVAS_WIDTH, (totalSize?.height || 0) / CANVAS_HEIGHT) *
+            SIZE_FACTOR *
+            INCH_TO_PIXEL);
 
     const draw = useCallback(
         (ctx: CanvasRenderingContext2D) => {

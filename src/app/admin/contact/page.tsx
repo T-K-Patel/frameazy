@@ -11,8 +11,13 @@ type Contact = {
 const ContactItem = ({ contact }: { contact: Contact }) => {
     return (
         <div className="flex flex-col gap-1 rounded-2xl border border-[#F1F1F1] p-5">
-            <h1 className="font-semibold leading-6">{contact.name}</h1>
-            <p className="text-sm font-semibold text-[#A3A1A1]">{contact.email}</p>
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="pb-1 font-semibold leading-6">{contact.name}</h1>
+                    <p className="text-sm font-semibold text-[#A3A1A1]">{contact.email}</p>
+                </div>
+                <p className="text-sm font-semibold">{contact.date.toDateString()}</p>
+            </div>
             <p className="border border-[#D2D1D1]" />
             <p className="max-w-[1132px] text-sm font-semibold leading-5">{contact.message}</p>
         </div>
