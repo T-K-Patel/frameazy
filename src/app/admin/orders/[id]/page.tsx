@@ -1,5 +1,5 @@
 "use client";
-import CustomizeDropDown from "@/components/CustomizeDropDown";
+import DropDown from "@/components/DropDown";
 import { CartItem } from "@prisma/client";
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -22,19 +22,14 @@ const DeliveryStatus = ({ status, value }: { status: string; value: string }) =>
 };
 const OrderDetails = ({ params }: { params: { id: string } }) => {
     const [order, setOrder] = useState({ paymentStatus: "Pending", deliveryStatus: "Pending" }); //TODO fetching order with the id;
+    const items = ["Pending", "Out for delivery", "Delivered", "Cancelled"];
     return (
         <div className="mx-auto flex w-5/6 max-w-screen-2xl flex-col gap-4 md:gap-8">
             <div className="flex flex-col gap-2 rounded-2xl border border-[#F1F1F1] px-4 py-6 md:gap-5">
                 <h1 className="leading-12 border-b border-[#F1F1F1] pb-3 text-3xl font-semibold">
                     Update Order Status
                 </h1>
-                <CustomizeDropDown
-                    value={order.deliveryStatus}
-                    onChange={(status: string) => {
-                        setOrder({ ...order, deliveryStatus: status });
-                    }}
-                    items={["Pending", "Out for delivery", "Delivered", "Cancelled"]}
-                />
+                <DropDown value={order.deliveryStatus} onChange={(status: string) => { setOrder({ ...order, deliveryStatus: status || "" }) }} items={items} />
             </div>
             <div className="flex flex-col gap-5 rounded-2xl border border-[#F1F1F1] px-4 py-6">
                 <h1 className="leading-12 border-b border-[#F1F1F1] pb-3 text-3xl font-semibold">Order Items</h1>

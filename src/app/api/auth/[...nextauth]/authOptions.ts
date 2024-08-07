@@ -16,38 +16,38 @@ export const authOptions: NextAuthOptions = {
     adapter: PrismaAdapter(db),
     debug: true,
     providers: [
-        CredentialsProvider({
-            name: "Credentials",
-            credentials: {
-                email: { label: "Email", type: "text", placeholder: "sample@mail.com", required: true },
-                password: { label: "Password", type: "password", required: true },
-            },
-            async authorize(credentials: Record<"email" | "password", string> | undefined): Promise<any> {
-                if (!credentials?.password) return null;
-                const existingUser = await db.user.findUnique({
-                    where: {
-                        email: credentials.email,
-                    },
-                });
+        // CredentialsProvider({
+        //     name: "Credentials",
+        //     credentials: {
+        //         email: { label: "Email", type: "text", placeholder: "sample@mail.com", required: true },
+        //         password: { label: "Password", type: "password", required: true },
+        //     },
+        //     async authorize(credentials: Record<"email" | "password", string> | undefined): Promise<any> {
+        //         if (!credentials?.password) return null;
+        //         const existingUser = await db.user.findUnique({
+        //             where: {
+        //                 email: credentials.email,
+        //             },
+        //         });
 
-                if (!existingUser) throw new Error("User with given credentials not found");
-                if (!existingUser.password)
-                    throw new Error(
-                        "You are not allowed to login to this account with password. Please use Google Sign In.",
-                    );
-                if (!existingUser.emailVerified) throw new Error("Email not verified. Please verify your email first.");
+        //         if (!existingUser) throw new Error("User with given credentials not found");
+        //         if (!existingUser.password)
+        //             throw new Error(
+        //                 "You are not allowed to login to this account with password. Please use Google Sign In.",
+        //             );
+        //         if (!existingUser.emailVerified) throw new Error("Email not verified. Please verify your email first.");
 
-                if (await bcrypt.compare(credentials.password, existingUser.password)) {
-                    return {
-                        id: existingUser.id,
-                        email: existingUser.email,
-                        emailVerified: existingUser.emailVerified,
-                        name: existingUser.name,
-                    };
-                }
-                throw new Error("User with given credentials not found");
-            },
-        }),
+        //         if (await bcrypt.compare(credentials.password, existingUser.password)) {
+        //             return {
+        //                 id: existingUser.id,
+        //                 email: existingUser.email,
+        //                 emailVerified: existingUser.emailVerified,
+        //                 name: existingUser.name,
+        //             };
+        //         }
+        //         throw new Error("User with given credentials not found");
+        //     },
+        // }),
         Google({
             clientId: process.env.GOOGLE_CLIENT_ID || "",
             clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
@@ -63,9 +63,9 @@ export const authOptions: NextAuthOptions = {
             if (account?.provider === "google") {
                 return profile?.email_verified;
             }
-            if (account?.provider === "credentials") {
-                return user?.emailVerified;
-            }
+            // if (account?.provider === "credentials") {
+            //     return user?.emailVerified;
+            // }
             return false;
         },
         jwt: async ({ token, user, profile }) => {

@@ -1,5 +1,5 @@
 import AddArtwork from "@/components/AddArtwork";
-import CustomizeDropDown from "@/components/CustomizeDropDown";
+import DropDown from "@/components/DropDown"
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import React from "react";
@@ -43,12 +43,12 @@ const Page = () => {
                             <InputField
                                 label={<strong>Mirror type</strong>}
                                 field={
-                                    <CustomizeDropDown value="something" onChange={() => {}} items={MirrorOptions} />
+                                    <DropDown value={"Something"} onChange={(status: string) => { }} items={MirrorOptions} />
                                 }
                             />
                             <InputField
                                 label={<strong>Frame</strong>}
-                                field={<CustomizeDropDown value="something" onChange={() => {}} items={frames} />}
+                                field={<DropDown value={"Something"} onChange={(status: string) => { }} items={frames} />}
                             />
                             <InputField
                                 label={<strong>Total Size</strong>}

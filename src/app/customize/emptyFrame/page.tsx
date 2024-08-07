@@ -1,5 +1,5 @@
 "use client";
-import CustomizeDropDown from "@/components/CustomizeDropDown";
+import DropDown from "@/components/DropDown"
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import React from "react";
@@ -96,22 +96,14 @@ function Page() {
                                         <div className="mb-3 grid w-full items-center gap-4 md:grid-cols-2">
                                             <div className="flex items-center gap-x-2">
                                                 <p className="">Total width:</p>
-                                                <CustomizeDropDown
-                                                    value="Something"
-                                                    onChange={() => {}}
-                                                    items={matWidths}
-                                                />
+                                                <DropDown value={"Something"} onChange={(status: string) => { }} items={matOptions} />
                                                 <span>
                                                     <strong>In</strong>
                                                 </span>
                                             </div>
                                             <div className="flex items-center gap-x-2">
                                                 <p>Top:</p>
-                                                <CustomizeDropDown
-                                                    value="Something"
-                                                    onChange={() => {}}
-                                                    items={matOptions}
-                                                />
+                                                <DropDown value={"Something"} onChange={(status: string) => { }} items={matOptions} />
                                             </div>
                                         </div>
                                         <button className="text-blue-1">Add More Mat</button>
@@ -126,11 +118,7 @@ function Page() {
                                         key={index}
                                         label={<strong>{option.title}</strong>}
                                         field={
-                                            <CustomizeDropDown
-                                                value="Something"
-                                                onChange={() => {}}
-                                                items={option.items}
-                                            />
+                                            <DropDown value={"Something"} onChange={(status: string) => { }} items={option.items} />
                                         }
                                     />
                                 );

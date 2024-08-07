@@ -1,6 +1,6 @@
 "use client";
 import AddArtwork from "@/components/AddArtwork";
-import CustomizeDropDown from "@/components/CustomizeDropDown";
+import DropDown from "@/components/DropDown";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import React from "react";
@@ -98,7 +98,9 @@ function Page() {
     return (
         <>
             <div className="grid min-h-[calc(100vh-150px)] gap-5 pb-4 pt-10 md:grid-cols-2">
-                <FrameCanvas image={{ src: frameOptions.data.croppedImage as string, width: 100, height: 100 }} />
+                <FrameCanvas image={{ src: frameOptions.data.croppedImage as string, width: 12, height: 9 }}
+                    matOptions={[{ color: "#eeeeee", width: 0.5 }, { color: "#777", width: 0.5 }]}
+                    totalSize={{ width: 16, height: 12 }} frameBorder={{ borderWidth: 1, src: "" }} />
                 <div className="mx-auto flex w-11/12 flex-col gap-6">
                     <h1 className="leading-auto text-3xl font-semibold">{content.title}</h1>
                     <div className="mb-3 flex flex-col gap-y-5">
@@ -136,22 +138,14 @@ function Page() {
                                             <div className="mb-3 grid w-full items-center gap-4 md:grid-cols-2">
                                                 <div className="flex items-center gap-x-2">
                                                     <p className="">Total width:</p>
-                                                    <CustomizeDropDown
-                                                        value="something"
-                                                        onChange={() => {}}
-                                                        items={matWidths}
-                                                    />
+                                                    <DropDown value={"Something"} onChange={(status: string) => { }} items={matWidths} />
                                                     <span>
                                                         <strong>In</strong>
                                                     </span>
                                                 </div>
                                                 <div className="flex items-center gap-x-2">
                                                     <p>Top:</p>
-                                                    <CustomizeDropDown
-                                                        value="something"
-                                                        onChange={() => {}}
-                                                        items={matOptions}
-                                                    />
+                                                    <DropDown value={"Something"} onChange={(status: string) => { }} items={matOptions} />
                                                 </div>
                                             </div>
                                             <button className="text-blue-1">Add More Mat</button>
@@ -166,11 +160,7 @@ function Page() {
                                             key={index}
                                             label={<strong>{option.title}</strong>}
                                             field={
-                                                <CustomizeDropDown
-                                                    value="something"
-                                                    onChange={() => {}}
-                                                    items={option.items}
-                                                />
+                                                <DropDown value={"Something"} onChange={(status: string) => { }} items={option.items} />
                                             }
                                         />
                                     );
