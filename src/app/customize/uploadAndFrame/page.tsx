@@ -3,7 +3,7 @@ import AddArtwork from "@/components/AddArtwork";
 import DropDown from "@/components/DropDown";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import React from "react";
+import React, { useState } from "react";
 import { useFrames } from "@/context/frames-context";
 import InputField from "../InputField";
 import FrameCanvas from "../FrameCanvas";
@@ -16,9 +16,35 @@ type CustomizeOptionsProps = {
 const matOptions = ["White Mat"];
 const matWidths = ["3"];
 
+type uploadOptionsProps = {
+    dimensions: { width: number; height: number };
+    frame?: string;
+    glazing?: string;
+    printing:string;
+    backing?:string;
+    stretching?:string;
+    sides?:string;
+}
+type matOptionsProps = {
+    width: number;
+    color: string;
+    id: string;
+}[];
+
 type ContentType = { title: string; mat: boolean; options: CustomizeOptionsProps[] };
 function Page() {
     const { frameOptions } = useFrames();
+    const [upload, setUpload] = useState<uploadOptionsProps>({
+        dimensions: { width: 0, height: 0 },
+        frame: "0.75 inch black frame",
+        glazing: "Regular",
+        printing:"Photo Paper",
+        backing:"Pine Mdf Hardboard",
+        stretching:"Regular",
+        sides:"Image mirrored"
+    });
+    const [mat, setMat] = useState<matOptionsProps>([{width: 3, color: "white",id:new Date().toString()}]);
+
     if (frameOptions.framingStyle != "uploadAndFrame") return <></>;
     let customizeOptions = frameOptions.data.frameType; //TODO Must implement a context here
     let content: ContentType = {
@@ -138,15 +164,30 @@ function Page() {
                                             <div className="mb-3 grid w-full items-center gap-4 md:grid-cols-2">
                                                 <div className="flex items-center gap-x-2">
                                                     <p className="">Total width:</p>
-                                                    <DropDown value={"Something"} onChange={(status: string) => { }} items={matWidths} />
-                                                    <span>
+                                                    <Input
+                                                        type="number"
+                                                        min={1}
+                                                        step={1}
+                                                        className="w-20 border border-gray-2 p-3 px-2 text-center"
+                                                        placeholder="0"
+                                                        value={mat[0].width}
+                                                        onChange={(e) => {
+                                                            // setMat({...mat[0], width: +e.target.value });
+                                                        }}
+                                                    />                                                    <span>
                                                         <strong>In</strong>
                                                     </span>
                                                 </div>
                                                 <div className="flex items-center gap-x-2">
                                                     <p>Top:</p>
-                                                    <DropDown value={"Something"} onChange={(status: string) => { }} items={matOptions} />
-                                                </div>
+                                                    <Input
+                                                        className="border border-gray-2 text-center"
+                                                        placeholder="white"
+                                                        value={mat[0].color}
+                                                        onChange={(e) => {
+                                                            // setMat({...mat[0], color: e.target.value });
+                                                        }}
+                                                    />                                                </div>
                                             </div>
                                             <button className="text-blue-1">Add More Mat</button>
                                         </div>
@@ -160,7 +201,10 @@ function Page() {
                                             key={index}
                                             label={<strong>{option.title}</strong>}
                                             field={
-                                                <DropDown value={"Something"} onChange={(status: string) => { }} items={option.items} />
+                                                //@ts-ignore
+                                                <DropDown value={upload[option.title.toLowerCase()]} onChange={(status: string) => { setUpload((upload)=>{
+                                                    return {...upload,[option.title.toLowerCase()]:status}
+                                                }) }} items={option.items} />
                                             }
                                         />
                                     );

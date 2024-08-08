@@ -1,14 +1,19 @@
-import AddArtwork from "@/components/AddArtwork";
 import DropDown from "@/components/DropDown"
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import React from "react";
+import React, { useState } from "react";
 import InputField from "../InputField";
 
 const MirrorOptions: string[] = ["Regular"];
 const frames: string[] = ["0.75inch black frame"];
 
+type MirrorOptions={
+    dimensions: { width: number; height: number };
+    frame: string;
+    mirrorType: string;
+}
 const Page = () => {
+    const [mirror,setMirror] = useState<MirrorOptions>({dimensions:{width:0,height:0},frame:"0.75inch black frame",mirrorType:"Regular"});
     return (
         <>
             <div className="grid min-h-[calc(100vh-150px)] gap-5 pb-4 pt-10 md:grid-cols-2">
@@ -43,12 +48,12 @@ const Page = () => {
                             <InputField
                                 label={<strong>Mirror type</strong>}
                                 field={
-                                    <DropDown value={"Something"} onChange={(status: string) => { }} items={MirrorOptions} />
+                                    <DropDown value={mirror.mirrorType} onChange={(status: string) => { setMirror({...mirror,mirrorType:status}) }} items={MirrorOptions} />
                                 }
                             />
                             <InputField
                                 label={<strong>Frame</strong>}
-                                field={<DropDown value={"Something"} onChange={(status: string) => { }} items={frames} />}
+                                field={<DropDown value={mirror.frame} onChange={(status: string) => { setMirror({...mirror,frame:status}) }} items={frames} />}
                             />
                             <InputField
                                 label={<strong>Total Size</strong>}

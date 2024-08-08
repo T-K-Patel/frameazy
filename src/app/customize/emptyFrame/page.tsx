@@ -2,7 +2,7 @@
 import DropDown from "@/components/DropDown"
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import React from "react";
+import React, { useState } from "react";
 import { useFrames } from "@/context/frames-context";
 import InputField from "../InputField";
 import { BiX } from "react-icons/bi";
@@ -13,13 +13,27 @@ type CustomizeOptionsProps = {
     items: string[];
 };
 
-const matOptions = ["White Mat"];
-const matWidths = ["3"];
+type emptyFrameProps = {
+    dimensions: { width: number; height: number };
+    frame: string;
+    glazing?: string;
+}
 
+type matOptionsProps = {
+    width: number;
+    color: string;
+    id: string;
+}[];
 type ContentType = { title: string; warning: string; mat: boolean; options: CustomizeOptionsProps[] };
 
 function Page() {
     const { frameOptions } = useFrames();
+    const [frame, setFrame] = useState<emptyFrameProps>({
+        dimensions: { width: 0, height: 0 },
+        frame: "0.75 inch black frame",
+        glazing: "Regular",
+    });
+    const [mat, setMat] = useState<matOptionsProps>([{width: 3, color: "white",id:new Date().toString()}]);
 
     if (frameOptions.framingStyle != "emptyFrame") return <></>;
     let customizeOptions = frameOptions.data.frameType;
@@ -96,14 +110,31 @@ function Page() {
                                         <div className="mb-3 grid w-full items-center gap-4 md:grid-cols-2">
                                             <div className="flex items-center gap-x-2">
                                                 <p className="">Total width:</p>
-                                                <DropDown value={"Something"} onChange={(status: string) => { }} items={matOptions} />
+                                                <Input
+                                                    type="number"
+                                                    min={1}
+                                                    step={1}
+                                                    className="w-20 border border-gray-2 p-3 px-2 text-center"
+                                                    placeholder="0"
+                                                    value={mat[0].width}
+                                                    onChange={(e) => {
+                                                        // setMat({...mat[0], width: +e.target.value });
+                                                    }}
+                                                />
                                                 <span>
                                                     <strong>In</strong>
                                                 </span>
                                             </div>
                                             <div className="flex items-center gap-x-2">
                                                 <p>Top:</p>
-                                                <DropDown value={"Something"} onChange={(status: string) => { }} items={matOptions} />
+                                                <Input
+                                                    className="border border-gray-2 text-center"
+                                                    placeholder="white"
+                                                    value={mat[0].color}
+                                                    onChange={(e) => {
+                                                        // setMat({...mat[0], color: e.target.value });
+                                                    }}
+                                                />
                                             </div>
                                         </div>
                                         <button className="text-blue-1">Add More Mat</button>
@@ -112,17 +143,23 @@ function Page() {
                             />
                         )}
                         <div className="flex flex-col gap-y-5">
-                            {content.options.map((option, index) => {
-                                return (
+                            {content.title==="Empty frame for paper items" ? (
+                                <>
                                     <InputField
-                                        key={index}
-                                        label={<strong>{option.title}</strong>}
-                                        field={
-                                            <DropDown value={"Something"} onChange={(status: string) => { }} items={option.items} />
-                                        }
+                                        label={<strong>Glazing</strong>}
+                                        field={<DropDown value={frame.glazing||""} onChange={(status: string) => { setFrame({...frame,glazing:status}) }} items={content.options[0].items} />}
                                     />
-                                );
-                            })}
+                                    <InputField
+                                        label={<strong>Frame</strong>}
+                                        field={<DropDown value={frame.frame} onChange={(status: string) => {setFrame({...frame,frame:status}) }} items={content.options[1].items} />}
+                                    />
+                                </>
+                            ) : (
+                                <InputField
+                                    label={<strong>Frame</strong>}
+                                    field={<DropDown value={frame.frame} onChange={(status: string) => {setFrame({...frame,frame:status}) }} items={content.options[1].items} />}
+                                />
+                            )}
                             <InputField label={<strong>Printing</strong>} field={<span>No Printing</span>} />
                         </div>
                         <InputField

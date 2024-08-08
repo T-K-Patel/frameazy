@@ -13,13 +13,6 @@ const Item = ({ item }: { item: CartItem }) => {
     );
 };
 
-const DeliveryStatus = ({ status, value }: { status: string; value: string }) => {
-    return (
-        <p className={`text-lg font-semibold ${value === status ? "text-[#A3A1A1]" : "text-black"} text-center`}>
-            {status}
-        </p>
-    );
-};
 const OrderDetails = ({ params }: { params: { id: string } }) => {
     const [order, setOrder] = useState({ paymentStatus: "Pending", deliveryStatus: "Pending" }); //TODO fetching order with the id;
     const items = ["Pending", "Out for delivery", "Delivered", "Cancelled"];

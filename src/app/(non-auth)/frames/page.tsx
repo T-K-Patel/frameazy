@@ -1,9 +1,6 @@
 "use client";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Item from "../(components)/Item";
-import { Category, Collection, Color } from "@prisma/client";
-import Checkbox from "@/components/Checkbox";
-import { Input } from "@/components/ui/input";
 
 import { Button } from "@/components/ui/button";
 import { RiArrowDropDownLine } from "react-icons/ri";
