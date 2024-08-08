@@ -3,28 +3,27 @@ import AddArtwork from "@/components/AddArtwork";
 import DropDown from "@/components/DropDown";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useFrames } from "@/context/frames-context";
 import InputField from "../InputField";
 import FrameCanvas from "../FrameCanvas";
+import { IoCloseSharp } from "react-icons/io5";
 
 type CustomizeOptionsProps = {
     title: string;
     items: string[];
 };
 
-const matOptions = ["White Mat"];
-const matWidths = ["3"];
-
 type uploadOptionsProps = {
     dimensions: { width: number; height: number };
-    frame?: string;
+    frame?: { src: string; borderWidth: number };
     glazing?: string;
-    printing:string;
-    backing?:string;
-    stretching?:string;
-    sides?:string;
-}
+    printing: string;
+    backing?: string;
+    stretching?: string;
+    sides?: string;
+};
+
 type matOptionsProps = {
     width: number;
     color: string;
@@ -36,14 +35,52 @@ function Page() {
     const { frameOptions } = useFrames();
     const [upload, setUpload] = useState<uploadOptionsProps>({
         dimensions: { width: 0, height: 0 },
-        frame: "0.75 inch black frame",
+        frame: { src: "0.75inch black frame ", borderWidth: 1 },
         glazing: "Regular",
-        printing:"Photo Paper",
-        backing:"Pine Mdf Hardboard",
-        stretching:"Regular",
-        sides:"Image mirrored"
+        printing: "Photo Paper",
+        backing: "Pine Mdf Hardboard",
+        stretching: "Regular",
+        sides: "Image mirrored",
     });
-    const [mat, setMat] = useState<matOptionsProps>([{width: 3, color: "white",id:new Date().toString()}]);
+    const [mat, setMat] = useState<matOptionsProps>([{ width: 0.75, color: "#ffffff", id: new Date().toString() }]);
+    useEffect(() => {
+        if (frameOptions.framingStyle === "uploadAndFrame") {
+            switch (frameOptions.data.frameType) {
+                case "printOnly":
+                    setUpload({
+                        dimensions: { width: frameOptions.data.width!, height: frameOptions.data.height! },
+                        printing: "Photo Paper",
+                    });
+                    break;
+                case "canvasPrint":
+                    setUpload({
+                        dimensions: { width: frameOptions.data.width!, height: frameOptions.data.height! },
+                        printing: "Canvas",
+                        backing: "Pine Mdf Hardboard",
+                        stretching: "Regular",
+                        sides: "Image mirrored",
+                    });
+                    break;
+                case "framedWithoutMG":
+                    setUpload({
+                        dimensions: { width: frameOptions.data.width!, height: frameOptions.data.height! },
+                        frame: { src: "0.75inch black frame", borderWidth: 1 },
+                        printing: "Photo Paper",
+                        stretching: "Photo Paper",
+                    });
+                    break;
+                case "framedWithMG":
+                    setUpload({
+                        dimensions: { width: frameOptions.data.width!, height: frameOptions.data.height! },
+                        frame: { src: "0.75inch black frame", borderWidth: 1 },
+                        glazing: "Regular",
+                        printing: "Photo Paper",
+                        backing: "Pine Mdf Hardboard",
+                    });
+                    break;
+            }
+        }
+    }, [frameOptions]);
 
     if (frameOptions.framingStyle != "uploadAndFrame") return <></>;
     let customizeOptions = frameOptions.data.frameType; //TODO Must implement a context here
@@ -121,12 +158,28 @@ function Page() {
         };
     }
 
+    if (!content.mat && mat.length > 0) {
+        setMat([]);
+    }
+
+    const totalSize = mat.reduce(
+        (acc, m) => {
+            acc.width += m.width * 2;
+            acc.height += m.width * 2;
+            return { ...acc };
+        },
+        { width: frameOptions.data.width! + 2, height: frameOptions.data.height! + 2 },
+    );
+
     return (
         <>
             <div className="grid min-h-[calc(100vh-150px)] gap-5 pb-4 pt-10 md:grid-cols-2">
-                <FrameCanvas image={{ src: frameOptions.data.croppedImage as string, width: 12, height: 9 }}
-                    matOptions={[{ color: "#eeeeee", width: 0.5 }, { color: "#777", width: 0.5 }]}
-                    totalSize={{ width: 16, height: 12 }} frameBorder={{ borderWidth: 1, src: "" }} />
+                <FrameCanvas
+                    image={{ src: frameOptions.data.croppedImage as string, ...upload.dimensions }}
+                    matOptions={mat}
+                    totalSize={totalSize}
+                    frameBorder={upload.frame}
+                />
                 <div className="mx-auto flex w-11/12 flex-col gap-6">
                     <h1 className="leading-auto text-3xl font-semibold">{content.title}</h1>
                     <div className="mb-3 flex flex-col gap-y-5">
@@ -134,26 +187,11 @@ function Page() {
                             <InputField
                                 label={<strong>Size</strong>}
                                 field={
-                                    <div className="flex items-center gap-4">
-                                        <Input
-                                            type="number"
-                                            min={1}
-                                            step={1}
-                                            className="w-20 border border-gray-2 p-3 px-2 text-center"
-                                            placeholder="0"
-                                            disabled
-                                        />
-                                        <p>X</p>
-                                        <Input
-                                            type="number"
-                                            min={1}
-                                            step={1}
-                                            className="w-20 border border-gray-2 p-3 px-2 text-center"
-                                            placeholder="0"
-                                            disabled
-                                        />
-                                        <span className="pr-2 font-semibold">In</span>
-                                    </div>
+                                    <p>
+                                        <span>{frameOptions.data.width}</span> <span>X</span>{" "}
+                                        <span>{frameOptions.data.height}</span>{" "}
+                                        <span className="font-semibold">In</span>
+                                    </p>
                                 }
                             />
                             {content.mat && (
@@ -161,35 +199,79 @@ function Page() {
                                     label={<strong>Mat</strong>}
                                     field={
                                         <div>
-                                            <div className="mb-3 grid w-full items-center gap-4 md:grid-cols-2">
-                                                <div className="flex items-center gap-x-2">
-                                                    <p className="">Total width:</p>
-                                                    <Input
-                                                        type="number"
-                                                        min={1}
-                                                        step={1}
-                                                        className="w-20 border border-gray-2 p-3 px-2 text-center"
-                                                        placeholder="0"
-                                                        value={mat[0].width}
-                                                        onChange={(e) => {
-                                                            // setMat({...mat[0], width: +e.target.value });
-                                                        }}
-                                                    />                                                    <span>
-                                                        <strong>In</strong>
-                                                    </span>
-                                                </div>
-                                                <div className="flex items-center gap-x-2">
-                                                    <p>Top:</p>
-                                                    <Input
-                                                        className="border border-gray-2 text-center"
-                                                        placeholder="white"
-                                                        value={mat[0].color}
-                                                        onChange={(e) => {
-                                                            // setMat({...mat[0], color: e.target.value });
-                                                        }}
-                                                    />                                                </div>
-                                            </div>
-                                            <button className="text-blue-1">Add More Mat</button>
+                                            {mat.map((m, ind) => {
+                                                return (
+                                                    <div
+                                                        className="mb-3 grid w-full items-center gap-4 md:grid-cols-2"
+                                                        key={ind}
+                                                    >
+                                                        <div className="flex items-center gap-x-2">
+                                                            <p className="">Width:</p>
+                                                            <Input
+                                                                type="number"
+                                                                min={0.25}
+                                                                step={0.25}
+                                                                className="w-20 border border-gray-2 p-3 px-2 text-center"
+                                                                placeholder="0"
+                                                                value={m.width}
+                                                                onChange={(e) => {
+                                                                    setMat((mat) => {
+                                                                        mat[ind].width = Number(e.target.value);
+                                                                        return [...mat];
+                                                                    });
+                                                                }}
+                                                            />
+                                                            <span>
+                                                                <strong>In</strong>
+                                                            </span>
+                                                        </div>
+                                                        <div className="flex items-center gap-x-2">
+                                                            <p>Color:</p>
+                                                            <Input
+                                                                className="h-10 w-20 p-1"
+                                                                placeholder="white"
+                                                                value={m.color}
+                                                                type="color"
+                                                                onChange={(e) => {
+                                                                    setMat((_m) => {
+                                                                        _m[ind].color = e.target.value;
+                                                                        return [..._m];
+                                                                    });
+                                                                }}
+                                                            />
+                                                            {ind != 0 && (
+                                                                <IoCloseSharp
+                                                                    className="flex-shrink-0"
+                                                                    onClick={() => {
+                                                                        setMat((_m) => {
+                                                                            return _m.filter((rm) => {
+                                                                                return rm.id != m.id;
+                                                                            });
+                                                                        });
+                                                                    }}
+                                                                />
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                            <button
+                                                onClick={() => {
+                                                    setMat((m) => {
+                                                        return [
+                                                            ...m,
+                                                            {
+                                                                width: 0.75,
+                                                                color: "#ffffff",
+                                                                id: new Date().toString(),
+                                                            },
+                                                        ];
+                                                    });
+                                                }}
+                                                className="text-blue-1"
+                                            >
+                                                Add More Mat
+                                            </button>
                                         </div>
                                     }
                                 />
@@ -201,10 +283,33 @@ function Page() {
                                             key={index}
                                             label={<strong>{option.title}</strong>}
                                             field={
-                                                //@ts-ignore
-                                                <DropDown value={upload[option.title.toLowerCase()]} onChange={(status: string) => { setUpload((upload)=>{
-                                                    return {...upload,[option.title.toLowerCase()]:status}
-                                                }) }} items={option.items} />
+                                                <DropDown
+                                                    value={
+                                                        option.title != "Frame"
+                                                            ? (upload[
+                                                                  option.title.toLowerCase() as keyof uploadOptionsProps
+                                                              ] as string)
+                                                            : upload.frame?.src!
+                                                    }
+                                                    onChange={(status: string) => {
+                                                        setUpload((upload) => {
+                                                            if (option.title != "Frame") {
+                                                                return {
+                                                                    ...upload,
+                                                                    [option.title.toLowerCase()]: status,
+                                                                };
+                                                            }
+                                                            return {
+                                                                ...upload,
+                                                                [option.title.toLowerCase()]: {
+                                                                    src: status,
+                                                                    borderWidth: 1,
+                                                                },
+                                                            };
+                                                        });
+                                                    }}
+                                                    items={option.items}
+                                                />
                                             }
                                         />
                                     );
@@ -218,7 +323,7 @@ function Page() {
                                 label={<strong>Total Size</strong>}
                                 field={
                                     <p>
-                                        <span>13</span> <span>X</span> <span>13</span>{" "}
+                                        <span>{totalSize.width}</span> <span>X</span> <span>{totalSize.height}</span>{" "}
                                         <span className="font-semibold">In</span>
                                     </p>
                                 }

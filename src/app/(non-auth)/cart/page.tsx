@@ -109,12 +109,11 @@ function Cart() {
         document.body.classList.toggle("overflow-hidden", showDialog);
     }, [showDialog]);
 
+    if (!session.data?.user.id) {
+        redirect(`/auth/login?callbackUrl=${encodeURIComponent(window.location.href)}`);
+    }
     if (loading) {
         return <LoadingCart />;
-    }
-
-    if (!session.data?.user) {
-        redirect("/login");
     }
 
     const deliveryCharge = cartItems.reduce((acc, item) => acc + item.quantity * 5, 0);

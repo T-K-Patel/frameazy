@@ -34,19 +34,6 @@ function CropImage() {
     const [zoom, setZoom] = useState(1);
     const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
 
-    useEffect(() => {
-        if (frameOptions.framingStyle == "uploadAndFrame") {
-            if (frameOptions.data?.image && frameOptions.data?.image instanceof File) {
-                const reader = new FileReader();
-                reader.onloadend = () => {
-                    const dataUrl = reader.result as string;
-                    setFrameOptions({ ...frameOptions, data: { ...frameOptions.data, image: dataUrl } });
-                };
-                reader.readAsDataURL(frameOptions.data.image);
-            }
-        }
-    }, [frameOptions, setFrameOptions]);
-
     const onCropComplete = useCallback((_croppedArea: Area, _croppedAreaPixels: Area) => {
         setCroppedAreaPixels(_croppedAreaPixels);
     }, []);
@@ -55,13 +42,13 @@ function CropImage() {
         if (frameOptions.framingStyle === "uploadAndFrame" && croppedAreaPixels) {
             try {
                 const croppedImage = await getCroppedImg(frameOptions.data.image as string, croppedAreaPixels);
-                setFrameOptions({ ...frameOptions, data: { ...frameOptions.data, croppedImage } });
+                setFrameOptions({ ...frameOptions, data: { ...frameOptions.data, croppedImage, ...size } });
             } catch (e) {
                 console.error(e);
                 alert("Failed to crop image");
             }
         }
-    }, [croppedAreaPixels, frameOptions, setFrameOptions]);
+    }, [croppedAreaPixels, frameOptions, setFrameOptions, size]);
 
     if (frameOptions.framingStyle != "uploadAndFrame") return null;
 

@@ -7,23 +7,17 @@ import { useFrames } from "@/context/frames-context";
 
 function UploadImage() {
     const [error, setError] = useState(null as string | null);
-    const { setFrameOptions } = useFrames();
+    const { frameOptions, setFrameOptions } = useFrames();
 
     const setImage = (image: File) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            const imageBlob = new Blob([reader.result as ArrayBuffer], { type: image.type });
-            const img = new Image();
-            img.onload = () => {
-                setFrameOptions({ framingStyle: "uploadAndFrame", data: { image } });
+        if (frameOptions.framingStyle == "uploadAndFrame") {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                const dataUrl = reader.result as string;
+                setFrameOptions({ ...frameOptions, data: { ...frameOptions.data, image: dataUrl } });
             };
-            img.onerror = () => {
-                // Image is invalid
-                setError("Image file is required");
-            };
-            img.src = URL.createObjectURL(imageBlob);
-        };
-        reader.readAsArrayBuffer(image);
+            reader.readAsDataURL(image);
+        }
     };
 
     const handleDragOver = (e: any) => {

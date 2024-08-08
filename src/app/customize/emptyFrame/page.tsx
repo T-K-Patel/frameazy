@@ -1,5 +1,5 @@
 "use client";
-import DropDown from "@/components/DropDown"
+import DropDown from "@/components/DropDown";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import React, { useState } from "react";
@@ -17,7 +17,7 @@ type emptyFrameProps = {
     dimensions: { width: number; height: number };
     frame: string;
     glazing?: string;
-}
+};
 
 type matOptionsProps = {
     width: number;
@@ -33,7 +33,7 @@ function Page() {
         frame: "0.75 inch black frame",
         glazing: "Regular",
     });
-    const [mat, setMat] = useState<matOptionsProps>([{width: 3, color: "white",id:new Date().toString()}]);
+    const [mat, setMat] = useState<matOptionsProps>([{ width: 3, color: "white", id: new Date().toString() }]);
 
     if (frameOptions.framingStyle != "emptyFrame") return <></>;
     let customizeOptions = frameOptions.data.frameType;
@@ -107,57 +107,110 @@ function Page() {
                                 label={<strong>Mat</strong>}
                                 field={
                                     <div>
-                                        <div className="mb-3 grid w-full items-center gap-4 md:grid-cols-2">
-                                            <div className="flex items-center gap-x-2">
-                                                <p className="">Total width:</p>
-                                                <Input
-                                                    type="number"
-                                                    min={1}
-                                                    step={1}
-                                                    className="w-20 border border-gray-2 p-3 px-2 text-center"
-                                                    placeholder="0"
-                                                    value={mat[0].width}
-                                                    onChange={(e) => {
-                                                        // setMat({...mat[0], width: +e.target.value });
-                                                    }}
-                                                />
-                                                <span>
-                                                    <strong>In</strong>
-                                                </span>
-                                            </div>
-                                            <div className="flex items-center gap-x-2">
-                                                <p>Top:</p>
-                                                <Input
-                                                    className="border border-gray-2 text-center"
-                                                    placeholder="white"
-                                                    value={mat[0].color}
-                                                    onChange={(e) => {
-                                                        // setMat({...mat[0], color: e.target.value });
-                                                    }}
-                                                />
-                                            </div>
-                                        </div>
-                                        <button className="text-blue-1">Add More Mat</button>
+                                        {mat.map((m, ind) => {
+                                            return (
+                                                <div
+                                                    className="mb-3 grid w-full items-center gap-4 md:grid-cols-2"
+                                                    key={ind}
+                                                >
+                                                    <div className="flex items-center gap-x-2">
+                                                        <p className="">Total width:</p>
+                                                        <Input
+                                                            type="number"
+                                                            min={1}
+                                                            step={1}
+                                                            className="w-20 border border-gray-2 p-3 px-2 text-center"
+                                                            placeholder="0"
+                                                            value={m.width}
+                                                            onChange={(e) => {
+                                                                setMat((mat) => {
+                                                                    mat[ind].width = Number(e.target.value);
+                                                                    return [...mat];
+                                                                });
+                                                            }}
+                                                        />
+                                                        <span>
+                                                            <strong>In</strong>
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex items-center gap-x-2">
+                                                        <p>Top:</p>
+                                                        <Input
+                                                            className="h-10 border border-gray-2 text-center"
+                                                            placeholder="white"
+                                                            value={m.color}
+                                                            type="color"
+                                                            onChange={(e) => {
+                                                                setMat((mat) => {
+                                                                    mat[ind].color = e.target.value;
+                                                                    return [...mat];
+                                                                });
+                                                            }}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                        <button
+                                            onClick={() => {
+                                                setMat((m) => {
+                                                    m.push({
+                                                        width: 3,
+                                                        color: "#fff",
+                                                        id: new Date().toString(),
+                                                    });
+                                                    return [...m];
+                                                });
+                                            }}
+                                            className="text-blue-1"
+                                        >
+                                            {" "}
+                                            Add More Mat
+                                        </button>
                                     </div>
                                 }
                             />
                         )}
                         <div className="flex flex-col gap-y-5">
-                            {content.title==="Empty frame for paper items" ? (
+                            {content.title === "Empty frame for paper items" ? (
                                 <>
                                     <InputField
                                         label={<strong>Glazing</strong>}
-                                        field={<DropDown value={frame.glazing||""} onChange={(status: string) => { setFrame({...frame,glazing:status}) }} items={content.options[0].items} />}
+                                        field={
+                                            <DropDown
+                                                value={frame.glazing || ""}
+                                                onChange={(status: string) => {
+                                                    setFrame({ ...frame, glazing: status });
+                                                }}
+                                                items={content.options[0].items}
+                                            />
+                                        }
                                     />
                                     <InputField
                                         label={<strong>Frame</strong>}
-                                        field={<DropDown value={frame.frame} onChange={(status: string) => {setFrame({...frame,frame:status}) }} items={content.options[1].items} />}
+                                        field={
+                                            <DropDown
+                                                value={frame.frame}
+                                                onChange={(status: string) => {
+                                                    setFrame({ ...frame, frame: status });
+                                                }}
+                                                items={content.options[1].items}
+                                            />
+                                        }
                                     />
                                 </>
                             ) : (
                                 <InputField
                                     label={<strong>Frame</strong>}
-                                    field={<DropDown value={frame.frame} onChange={(status: string) => {setFrame({...frame,frame:status}) }} items={content.options[1].items} />}
+                                    field={
+                                        <DropDown
+                                            value={frame.frame}
+                                            onChange={(status: string) => {
+                                                setFrame({ ...frame, frame: status });
+                                            }}
+                                            items={content.options[1].items}
+                                        />
+                                    }
                                 />
                             )}
                             <InputField label={<strong>Printing</strong>} field={<span>No Printing</span>} />

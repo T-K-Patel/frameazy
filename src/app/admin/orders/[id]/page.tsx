@@ -22,7 +22,13 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                 <h1 className="leading-12 border-b border-[#F1F1F1] pb-3 text-3xl font-semibold">
                     Update Order Status
                 </h1>
-                <DropDown value={order.deliveryStatus} onChange={(status: string) => { setOrder({ ...order, deliveryStatus: status || "" }) }} items={items} />
+                <DropDown
+                    value={order.deliveryStatus}
+                    onChange={(status: string) => {
+                        setOrder({ ...order, deliveryStatus: status || "" });
+                    }}
+                    items={items}
+                />
             </div>
             <div className="flex flex-col gap-5 rounded-2xl border border-[#F1F1F1] px-4 py-6">
                 <h1 className="leading-12 border-b border-[#F1F1F1] pb-3 text-3xl font-semibold">Order Items</h1>

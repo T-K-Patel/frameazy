@@ -16,9 +16,13 @@ const LoginPage = ({ searchParams }: { searchParams: Record<string, any> }) => {
 
     useEffect(() => {
         if (session.data?.user) {
-            redirect("/", RedirectType.replace);
+            if (searchParams.callbackUrl) {
+                redirect(searchParams.callbackUrl, RedirectType.replace);
+            } else {
+                redirect("/", RedirectType.replace);
+            }
         }
-    }, [session]);
+    }, [session, searchParams]);
 
     return (
         <div className="no-scrollbar flex h-full flex-col gap-y-5 overflow-y-auto px-5 py-4">
