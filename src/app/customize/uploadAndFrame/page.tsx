@@ -168,7 +168,10 @@ function Page() {
             acc.height += m.width * 2;
             return { ...acc };
         },
-        { width: frameOptions.data.width! + 2, height: frameOptions.data.height! + 2 },
+        {
+            width: frameOptions.data.width! + 2 * upload.frame?.borderWidth!,
+            height: frameOptions.data.height! + 2 * upload.frame?.borderWidth!,
+        },
     );
 
     return (
@@ -215,9 +218,9 @@ function Page() {
                                                                 placeholder="0"
                                                                 value={m.width}
                                                                 onChange={(e) => {
-                                                                    setMat((mat) => {
-                                                                        mat[ind].width = Number(e.target.value);
-                                                                        return [...mat];
+                                                                    setMat((_m) => {
+                                                                        _m[ind].width = Number(e.target.value);
+                                                                        return [..._m];
                                                                     });
                                                                 }}
                                                             />

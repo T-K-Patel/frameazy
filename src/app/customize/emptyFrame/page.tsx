@@ -2,11 +2,12 @@
 import DropDown from "@/components/DropDown";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useFrames } from "@/context/frames-context";
 import InputField from "../InputField";
 import { BiX } from "react-icons/bi";
 import FrameCanvas from "../FrameCanvas";
+import { IoCloseSharp } from "react-icons/io5";
 
 type CustomizeOptionsProps = {
     title: string;
@@ -15,7 +16,7 @@ type CustomizeOptionsProps = {
 
 type emptyFrameProps = {
     dimensions: { width: number; height: number };
-    frame: string;
+    frame?: { src: string; borderWidth: number };
     glazing?: string;
 };
 
@@ -30,10 +31,30 @@ function Page() {
     const { frameOptions } = useFrames();
     const [frame, setFrame] = useState<emptyFrameProps>({
         dimensions: { width: 0, height: 0 },
-        frame: "0.75 inch black frame",
+        frame: { src: "0.75 inch black frame", borderWidth: 1 },
         glazing: "Regular",
     });
     const [mat, setMat] = useState<matOptionsProps>([{ width: 3, color: "white", id: new Date().toString() }]);
+
+    useEffect(() => {
+        if (frameOptions.framingStyle === "emptyFrame") {
+            switch (frameOptions.data.frameType) {
+                case "canvas|panel":
+                    setFrame({
+                        dimensions: { width: 12, height: 9 },
+                        frame: { src: "0.75 inch black frame", borderWidth: 1 },
+                    });
+                    break;
+                case "paper":
+                    setFrame({
+                        dimensions: { width: 12, height: 9 },
+                        frame: { src: "0.75 inch black frame", borderWidth: 1 },
+                        glazing: "Regular",
+                    });
+                    break;
+            }
+        }
+    }, [frameOptions]);
 
     if (frameOptions.framingStyle != "emptyFrame") return <></>;
     let customizeOptions = frameOptions.data.frameType;
@@ -68,9 +89,25 @@ function Page() {
         };
     }
 
+    if (!content.mat && mat.length > 0) {
+        setMat([]);
+    }
+
+    const totalSize = mat.reduce(
+        (acc, m) => {
+            acc.width += m.width * 2;
+            acc.height += m.width * 2;
+            return { ...acc };
+        },
+        {
+            width: frame.dimensions.width + 2 * frame.frame?.borderWidth!,
+            height: frame.dimensions.height + 2 * frame.frame?.borderWidth!,
+        },
+    );
+
     return (
         <div className="grid min-h-[calc(100vh-150px)] gap-5 pb-4 pt-10 md:grid-cols-2">
-            <FrameCanvas />
+            <FrameCanvas matOptions={mat} totalSize={totalSize} frameBorder={frame.frame} />
             <div className="mx-auto flex w-11/12 flex-col gap-6">
                 <h1 className="leading-auto text-3xl font-semibold">{content.title}</h1>
                 <div className="mb-3 flex flex-col gap-y-5">
@@ -89,6 +126,13 @@ function Page() {
                                         step={1}
                                         className="w-20 border border-gray-2 p-3 px-2 text-center"
                                         placeholder="0"
+                                        value={frame.dimensions.width}
+                                        onChange={(e) => {
+                                            setFrame({
+                                                ...frame,
+                                                dimensions: { ...frame.dimensions, width: Number(e.target.value) },
+                                            });
+                                        }}
                                     />
                                     <p>X</p>
                                     <Input
@@ -97,6 +141,13 @@ function Page() {
                                         step={1}
                                         className="w-20 border border-gray-2 p-3 px-2 text-center"
                                         placeholder="0"
+                                        value={frame.dimensions.height}
+                                        onChange={(e) => {
+                                            setFrame({
+                                                ...frame,
+                                                dimensions: { ...frame.dimensions, height: Number(e.target.value) },
+                                            });
+                                        }}
                                     />
                                     <span className="pr-2 font-semibold">In</span>
                                 </div>
@@ -114,7 +165,7 @@ function Page() {
                                                     key={ind}
                                                 >
                                                     <div className="flex items-center gap-x-2">
-                                                        <p className="">Total width:</p>
+                                                        <p className="">Width:</p>
                                                         <Input
                                                             type="number"
                                                             min={1}
@@ -123,9 +174,9 @@ function Page() {
                                                             placeholder="0"
                                                             value={m.width}
                                                             onChange={(e) => {
-                                                                setMat((mat) => {
-                                                                    mat[ind].width = Number(e.target.value);
-                                                                    return [...mat];
+                                                                setMat((_m) => {
+                                                                    _m[ind].width = Number(e.target.value);
+                                                                    return [..._m];
                                                                 });
                                                             }}
                                                         />
@@ -134,19 +185,31 @@ function Page() {
                                                         </span>
                                                     </div>
                                                     <div className="flex items-center gap-x-2">
-                                                        <p>Top:</p>
+                                                        <p>Color:</p>
                                                         <Input
-                                                            className="h-10 border border-gray-2 text-center"
+                                                            className="h-10 w-20 p-1"
                                                             placeholder="white"
                                                             value={m.color}
                                                             type="color"
                                                             onChange={(e) => {
-                                                                setMat((mat) => {
-                                                                    mat[ind].color = e.target.value;
-                                                                    return [...mat];
+                                                                setMat((_m) => {
+                                                                    _m[ind].color = e.target.value;
+                                                                    return [..._m];
                                                                 });
                                                             }}
                                                         />
+                                                        {ind != 0 && (
+                                                            <IoCloseSharp
+                                                                className="flex-shrink-0"
+                                                                onClick={() => {
+                                                                    setMat((_m) => {
+                                                                        return _m.filter((rm) => {
+                                                                            return rm.id != m.id;
+                                                                        });
+                                                                    });
+                                                                }}
+                                                            />
+                                                        )}
                                                     </div>
                                                 </div>
                                             );
@@ -154,12 +217,10 @@ function Page() {
                                         <button
                                             onClick={() => {
                                                 setMat((m) => {
-                                                    m.push({
-                                                        width: 3,
-                                                        color: "#fff",
-                                                        id: new Date().toString(),
-                                                    });
-                                                    return [...m];
+                                                    return [
+                                                        ...m,
+                                                        { width: 0.75, color: "#ffffff", id: new Date().toString() },
+                                                    ];
                                                 });
                                             }}
                                             className="text-blue-1"
@@ -190,9 +251,9 @@ function Page() {
                                         label={<strong>Frame</strong>}
                                         field={
                                             <DropDown
-                                                value={frame.frame}
+                                                value={frame.frame?.src!}
                                                 onChange={(status: string) => {
-                                                    setFrame({ ...frame, frame: status });
+                                                    setFrame({ ...frame, frame: { src: status, borderWidth: 0.75 } });
                                                 }}
                                                 items={content.options[1].items}
                                             />
@@ -204,9 +265,9 @@ function Page() {
                                     label={<strong>Frame</strong>}
                                     field={
                                         <DropDown
-                                            value={frame.frame}
+                                            value={frame.frame?.src!}
                                             onChange={(status: string) => {
-                                                setFrame({ ...frame, frame: status });
+                                                setFrame({ ...frame, frame: { src: status, borderWidth: 0.75 } });
                                             }}
                                             items={content.options[1].items}
                                         />
@@ -219,7 +280,7 @@ function Page() {
                             label={<strong>Total Size</strong>}
                             field={
                                 <p>
-                                    <span>13</span> <span>X</span> <span>13</span>{" "}
+                                    <span>{totalSize.width}</span> <span>X</span> <span>{totalSize.height}</span>{" "}
                                     <span className="font-semibold">In</span>
                                 </p>
                             }
