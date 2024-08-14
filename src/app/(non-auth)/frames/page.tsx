@@ -28,7 +28,7 @@ function Frames() {
             if (data.success) {
                 // setPage(1);
                 setFrames(data.data.frames);
-                setTotalFrames(data.data.frames.length);
+                setTotalFrames(data.data.total);
             }
         });
     }, [debouncedFilters, page]);
