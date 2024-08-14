@@ -2,14 +2,15 @@
 import { useSession } from "next-auth/react";
 import React, { createContext, ReactNode, useEffect, useState } from "react";
 
-// Define the shape of the frame options data
 type FrameOptions =
     | { framingStyle: "none"; data?: null }
     | {
           framingStyle: "uploadAndFrame";
           data: {
-              image?: File | string;
-              croppedImage?: File | string;
+              image?: string;
+              croppedImage?: string;
+              width?: number;
+              height?: number;
               frameType?: "printOnly" | "canvasPrint" | "framedWithoutMG" | "framedWithMG";
           };
       }
@@ -32,12 +33,8 @@ const isFrameOptions = (obj: any): obj is FrameOptions => {
             case "uploadAndFrame":
                 return (
                     obj.data &&
-                    (typeof obj.data.image === "string" ||
-                        obj.data.image instanceof File ||
-                        obj.data.image === undefined) &&
-                    (typeof obj.data.croppedImage === "string" ||
-                        obj.data.croppedImage instanceof File ||
-                        obj.data.croppedImage === undefined) &&
+                    (typeof obj.data.image === "string" || obj.data.image === undefined) &&
+                    (typeof obj.data.croppedImage === "string" || obj.data.croppedImage === undefined) &&
                     (obj.data.frameType === "printOnly" ||
                         obj.data.frameType === "canvasPrint" ||
                         obj.data.frameType === "framedWithoutMG" ||

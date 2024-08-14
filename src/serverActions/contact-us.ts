@@ -1,10 +1,11 @@
 "use server";
 
 import { getServerSession } from "next-auth";
-import { db } from "../../prisma/db";
+import { db } from "../lib/db";
 import { CustomError } from "@/lib/CustomError";
+import { ServerActionReturnType } from "@/types/serverActionReturnType";
 
-export async function contactUsAction(state: any, formData: FormData) {
+export async function contactUsAction(state: any, formData: FormData): Promise<ServerActionReturnType<string>> {
     try {
         const session = await getServerSession();
         const name = formData.get("name")?.toString();
@@ -25,18 +26,18 @@ export async function contactUsAction(state: any, formData: FormData) {
                     },
                 });
                 if (user) userId = user.id;
-            } catch {}
+            } catch { }
         }
 
         const success = await db.message.create({ data: { name, email, message, userId } });
         if (!success) throw new CustomError("Failed to send message");
 
-        return { data: "Your message has been sent successfully. We will get back to you soon.", error: null };
-    } catch (e: any) {
-        if (!(e instanceof CustomError)) console.error(e);
-        return {
-            data: null,
-            error: e instanceof CustomError ? e.message : "Something went wrong. Please try again later.",
-        };
+        return { data: "Your message has been sent successfully. We will get back to you soon.", success: true };
+    } catch (error: any) {
+        if (error instanceof CustomError) {
+            return { success: false, error: error.message };
+        }
+        console.error("contactUsAction error", error);
+        return { success: false, error: "Something went wrong" };
     }
 }

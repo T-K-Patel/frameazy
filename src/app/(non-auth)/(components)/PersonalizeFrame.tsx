@@ -1,10 +1,10 @@
 import React from "react";
-import { BsArrowRight } from "react-icons/bs";
 import Personal1 from "@/assets/personal1.png";
 import Personal2 from "@/assets/personal2.png";
 import Personal3 from "@/assets/personal3.png";
 import Image, { StaticImageData } from "next/image";
-import { Button } from "@/components/ui/button";
+import { getImagePlaceholder } from "@/components/imagePlaceholder";
+import SelectFrame from "@/components/customizing/SelectFrame";
 
 type PersonalArtItemProps = {
     img: StaticImageData;
@@ -15,7 +15,13 @@ type PersonalArtItemProps = {
 const PersonalArtItem = ({ img, title, desc }: PersonalArtItemProps) => {
     return (
         <div className="h-full w-full max-w-[350px] text-black">
-            <Image src={img} alt="" className="w-full rounded-t-xl" />
+            <Image
+                src={img}
+                alt=""
+                className="w-full rounded-t-xl"
+                placeholder="blur"
+                blurDataURL={getImagePlaceholder(img.width, img.height)}
+            />
             <div className="rounded-b-xl bg-white px-5 py-5">
                 <h2 className="pb-3 text-2xl font-semibold">{title}</h2>
                 <p className="font-light">{desc}</p>
@@ -54,14 +60,15 @@ const PersonalizeFrame = () => {
                     />
                 </div>
                 <div className="flex justify-center pt-8">
-                    <Button
+                    {/* <Button
                         size={"sm"}
                         variant={"outline"}
                         className="h-auto bg-transparent !px-8 !py-4 text-xl font-semibold text-white transition-all duration-200 active:scale-90"
                     >
-                        Get Started
+                        Get Started&nbsp;
                         <BsArrowRight />
-                    </Button>
+                    </Button> */}
+                    <SelectFrame />
                 </div>
             </div>
         </section>

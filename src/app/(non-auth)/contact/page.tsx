@@ -1,7 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import Image from "next/image";
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import Contact from "@/assets/contact.png";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -23,9 +22,11 @@ const ContactPage = () => {
 
     const [state, action] = useFormState(contactUsAction, null);
 
-    if (state?.data) {
-        formRef.current?.reset();
-    }
+    useEffect(() => {
+        if (state?.success) {
+            formRef.current?.reset();
+        }
+    }, [state]);
 
     return (
         <section className="mx-auto flex h-auto max-w-screen-2xl flex-col gap-y-4 px-0">
@@ -84,12 +85,12 @@ const ContactPage = () => {
                                     maxLength={1000}
                                 />
                             </div>
-                            {state?.error && (
+                            {state?.success == false && (
                                 <div className="flex h-auto w-full flex-col gap-y-2">
                                     <span className="text-red-500">{state.error}</span>
                                 </div>
                             )}
-                            {state?.data && (
+                            {state?.success && (
                                 <div className="flex h-auto w-full flex-col gap-y-2">
                                     <span className="text-green-500">{state.data}</span>
                                 </div>

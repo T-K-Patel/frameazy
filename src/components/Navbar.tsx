@@ -8,7 +8,6 @@ import { RxHamburgerMenu } from "react-icons/rx";
 import Logo from "@/assets/frameasy-logo.png";
 import Sidebar from "@/components/SideBar";
 import { Button } from "@/components/ui/button";
-import { signOutAction } from "@/serverActions/auth/signout";
 import { signOut, useSession } from "next-auth/react";
 
 const Navbar = () => {

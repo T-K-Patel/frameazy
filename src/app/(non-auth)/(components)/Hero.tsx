@@ -2,6 +2,7 @@ import Image from "next/image";
 import React from "react";
 import heroImage from "@/assets/hero_img.png";
 import SelectFrame from "@/components/customizing/SelectFrame";
+import { getImagePlaceholder } from "@/components/imagePlaceholder";
 
 function Hero() {
     return (
@@ -19,6 +20,8 @@ function Hero() {
                     <div className="flex w-full flex-1 justify-center md:justify-end">
                         <Image
                             src={heroImage}
+                            placeholder="blur"
+                            blurDataURL={getImagePlaceholder(heroImage.width, heroImage.height)}
                             alt="hero"
                             loading="lazy"
                             className="w-full object-cover max-md:h-[375px] md:max-h-screen"

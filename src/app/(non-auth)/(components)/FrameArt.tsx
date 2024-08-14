@@ -1,7 +1,6 @@
 import Image from "next/image";
 import ArtImg from "@/assets/art_1.png";
-import { Button } from "@/components/ui/button";
-import { BsArrowRight } from "react-icons/bs";
+import { getImagePlaceholder } from "@/components/imagePlaceholder";
 
 const FrameArt = () => {
     return (
@@ -13,17 +12,24 @@ const FrameArt = () => {
                     frame is not just a border for your artwork; it&apos;s an essential piece of the artwork itself.
                     Each frame we create is a testament to our commitment to artistry and craftsmanship.
                 </p>
-                <Button
+                {/* <Button
                     size={"sm"}
                     variant={"outline"}
                     className="mt-8 h-auto border border-black bg-transparent px-8 py-4 text-xl font-semibold text-black transition-all duration-200 active:scale-90"
                 >
-                    Get Started
+                    Get Started&nbsp;
                     <BsArrowRight />
-                </Button>
+                </Button> */}
             </div>
             <div className="flex flex-1 justify-end">
-                <Image src={ArtImg} alt="frame" loading="lazy" className="rounded-xl object-cover" />
+                <Image
+                    src={ArtImg}
+                    alt="frame"
+                    placeholder="blur"
+                    blurDataURL={getImagePlaceholder(ArtImg.width, ArtImg.height)}
+                    loading="lazy"
+                    className="rounded-xl object-cover"
+                />
             </div>
         </div>
     );

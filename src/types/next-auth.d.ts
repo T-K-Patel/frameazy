@@ -1,26 +1,23 @@
-import { DefaultSession } from "next-auth";
+/* eslint-disable no-unused-vars */
+import { DefaultSession, } from "next-auth";
+import { Role } from "@prisma/client";
 
 declare module "next-auth" {
     interface Session extends DefaultSession {
-        user: User;
-        data: string;
+        user?: User;
     }
 
     interface User {
         id: string;
         name: string;
         email: string;
-        emailVerified?: boolean;
+        image: string;
+        role: Role;
     }
+}
 
-    interface Credentials {
-        email: string;
-        password: string;
-    }
-
-    interface Profile {
-        name: string;
-        email: string;
-        email_verified: boolean;
+declare module "next-auth/jwt" {
+    interface JWT {
+        id: string;
     }
 }

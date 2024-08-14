@@ -1,3 +1,5 @@
+// OPTIMIZE: use redis pub/sub to to send email to reduce latency.  (ADVANCED, Only work on server, not serverless functions. )
+
 export async function sendVerificationEmail(to: string, token: string) {
     const subject = "Email Verification";
     // FIXME: fix html and verification link

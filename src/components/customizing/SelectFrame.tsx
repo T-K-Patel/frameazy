@@ -53,7 +53,7 @@ const SelectFrame = () => {
         contentDivRef.current?.scrollTo({ top: 0, behavior: "smooth" });
     }, [framingString]);
 
-    let onBack = () => {};
+    let onBack = () => { };
 
     let content: ContentType = {
         title: "Select your style of frame",
@@ -124,7 +124,6 @@ const SelectFrame = () => {
             setFrameOptions({ framingStyle: "none" });
         };
     } else if (framing.framingStyle == "uploadAndFrame") {
-        let comp: null | ReactNode = null;
         if (!framing.data.image) {
             content = {
                 title: "Image of the subject",
@@ -221,13 +220,13 @@ const SelectFrame = () => {
                     onClick={() => setIsOpen(true)}
                     className="mt-8 h-min w-min bg-transparent px-8 py-4 text-xl font-semibold transition-all duration-200 active:scale-90"
                 >
-                    Start Framing
+                    Start Framing&nbsp;
                     <BsArrowRight />
                 </Button>
             </DialogTrigger>
             <DialogContent
                 className={cn(
-                    "flex max-h-[90%] min-h-[70%] w-5/6 flex-col px-5 max-md:w-11/12 md:max-h-[85%] md:px-10",
+                    "flex max-h-[90%] min-h-[70%] w-5/6 max-w-screen-2xl flex-col px-5 max-md:w-11/12 md:max-h-[90%] md:px-10",
                     framing.framingStyle != "none" && framing.framingStyle != "mirrorFrame"
                         ? "pb-6 md:pb-14"
                         : "py-6 pt-10 md:py-14",
@@ -239,17 +238,19 @@ const SelectFrame = () => {
                             size={"sm"}
                             variant={"outline"}
                             onClick={onBack}
-                            className="h-min w-min border border-black p-2 text-lg font-semibold transition-all duration-200 active:scale-90 md:text-xl"
+                            className="h-min w-min border border-black p-2 text-sm font-semibold transition-all duration-200 active:scale-90 md:text-xl"
                         >
-                            <BiArrowBack /> Back
+                            <BiArrowBack />
+                            &nbsp;Back
                         </Button>
                         <Button
                             size={"sm"}
                             variant={"outline"}
                             onClick={resetFrames}
-                            className="h-min w-min border border-black p-2 text-lg font-semibold transition-all duration-200 active:scale-90 md:text-xl"
+                            className="h-min w-min border border-black p-2 text-sm font-semibold transition-all duration-200 active:scale-90 md:text-xl"
                         >
-                            <BiRepeat /> Reset
+                            <BiRepeat />
+                            &nbsp;Reset
                         </Button>
                     </DialogHeader>
                 )}
@@ -259,10 +260,15 @@ const SelectFrame = () => {
                 >
                     <div className="h-auto w-auto items-center gap-y-4">
                         <h1 className="leading-12 text-center text-xl font-semibold md:text-3xl">{content.title}</h1>
-                        <p className="text-center text-lg md:leading-[30px] lg:text-xl">{content.desc}</p>
+                        <p className="text-center text-sm md:text-xl md:leading-[30px]">{content.desc}</p>
                     </div>
                     <div
-                        className="grid items-center justify-center gap-3 gap-y-3 max-md:flex-col md:gap-5"
+                        className={cn(
+                            "grid items-center justify-center gap-3 gap-y-3 max-md:!grid-cols-1 max-md:flex-col md:gap-5",
+                            framing.framingStyle == "uploadAndFrame" && framing.data.image && !framing.data.croppedImage
+                                ? "w-full place-items-center"
+                                : "",
+                        )}
                         style={{
                             gridTemplateColumns: `repeat(${content.component ? 1 : content.options?.length == 4 ? 2 : content.options?.length || 3},1fr)`,
                         }}

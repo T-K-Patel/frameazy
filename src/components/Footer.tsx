@@ -6,11 +6,12 @@ import Image from "next/image";
 import { Button } from "./ui/button";
 import { useFormState, useFormStatus } from "react-dom";
 import { subscribeNewsLetterAction } from "@/serverActions/subscribe-news-letter";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 
 const SubscribeButton = () => {
     const { pending } = useFormStatus();
+
     return (
         <Button
             size={"lg"}
@@ -24,13 +25,17 @@ const SubscribeButton = () => {
 
 const Footer = () => {
     const formRef = useRef<HTMLFormElement>(null);
-    const [state, action] = useFormState(subscribeNewsLetterAction, { data: null, error: null });
+    const [state, action] = useFormState(subscribeNewsLetterAction, null);
 
-    if (state.data) {
-        alert(state.data);
-        formRef.current?.reset();
-    }
-    if (state.error) alert(state.error);
+    useEffect(() => {
+        if (!state) return;
+        if (state.success) {
+            alert(state.data);
+            formRef.current?.reset();
+        } else {
+            alert(state.error);
+        }
+    }, [state]);
 
     return (
         <footer className="mx-auto max-w-screen-2xl">
