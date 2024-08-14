@@ -8,6 +8,8 @@ import InputField from "../InputField";
 import { BiX } from "react-icons/bi";
 import FrameCanvas from "../FrameCanvas";
 import { IoCloseSharp } from "react-icons/io5";
+import useDebounce from "@/lib/useDebounce";
+
 
 type CustomizeOptionsProps = {
     title: string;
@@ -34,21 +36,22 @@ function Page() {
         frame: { src: "0.75 inch black frame", borderWidth: 1 },
         glazing: "Regular",
     });
-    const [mat, setMat] = useState<matOptionsProps>([{ width: 3, color: "white", id: new Date().toString() }]);
-
+    const [mat, setMat] = useState<matOptionsProps>([{ width: 1, color: "#ffffff", id: new Date().toString() }]);
+    const debouncedFrame = useDebounce<emptyFrameProps>(frame, 300);
+    const debouncedMat = useDebounce<matOptionsProps>(mat, 1000);
     useEffect(() => {
         if (frameOptions.framingStyle === "emptyFrame") {
             switch (frameOptions.data.frameType) {
                 case "canvas|panel":
                     setFrame({
                         dimensions: { width: 12, height: 9 },
-                        frame: { src: "0.75 inch black frame", borderWidth: 1 },
+                        frame: { src: "0.75 inch black frame", borderWidth: 0.75 },
                     });
                     break;
                 case "paper":
                     setFrame({
                         dimensions: { width: 12, height: 9 },
-                        frame: { src: "0.75 inch black frame", borderWidth: 1 },
+                        frame: { src: "0.75 inch black frame", borderWidth: 0.75 },
                         glazing: "Regular",
                     });
                     break;
@@ -93,21 +96,21 @@ function Page() {
         setMat([]);
     }
 
-    const totalSize = mat.reduce(
+    const totalSize = debouncedMat.reduce(
         (acc, m) => {
             acc.width += m.width * 2;
             acc.height += m.width * 2;
             return { ...acc };
         },
         {
-            width: frame.dimensions.width + 2 * frame.frame?.borderWidth!,
-            height: frame.dimensions.height + 2 * frame.frame?.borderWidth!,
+            width: debouncedFrame.dimensions.width + 2 * debouncedFrame.frame?.borderWidth!,
+            height: debouncedFrame.dimensions.height + 2 * debouncedFrame.frame?.borderWidth!,
         },
     );
 
     return (
         <div className="grid min-h-[calc(100vh-150px)] gap-5 pb-4 pt-10 md:grid-cols-2">
-            <FrameCanvas matOptions={mat} totalSize={totalSize} frameBorder={frame.frame} />
+            <FrameCanvas matOptions={debouncedMat} totalSize={totalSize} frameBorder={debouncedFrame.frame} />
             <div className="mx-auto flex w-11/12 flex-col gap-6">
                 <h1 className="leading-auto text-3xl font-semibold">{content.title}</h1>
                 <div className="mb-3 flex flex-col gap-y-5">
@@ -117,7 +120,7 @@ function Page() {
                     </div>
                     <div className="flex flex-col gap-y-8">
                         <InputField
-                            label={<strong>Size</strong>}
+                            label={<strong>Opening Size</strong>}
                             field={
                                 <div className="flex items-center gap-4">
                                     <Input
@@ -168,8 +171,8 @@ function Page() {
                                                         <p className="">Width:</p>
                                                         <Input
                                                             type="number"
-                                                            min={1}
-                                                            step={1}
+                                                            min={0.25}
+                                                            step={0.25}
                                                             className="w-20 border border-gray-2 p-3 px-2 text-center"
                                                             placeholder="0"
                                                             value={m.width}
@@ -269,7 +272,7 @@ function Page() {
                                             onChange={(status: string) => {
                                                 setFrame({ ...frame, frame: { src: status, borderWidth: 0.75 } });
                                             }}
-                                            items={content.options[1].items}
+                                            items={content.options[0].items}
                                         />
                                     }
                                 />

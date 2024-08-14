@@ -26,7 +26,7 @@ export async function contactUsAction(state: any, formData: FormData): Promise<S
                     },
                 });
                 if (user) userId = user.id;
-            } catch {}
+            } catch { }
         }
 
         const success = await db.message.create({ data: { name, email, message, userId } });

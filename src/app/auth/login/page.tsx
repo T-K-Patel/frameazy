@@ -5,8 +5,6 @@ import { RedirectType, redirect } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import Logo from "../../../assets/Logo.svg";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import Google from "../../../assets/google.svg";
 import Link from "next/link";
 
@@ -22,6 +20,7 @@ const LoginPage = ({ searchParams }: { searchParams: Record<string, any> }) => {
                 redirect("/", RedirectType.replace);
             }
         }
+        setError("");
     }, [session, searchParams]);
 
     return (
@@ -43,7 +42,7 @@ const LoginPage = ({ searchParams }: { searchParams: Record<string, any> }) => {
                         variant={"outline"}
                         className="flex h-auto w-full gap-x-3 overflow-hidden rounded-xl border border-black px-3 py-3"
                         onClick={async () => {
-                            await signIn("google");
+                            await signIn("google", { redirect: false });
                         }}
                     >
                         <Image src={Google} alt="google" />

@@ -4,7 +4,7 @@ import Item from "../(components)/Item";
 
 import { Button } from "@/components/ui/button";
 import { RiArrowDropDownLine } from "react-icons/ri";
-import { FramesDataType, FramesFilterType, getFramesAction } from "@/serverActions/frames/frame.action";
+import { getFramesAction, FrameDataType, FramesFilterType } from "@/serverActions/frames/frame.action";
 import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
 import useDebounce from "@/lib/useDebounce";
 import FramesPagination from "./FramesPagination";
@@ -20,18 +20,18 @@ function Frames() {
     const [totalFrames, setTotalFrames] = useState(0);
     const [page, setPage] = useState(1);
     const [sidebarHidden, setSidebarHidden] = useState(true);
-    const [frames, setFrames] = useState<FramesDataType[]>();
+    const [frames, setFrames] = useState<FrameDataType[]>();
 
-    const debouncedFilters = useDebounce<FramesFilterType>(filters, 800);
+    const debouncedFilters = useDebounce(filters, 800);
     useEffect(() => {
-        getFramesAction(debouncedFilters).then((data) => {
+        getFramesAction(debouncedFilters, page - 1).then((data) => {
             if (data.success) {
-                setPage(1);
+                // setPage(1);
                 setFrames(data.data.frames);
-                setTotalFrames(data.data.frames.length * 3);
+                setTotalFrames(data.data.frames.length);
             }
         });
-    }, [debouncedFilters]);
+    }, [debouncedFilters, page]);
 
     const [winWidth, setWinWidth] = useState(window.innerWidth);
 

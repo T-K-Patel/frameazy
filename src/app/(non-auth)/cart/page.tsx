@@ -6,7 +6,8 @@ import Image from "next/image";
 import RazorpayLogo from "@/assets/Razorpay_logo.svg";
 import { useSession } from "next-auth/react";
 import { getImagePlaceholder } from "@/components/imagePlaceholder";
-import { CartItemType, clearCartAction, getCartItems, placeOrderAction } from "@/serverActions/cart/cart.actions";
+import { CartItemType, clearCartAction, getCartItems } from "@/serverActions/cart/cart.actions";
+import { placeOrderAction } from "@/serverActions/orders/orders.action";
 import { useFormState, useFormStatus } from "react-dom";
 import LoadingCart from "./(components)/LoadingCart";
 import { redirect } from "next/navigation";
@@ -51,7 +52,7 @@ function Cart() {
                     setError(res.error);
                 }
             })
-            .catch((e) => {
+            .catch(() => {
                 setError("An error occurred while fetching cart items");
             })
             .finally(() => {
@@ -109,7 +110,7 @@ function Cart() {
         document.body.classList.toggle("overflow-hidden", showDialog);
     }, [showDialog]);
 
-    if (!session.data?.user.id) {
+    if (!session?.data?.user?.id) {
         redirect(`/auth/login?callbackUrl=${encodeURIComponent(window.location.href)}`);
     }
     if (loading) {
@@ -119,7 +120,7 @@ function Cart() {
     const deliveryCharge = cartItems.reduce((acc, item) => acc + item.quantity * 5, 0);
 
     const orderTotal =
-        Math.round(cartItems.reduce((acc, item) => acc + item.quantity * (item.frame.price || 0), 0) * 10) / 10;
+        Math.round(cartItems.reduce((acc, item) => acc + item.quantity * (item.single_unit_price || 0), 0) * 10) / 10;
 
     return (
         <section className="mx-auto my-5 max-w-screen-2xl">
@@ -295,8 +296,8 @@ function Cart() {
                                             <h1 className="text-3xl font-semibold">Order Placed</h1>
                                             <p className="text-lg">Your order has been placed successfully.</p>
                                             <>
-                                                <p>Order ID: {placeOrderState.data.orderId}</p>
-                                                <p>Amount: {placeOrderState.data.orderTotal}</p>
+                                                <p>Order ID: 1</p>
+                                                <p>Amount: 20</p>
                                                 <div className="grid grid-cols-2 gap-4">
                                                     <Button
                                                         size={"lg"}

@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { NextApiRequest, NextApiResponse } from "next";
-import { Category, Collection, Color, Frame } from "@prisma/client";
+import { Category, Collection, Color } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 function generateFakeFrames() {
@@ -11,18 +11,19 @@ function generateFakeFrames() {
     for (let i = 0; i < 100; i++) {
         frames.push({
             name: `frame-${i}`,
-            price: Math.floor((Math.random() * 1000 + 50) * 100) / 100,
-            image: `http://localhost:3000/frame-1.png`,
+            unit_price: Math.floor((Math.random() * 1000 + 50) * 100) / 100,
+            image: `https://res.cloudinary.com/dgxfuzqed/image/upload/v1723384497/tbaduzly2ryd6gpn3eqg.avif`,
+            borderSrc: `https://res.cloudinary.com/dgxfuzqed/image/upload/v1723392686/yqsyyjoi1wottessqsod.jpg`,
+            borderWidth: Math.floor((Math.random() * 3 + 0.5) * 100) / 100,
             category: categories[Math.floor(Math.random() * categories.length)] as Category,
             color: colors[Math.floor(Math.random() * colors.length)] as Color,
             collection: collections[Math.floor(Math.random() * collections.length)] as Collection,
-            height: Math.floor(Math.random() * 20 + 3),
-            width: Math.floor(Math.random() * 20 + 3),
         });
     }
     return frames;
 }
 
+// eslint-disable-next-line no-unused-vars
 export async function GET(req: NextApiRequest, res: NextApiResponse) {
     await db.frame.createMany({
         data: generateFakeFrames(),

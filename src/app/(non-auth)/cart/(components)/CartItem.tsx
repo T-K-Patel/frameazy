@@ -9,7 +9,9 @@ import { Button } from "@/components/ui/button";
 
 export type CartItemCompType = {
     item: CartItemType;
+    // eslint-disable-next-line no-unused-vars
     updateState: (qty: number, itemId: string) => void;
+    // eslint-disable-next-line no-unused-vars
     deleteItem: (itemId: string) => void;
     fetchCartItems: () => void;
 };
@@ -30,7 +32,7 @@ export const CartItem = ({ item, updateState, deleteItem, fetchCartItems }: Cart
         async function updateQty() {
             if (qty !== item.quantity) {
                 setUpdating(true);
-                const updatedData = await updateCartItemQty(qty, item.id, "1");
+                const updatedData = await updateCartItemQty(qty, item.id);
                 if (updatedData.success) {
                     updateState(updatedData.data, item.id);
                 } else {
@@ -47,7 +49,7 @@ export const CartItem = ({ item, updateState, deleteItem, fetchCartItems }: Cart
         <div className="flex flex-wrap items-center justify-between rounded-xl border border-solid border-[#f1f1f1] p-2">
             <div className="flex items-center gap-5">
                 <Image
-                    src={item.image || CartImage}
+                    src={item.frame?.image || CartImage}
                     alt="frame"
                     width={512}
                     height={512}
@@ -56,7 +58,7 @@ export const CartItem = ({ item, updateState, deleteItem, fetchCartItems }: Cart
                     className="aspect-square w-10 flex-shrink-0 rounded-lg border border-black object-contain md:w-20"
                 />
                 <p className="leading-auto w-[75%] flex-shrink-0 text-sm font-semibold md:text-base">
-                    {item.frame.name}
+                    {item.frame?.name}
                 </p>
             </div>
             <div className="flex items-center justify-between gap-5 md:gap-8">
@@ -81,7 +83,7 @@ export const CartItem = ({ item, updateState, deleteItem, fetchCartItems }: Cart
                         </button>
                     </>
                 </div>
-                <p className="text-end font-semibold"> &#8377; {(item.frame?.price || 0) * item.quantity}</p>
+                <p className="text-end font-semibold"> &#8377; {(item.single_unit_price || 0) * item.quantity}</p>
                 <>
                     <Button
                         variant={"ghost"}

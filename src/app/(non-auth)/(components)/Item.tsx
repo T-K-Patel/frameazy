@@ -5,32 +5,31 @@ import { BsCart3 } from "react-icons/bs";
 import { AiFillEdit } from "react-icons/ai";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { FramesDataType } from "@/serverActions/frames/frame.action";
-import { get } from "http";
+import { FrameDataType, PopularFrameDataType } from "@/serverActions/frames/frame.action";
 import { getImagePlaceholder } from "@/components/imagePlaceholder";
-import { addCartItem } from "@/serverActions/cart/cart.actions";
 
-function Item({ item }: { item: FramesDataType }) {
+function Item({ item }: { item: FrameDataType | PopularFrameDataType }) {
     return (
         <div className="mx-auto w-fit rounded-2xl border border-solid p-3">
             <div className="flex items-center justify-center">
                 <Image
-                    src={Frame.src}
+                    src={item.image}
                     width={300}
                     height={400}
                     alt="frame"
                     placeholder="blur"
                     blurDataURL={getImagePlaceholder()}
-                    className="aspect-[3/4] w-full max-w-64"
+                    className="aspect-[3/4] w-full max-w-64 object-contain"
                 />
             </div>
             <h2 className="mt-3 text-xl">{item.name}</h2>
-            <p className="mb-5">{item.price}</p>
+            <p className="mb-5">{item.unit_price}</p>
             <form className="flex gap-5">
                 {/* // TODO: Change this implementation to handle disabling button */}
                 <Button
                     size={"sm"}
-                    formAction={async () => await addCartItem({ frameId: item.id, image: "", quantity: 1, userId: "" })}
+                    formAction={async () => null}
+                    // formAction={async () => await addCartItemAction({ frameId: item.id, image: "", quantity: 1, userId: "" })}
                     className="h-min w-min border border-transparent px-4 py-3 text-xl font-semibold transition-all duration-200 active:scale-90"
                 >
                     <BsCart3 size={24} />
@@ -70,7 +69,7 @@ export function FrameLoading() {
             <div className="flex gap-5">
                 <Button
                     size={"sm"}
-                    onClick={() => {}}
+                    onClick={() => { }}
                     disabled
                     className="h-min w-min border border-transparent px-4 py-3 text-xl font-semibold transition-all duration-200 active:scale-90"
                 >
@@ -80,7 +79,7 @@ export function FrameLoading() {
                 <Button
                     size={"sm"}
                     disabled
-                    onClick={() => {}}
+                    onClick={() => { }}
                     variant={"outline"}
                     className="h-min w-min border border-black bg-transparent px-4 py-3 text-lg font-semibold text-black transition-all duration-200 active:scale-90"
                 >

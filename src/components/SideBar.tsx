@@ -2,7 +2,6 @@
 import { FaTimes } from "react-icons/fa";
 import { BsCart3 } from "react-icons/bs";
 import Link from "next/link";
-import { signOutAction } from "@/serverActions/auth/signout";
 import { Button } from "./ui/button";
 import { signOut } from "next-auth/react";
 
@@ -28,9 +27,8 @@ const Sidebar = ({ toggle, links, showSideBar, currentUser, pathname, barRef }: 
             )}
             <div
                 ref={barRef}
-                className={`fixed top-0 z-30 h-screen w-48 bg-white px-5 text-right shadow-xl duration-300 ease-in-out md:hidden ${
-                    showSideBar ? "right-0" : "right-[-100%]"
-                }`}
+                className={`fixed top-0 z-30 h-screen w-48 bg-white px-5 text-right shadow-xl duration-300 ease-in-out md:hidden ${showSideBar ? "right-0" : "right-[-100%]"
+                    }`}
             >
                 <div className="flex h-full flex-col justify-between pb-7">
                     <div>

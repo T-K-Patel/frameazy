@@ -1,7 +1,5 @@
 import Image from "next/image";
 import ArtImg from "@/assets/art_1.png";
-import { Button } from "@/components/ui/button";
-import { BsArrowRight } from "react-icons/bs";
 import { getImagePlaceholder } from "@/components/imagePlaceholder";
 
 const FrameArt = () => {

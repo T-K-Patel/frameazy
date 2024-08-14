@@ -1,4 +1,4 @@
-import React, { InputHTMLAttributes } from "react";
+import React from "react";
 import { Input, InputProps } from "./ui/input";
 import { Label } from "./ui/label";
 

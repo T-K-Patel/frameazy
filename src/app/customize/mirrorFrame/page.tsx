@@ -1,9 +1,11 @@
+"use client"
 import DropDown from "@/components/DropDown";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import React, { useState } from "react";
 import InputField from "../InputField";
 import FrameCanvas from "../FrameCanvas";
+import useDebounce from "@/lib/useDebounce";
 
 const MirrorOptions: string[] = ["Regular"];
 const frames: string[] = ["0.75inch black frame"];
@@ -19,10 +21,11 @@ const Page = () => {
         frame: { src: "0.75inch black frame", borderWidth: 0.75 },
         mirrorType: "Regular",
     });
+    const debouncedDimensions = useDebounce<{ width: number, height: number }>(mirror.dimensions, 300)
     return (
         <>
             <div className="grid min-h-[calc(100vh-150px)] gap-5 pb-4 pt-10 md:grid-cols-2">
-                <FrameCanvas totalSize={mirror.dimensions} frameBorder={mirror.frame} />
+                <FrameCanvas totalSize={debouncedDimensions} frameBorder={mirror.frame} />
                 <div className="mx-auto flex w-11/12 flex-col gap-6">
                     <h1 className="leading-auto text-3xl font-semibold">Framed mirror</h1>
                     <div className="mb-3 flex flex-col gap-y-5">

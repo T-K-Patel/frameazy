@@ -1,10 +1,8 @@
 import React from "react";
-import { BsArrowRight } from "react-icons/bs";
 import Personal1 from "@/assets/personal1.png";
 import Personal2 from "@/assets/personal2.png";
 import Personal3 from "@/assets/personal3.png";
 import Image, { StaticImageData } from "next/image";
-import { Button } from "@/components/ui/button";
 import { getImagePlaceholder } from "@/components/imagePlaceholder";
 import SelectFrame from "@/components/customizing/SelectFrame";
 

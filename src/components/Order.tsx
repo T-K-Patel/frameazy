@@ -9,7 +9,7 @@ type Order = {
     paymentStatus: "Pending" | "Completed";
 };
 
-export const Order = ({ order }: { order: Order }) => {
+const Order = ({ order }: { order: Order }) => {
     return (
         <div className="flex flex-col justify-between gap-3 rounded-lg border border-[#F1F1F1] px-3 py-4 md:flex-row">
             <div className="grid flex-grow grid-cols-1 gap-y-2 border-[#F1F1F1] md:grid-cols-3 md:border-r">
@@ -73,3 +73,5 @@ export const Order = ({ order }: { order: Order }) => {
         </div>
     );
 };
+
+export { Order };

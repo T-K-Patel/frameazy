@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useFrames } from "@/context/frames-context";
 import Cropper, { Area } from "react-easy-crop";
 import { Label } from "../ui/label";

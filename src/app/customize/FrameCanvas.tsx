@@ -1,9 +1,9 @@
-import React, { useCallback, useEffect, useMemo, useRef } from "react";
+import React, { useCallback, useMemo } from "react";
 
 const CANVAS_WIDTH = 2048;
 const CANVAS_HEIGHT = CANVAS_WIDTH;
 // const CANVAS_HEIGHT = (CANVAS_WIDTH * 3) / 4;
-const INCH_TO_PIXEL = 96;
+// const INCH_TO_PIXEL = 96;
 const SIZE_FACTOR = 1.1;
 
 type FrameCanvasProps = {
@@ -21,14 +21,17 @@ type FrameCanvasProps = {
 
 // https://09vt97f6-3000.inc1.devtunnels.ms/
 
+type CanvasProps = {
+    // eslint-disable-next-line no-unused-vars
+    draw?: (c: CanvasRenderingContext2D) => void;
+    className: string;
+}
+
 function Canvas({
     draw,
     className,
     ...props
-}: {
-    draw?: (context: CanvasRenderingContext2D) => void;
-    className: string;
-}) {
+}: CanvasProps) {
     const canvasRef = React.useRef<HTMLCanvasElement>(null);
     React.useEffect(() => {
         const context = canvasRef.current?.getContext("2d");
@@ -80,10 +83,21 @@ const FrameCanvas = ({ image, totalSize, frameBorder, matOptions }: FrameCanvasP
      * SF*th<ch
      * SF*tw<cw
      */
-    const cis = useMemo(() => new Image(), []);
-    cis.src = image?.src || "";
-    cis.loading = "eager";
-    // cis.src = "https://admin.walraft.com/uploads/frames/small-brown-gold-875-b.jpg";;
+    const cis = useMemo(() => {
+        const _cis = new Image();
+        _cis.src = image?.src || "";
+        _cis.loading = "eager";
+        return _cis;
+    }, [image?.src]);
+
+    const frameCIS = useMemo(() => {
+        const _cis = new Image()
+        _cis.src = frameBorder?.src || "";
+        _cis.src = "http://localhost:3000/small_antique_golddd3.jpg";
+        _cis.loading = "eager";
+        return _cis;
+    }, [frameBorder?.src]);
+
     const SCALE_FACTOR =
         1 / (Math.max((totalSize?.width || 0) / CANVAS_WIDTH, (totalSize?.height || 0) / CANVAS_HEIGHT) * SIZE_FACTOR);
 
@@ -109,6 +123,7 @@ const FrameCanvas = ({ image, totalSize, frameBorder, matOptions }: FrameCanvasP
 
     const draw = useCallback(
         (ctx: CanvasRenderingContext2D) => {
+            ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
             const wL = new WorkLocation(
                 SCALE_FACTOR,
                 (CANVAS_WIDTH - totalSize.width * SCALE_FACTOR) / 2,
@@ -129,12 +144,13 @@ const FrameCanvas = ({ image, totalSize, frameBorder, matOptions }: FrameCanvasP
 
             // Draw Frame
             if (frameBorder) {
-                const frameCIS = new Image();
-                frameCIS.src = "http://localhost:3000/small_antique_golddd3.jpg";
-                frameCIS.loading = "eager";
+                // const frameCIS = new Image();
+                // // frameCIS.src = "http://localhost:3000/small_antique_golddd3.jpg";
                 // frameCIS.src = "http://localhost:3000/small-brown-gold-875-b.jpg";
+                // frameCIS.loading = "eager";
 
                 const fWL = wL.copy();
+                fWL.shrink = () => null;
                 wL.shrink(frameBorder.borderWidth);
 
                 const drawFrame = () => {
@@ -228,7 +244,8 @@ const FrameCanvas = ({ image, totalSize, frameBorder, matOptions }: FrameCanvasP
             [...(matOptions || [])].reverse().map((option) => {
                 drawMat(option.color, option.width);
             });
-
+            ctx.fillStyle = "white";
+            ctx.fillRect(wL.x, wL.y, wL.w, wL.h);
             if (image) {
                 // Draw Image
                 ctx.drawImage(cis, wL.x, wL.y, wL.w, wL.h);
@@ -238,7 +255,7 @@ const FrameCanvas = ({ image, totalSize, frameBorder, matOptions }: FrameCanvasP
                 };
             }
         },
-        [SCALE_FACTOR, totalSize.width, totalSize.height, frameBorder, matOptions, image, cis],
+        [SCALE_FACTOR, totalSize.width, totalSize.height, frameBorder, matOptions, image, frameCIS, cis],
     );
 
     return (

@@ -1,8 +1,7 @@
 "use server";
 
-import { Category, Collection, Color, Frame } from "@prisma/client";
+import { Category, Collection, Color, OrderStatus } from "@prisma/client";
 import { db } from "@/lib/db";
-import { redisClient } from "@/lib/redis.client";
 import { ServerActionReturnType } from "@/types/serverActionReturnType";
 import { CustomError } from "@/lib/CustomError";
 
@@ -13,39 +12,58 @@ export type FramesFilterType = {
     colors: Color[];
 };
 
-export type FramesDataType = {
+export type PopularFrameDataType = {
     id: string;
     name: string;
-    price: number;
+    unit_price: number;
+    height: number | null;
+    width: number | null;
     image: string;
 };
+export type FrameDataType = PopularFrameDataType & {
+    color: Color,
+    collection: Collection,
+    category: Category
+}
 
 export async function getFramesAction(
     filters: FramesFilterType,
-): Promise<ServerActionReturnType<{ total: number; frames: FramesDataType[] }>> {
+    page: number
+): Promise<ServerActionReturnType<{ total: number; frames: FrameDataType[] }>> {
     try {
-        // LATER: Implement pagination and caching
         const frames = await db.frame.findMany({
             where: {
                 AND: [
-                    ...(filters.categories.length > 0 ? [{ category: { in: filters.categories } }] : []),
-                    ...(filters.collections.length > 0 ? [{ collection: { in: filters.collections } }] : []),
-                    ...(filters.colors.length > 0 ? [{ color: { in: filters.colors } }] : []),
-                    ...(filters.aspects?.length > 0
-                        ? filters.aspects.map((aspect) => ({
-                              AND: [{ height: { equals: aspect.height } }, { width: { equals: aspect.width } }],
-                          }))
-                        : []),
+                    filters.categories.length > 0 ? { category: { in: filters.categories } } : {},
+                    filters.collections.length > 0 ? { collection: { in: filters.collections } } : {},
+                    filters.colors.length > 0 ? { color: { in: filters.colors } } : {},
                 ],
             },
             select: {
                 id: true,
                 name: true,
-                price: true,
+                unit_price: true,
+                height: true,
+                width: true,
+                color: true,
+                collection: true,
+                category: true,
                 image: true,
             },
+            skip: page * 18,
+            take: 18
         });
-        return { data: { frames, total: 100 }, success: true };
+        const total = await db.frame.count({
+            where: {
+                AND: [
+                    filters.categories.length > 0 ? { category: { in: filters.categories } } : {},
+                    filters.collections.length > 0 ? { collection: { in: filters.collections } } : {},
+                    filters.colors.length > 0 ? { color: { in: filters.colors } } : {},
+                ],
+            },
+        });
+
+        return { success: true, data: { total, frames } };
     } catch (error) {
         if (error instanceof CustomError) {
             return { success: false, error: error.message };
@@ -55,34 +73,40 @@ export async function getFramesAction(
     }
 }
 
-export async function getPopularFramesAction(): Promise<ServerActionReturnType<FramesDataType[]>> {
+export async function getPopularFramesAction(): Promise<ServerActionReturnType<PopularFrameDataType[]>> {
     try {
-        // await new Promise((resolve) => setTimeout(resolve, 5000));
-        const cached = await redisClient
-            .get("frames:popularFrames")
-            .then((res) => (res ? (JSON.parse(res) as FramesDataType[]) : null));
-        if (cached) {
-            return { success: true, data: cached };
-        }
-
-        // OPTIMIZE: Use more efficient query to get popular frames (this is too slow for production)
-        console.log("Fetching popular frames from DB");
         const frames = await db.frame.findMany({
+            where: {
+                OrderItem: {
+                    some: {
+                        order: {
+                            order_status: {
+                                in: [
+                                    OrderStatus.Approved,
+                                    OrderStatus.Delivered,
+                                    OrderStatus.Shipped,
+                                    OrderStatus.Processing
+                                ]
+                            }
+                        }
+                    }
+                }
+            },
             orderBy: {
                 OrderItem: {
                     _count: "desc",
                 },
             },
+            take: 6,
             select: {
                 id: true,
                 name: true,
-                price: true,
+                unit_price: true,
+                height: true,
+                width: true,
                 image: true,
-            },
-            take: 6,
+            }
         });
-        await redisClient.set("frames:popularFrames", JSON.stringify(frames));
-        await redisClient.expire("frames:popularFrames", 60 * 60 * 1); // 1 hour
 
         return { success: true, data: frames };
     } catch (error) {

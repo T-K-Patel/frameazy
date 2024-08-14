@@ -1,6 +1,7 @@
 import React from "react";
 
 const OrderDetails = ({ params }: { params: { id: string } }) => {
+    console.log(params)
     const order: any = {}; //TODO server action for fetcching the order by giving the id
     return (
         <div className="mx-auto flex w-11/12 max-w-screen-2xl flex-col gap-4">

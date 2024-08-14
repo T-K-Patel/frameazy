@@ -7,10 +7,10 @@ import "swiper/css/navigation";
 
 import { Navigation, Autoplay } from "swiper/modules";
 import Link from "next/link";
-import { FramesDataType, getPopularFramesAction } from "@/serverActions/frames/frame.action";
+import { PopularFrameDataType, getPopularFramesAction } from "@/serverActions/frames/frame.action";
 
 const PopularItems = () => {
-    const [popularFrames, setPopularFrames] = useState<FramesDataType[]>([]);
+    const [popularFrames, setPopularFrames] = useState<PopularFrameDataType[]>([]);
     const [loading, setLoading] = useState(true);
     useEffect(() => {
         setLoading(true);
@@ -64,23 +64,23 @@ const PopularItems = () => {
             >
                 {loading
                     ? Array.from({ length: 6 }).map((_, ind) => {
-                          return (
-                              <React.Fragment key={ind}>
-                                  <SwiperSlide>
-                                      <FrameLoading />
-                                  </SwiperSlide>
-                              </React.Fragment>
-                          );
-                      })
+                        return (
+                            <React.Fragment key={ind}>
+                                <SwiperSlide>
+                                    <FrameLoading />
+                                </SwiperSlide>
+                            </React.Fragment>
+                        );
+                    })
                     : popularFrames.map((item, ind) => {
-                          return (
-                              <React.Fragment key={ind}>
-                                  <SwiperSlide>
-                                      <Item item={item} />
-                                  </SwiperSlide>
-                              </React.Fragment>
-                          );
-                      })}
+                        return (
+                            <React.Fragment key={ind}>
+                                <SwiperSlide>
+                                    <Item item={item} />
+                                </SwiperSlide>
+                            </React.Fragment>
+                        );
+                    })}
             </Swiper>
         </div>
     );

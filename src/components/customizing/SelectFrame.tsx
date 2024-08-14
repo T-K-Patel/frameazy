@@ -53,7 +53,7 @@ const SelectFrame = () => {
         contentDivRef.current?.scrollTo({ top: 0, behavior: "smooth" });
     }, [framingString]);
 
-    let onBack = () => {};
+    let onBack = () => { };
 
     let content: ContentType = {
         title: "Select your style of frame",
@@ -124,7 +124,6 @@ const SelectFrame = () => {
             setFrameOptions({ framingStyle: "none" });
         };
     } else if (framing.framingStyle == "uploadAndFrame") {
-        let comp: null | ReactNode = null;
         if (!framing.data.image) {
             content = {
                 title: "Image of the subject",

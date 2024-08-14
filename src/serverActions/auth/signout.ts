@@ -2,5 +2,6 @@
 import { signOut } from "next-auth/react";
 
 export const signOutAction = async () => {
-    signOut();
+    await signOut();
+    return true;
 };

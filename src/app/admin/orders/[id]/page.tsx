@@ -1,19 +1,18 @@
 "use client";
 import DropDown from "@/components/DropDown";
-import { CartItem } from "@prisma/client";
 import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
-const Item = ({ item }: { item: CartItem }) => {
-    return (
-        <div className="flex flex-col items-center justify-between gap-y-2 md:flex-row">
-            <div className="flex items-center justify-between md:gap-8">
-                <div className="h-full w-16 overflow-hidden rounded-xl bg-gray-2" />
-            </div>
-        </div>
-    );
-};
+// const Item = ({ item }: { item: CartItem }) => {
+//     return (
+//         <div className="flex flex-col items-center justify-between gap-y-2 md:flex-row">
+//             <div className="flex items-center justify-between md:gap-8">
+//                 <div className="h-full w-16 overflow-hidden rounded-xl bg-gray-2" />
+//             </div>
+//         </div>
+//     );
+// };
 
 const OrderDetails = ({ params }: { params: { id: string } }) => {
+    console.log(params);
     const [order, setOrder] = useState({ paymentStatus: "Pending", deliveryStatus: "Pending" }); //TODO fetching order with the id;
     const items = ["Pending", "Out for delivery", "Delivered", "Cancelled"];
     return (

@@ -7,20 +7,28 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  user
+  admin
+}
+
 model User {
   id            String          @id @default(auto()) @map("_id") @db.ObjectId
   name          String?
   email         String?         @unique
   emailVerified DateTime?       @map("email_verified")
-  password      String?
+  role          Role            @default(user)
   image         String?
   accounts      Account[]
   sessions      Session[]
   Authenticator Authenticator[]
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-  CartItem      CartItem[]
-  Order         Order[]
+
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  CartItem  CartItem[]
+  Order     Order[]
+
+  @@map("users")
 }
 
 model Account {
@@ -42,6 +50,7 @@ model Account {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+  @@map("accounts")
 }
 
 model Session {
@@ -52,6 +61,8 @@ model Session {
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+
+  @@map("sessions")
 }
 
 model VerificationToken {
@@ -61,6 +72,7 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+  @@map("verification_tokens")
 }
 
 // Optional for WebAuthn support
@@ -80,41 +92,53 @@ model Authenticator {
 }
 
 model Frame {
-  id         String      @id @default(auto()) @map("_id") @db.ObjectId
-  name       String      @unique
-  price      Float
-  image      String
-  min_image  String
-  category   Category
-  color      Color
-  collection Collection
-  width      Int
-  height     Int
-  CartItem   CartItem[]
-  OrderItem  OrderItem[]
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  name        String      @unique
+  image       String
+  borderSrc   String
+  borderWidth Int
+  unit_price  Float
+  category    Category
+  color       Color
+  collection  Collection
+  width       Int?
+  height      Int?
+  CartItem    CartItem[]
+  OrderItem   OrderItem[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
 }
 
 enum Category {
-  A
-  B
-  C
-  D
+  Frame_SingleMat
+  Frame_DoubleMats
+  PictureFrames
+  Collages_SingleMat
+  Collages_DoubleMats
+  DiplomasFrames
 }
 
 enum Color {
-  A
-  B
-  C
-  D
+  Aqua
+  Barnwood
+  Black
+  BlondeBurl
+  Brown
+  Bronze
+  Burgundy
+  Charcoal
+  ClearStain
+  Cherry
+  Gold
+  Coffee
+  Green
+  Grey
+  Honey
 }
 
 enum Collection {
-  A
-  B
-  C
-  D
+  NaturalWoodCollection
+  CloaseoutPicturesFrames
 }
 
 enum Mirror {
@@ -124,14 +148,20 @@ enum Mirror {
   D
 }
 
+enum MessageStatus {
+  UnResolved
+  Resolved
+}
+
 model Message {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  id        String        @id @default(auto()) @map("_id") @db.ObjectId
   message   String
   name      String
   email     String
-  userId    String?  @db.ObjectId
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  userId    String?       @db.ObjectId
+  status    MessageStatus @default(UnResolved)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
 }
 
 enum Glazing {
@@ -141,45 +171,115 @@ enum Glazing {
   D
 }
 
-// TODO: add fields for dimensions and other properties required
+enum Printing {
+  A
+  B
+  C
+  D
+}
+
+enum Backing {
+  A
+  B
+  C
+  D
+}
+
+enum Stretching {
+  A
+  B
+  C
+  D
+}
+
+enum Sides {
+  A
+  B
+  C
+  D
+}
+
+type Address {
+  name      String
+  addressL1 String
+  addressL2 String
+  city      String
+  pincode   String
+  state     String
+  phone     String
+}
+
+type MatOptions {
+  color Color
+  width Int
+}
+
+enum CustomizationType {
+  ImageWithMatAndGlazing
+  ImageWithoutMatAndGlazing
+  ImagePrintOnly
+  ImageCanvasPrint
+  EmptyForCanvas
+  EmptyForPaper
+  FramedMirror
+}
+
+type Customization {
+  type       CustomizationType
+  glazing    Glazing?
+  width      Int
+  height     Int
+  mat        MatOptions[]
+  mirror     Mirror?
+  image      String?
+  printing   Printing?
+  backing    Backing?
+  stretching Stretching?
+  sides      Sides?
+}
+
 model CartItem {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String   @db.ObjectId
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  frameId   String   @db.ObjectId
-  frame     Frame    @relation(fields: [frameId], references: [id], onDelete: Restrict)
-  image     String?
-  mirror    Mirror?
+  id                String        @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String        @db.ObjectId
+  user              User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  frameId           String?       @db.ObjectId
+  frame             Frame?        @relation(fields: [frameId], references: [id], onDelete: Restrict)
+  customization     Customization
+  single_unit_price Float
+
   quantity  Int      @default(1)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([userId, frameId])
+  @@index([userId, frameId])
+  @@map("cart_items")
 }
 
 model Order {
-  id              String        @id @default(auto()) @map("_id") @db.ObjectId
-  userId          String        @db.ObjectId
-  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  price           Int
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Cost breakup
+  packaging       Int
   delivery_charge Int
-  payment_status  PaymentStatus @default(UnInitiated)
-  pay_order_id    String?
-  pay_time        DateTime?
-  order_status    OrderStatus   @default(Received)
-  order_items     OrderItem[]
-  transactions    Transaction[]
-  name            String
-  addressL1       String
-  addressL2       String
-  city            String
-  pincode         String
-  state           String
-  phone           String
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  discount        Int @default(0)
+
+  // Items and Status
+  order_items  OrderItem[]
+  order_status OrderStatus @default(Received)
+
+  // Payment and shipping
+  transaction_status PaymentStatus @default(UnInitiated)
+  shipping_address   Address
+  delivery_date      DateTime
+  transactions       Transaction[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId])
+  @@map("orders")
 }
 
 enum OrderStatus {
@@ -188,6 +288,8 @@ enum OrderStatus {
   Processing
   Shipped
   Delivered
+  Rejected
+  Canceled
 }
 
 enum PaymentStatus {
@@ -197,43 +299,45 @@ enum PaymentStatus {
   Failed
 }
 
-// TODO: add fields for dimensions and other properties required
 model OrderItem {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  frameId   String   @db.ObjectId
-  frame     Frame    @relation(fields: [frameId], references: [id], onDelete: Restrict)
-  image     String
-  quantity  Int
-  orderId   String   @db.ObjectId
-  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  id                String        @id @default(auto()) @map("_id") @db.ObjectId
+  frameId           String?       @db.ObjectId
+  frame             Frame?        @relation(fields: [frameId], references: [id], onDelete: Restrict)
+  customization     Customization
+  quantity          Int
+  single_unit_price Float
+  orderId           String        @db.ObjectId
+  order             Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([frameId])
   @@index([orderId])
+  @@map("order_items")
 }
 
 model Transaction {
-  id             String            @id @default(auto()) @map("_id") @db.ObjectId
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  // Payment Gateway fields
   paymentOrderId String
   paymentId      String
-  orderId        String            @db.ObjectId
-  order          Order             @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  amount         Float
-  currency       String
-  status         TransactionStatus
-  description    String?
-  createdAt      DateTime          @default(now())
-  updatedAt      DateTime          @updatedAt
+
+  // Order and Amount
+  orderId  String        @db.ObjectId
+  order    Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  amount   Float
+  currency String
+  status   PaymentStatus @default(Pending)
+
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   @@index([orderId])
   @@index([paymentOrderId])
-}
-
-enum TransactionStatus {
-  Pending
-  Success
-  Failed
+  @@map("transactions")
 }
 
 model Subscription {
@@ -245,6 +349,7 @@ model Subscription {
   updatedAt        DateTime           @updatedAt
 
   @@index([status])
+  @@map("subscriptions")
 }
 
 enum SubscriptionStatus {

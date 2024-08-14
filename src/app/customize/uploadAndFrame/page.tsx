@@ -1,5 +1,4 @@
 "use client";
-import AddArtwork from "@/components/AddArtwork";
 import DropDown from "@/components/DropDown";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,12 +34,7 @@ function Page() {
     const { frameOptions } = useFrames();
     const [upload, setUpload] = useState<uploadOptionsProps>({
         dimensions: { width: 0, height: 0 },
-        frame: { src: "0.75inch black frame ", borderWidth: 1 },
-        glazing: "Regular",
         printing: "Photo Paper",
-        backing: "Pine Mdf Hardboard",
-        stretching: "Regular",
-        sides: "Image mirrored",
     });
     const [mat, setMat] = useState<matOptionsProps>([{ width: 0.75, color: "#ffffff", id: new Date().toString() }]);
     useEffect(() => {
@@ -290,8 +284,8 @@ function Page() {
                                                     value={
                                                         option.title != "Frame"
                                                             ? (upload[
-                                                                  option.title.toLowerCase() as keyof uploadOptionsProps
-                                                              ] as string)
+                                                                option.title.toLowerCase() as keyof uploadOptionsProps
+                                                            ] as string)
                                                             : upload.frame?.src!
                                                     }
                                                     onChange={(status: string) => {

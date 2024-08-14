@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev -H 0.0.0.0",
     "build": "next build",
+    "build:no-lint": "next build --no-lint",
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --write **/*.{ts,tsx,js,jsx,json,css}"
@@ -24,11 +25,13 @@
     "@types/next-auth": "^3.15.0",
     "bcrypt": "^5.1.1",
     "class-variance-authority": "^0.7.0",
+    "cloudinary": "^2.4.0",
     "clsx": "^2.1.1",
     "ioredis": "^5.4.1",
     "lucide-react": "^0.399.0",
     "next": "14.2.5",
     "next-auth": "^4.24.7",
+    "next-cloudinary": "^6.10.0",
     "prisma": "^5.16.1",
     "razorpay": "^2.9.4",
     "react": "^18",
@@ -42,7 +45,8 @@
     "swiper": "^11.1.4",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
-    "ts-node": "^10.9.2"
+    "ts-node": "^10.9.2",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.6",

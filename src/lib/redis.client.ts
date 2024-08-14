@@ -1,9 +1,9 @@
-import "server-only";
-import { Redis } from "ioredis";
+// import "server-only";
+// import { Redis } from "ioredis";
 
-const redisClient = new Redis({
-    host: "localhost",
-    port: 6379,
-});
+// const redisClient = new Redis({
+//     host: "localhost",
+//     port: 6379,
+// });
 
-export { redisClient };
+// export { redisClient };

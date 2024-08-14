@@ -1,4 +1,4 @@
-import Image, { StaticImageData } from "next/image";
+import Image from "next/image";
 import DefaultImage from "../../../../public/Default.svg";
 import { Order } from "@/components/Order";
 

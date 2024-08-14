@@ -9,6 +9,10 @@ function UploadImage() {
     const [error, setError] = useState(null as string | null);
     const { frameOptions, setFrameOptions } = useFrames();
 
+    React.useEffect(() => {
+        setError(null);
+    }, []);
+
     const setImage = (image: File) => {
         if (frameOptions.framingStyle == "uploadAndFrame") {
             const reader = new FileReader();
