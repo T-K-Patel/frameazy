@@ -8,7 +8,6 @@ import { CustomError } from "@/lib/CustomError";
 export type FramesFilterType = {
     categories: Category[];
     collections: Collection[];
-    aspects: { height: number; width: number }[];
     colors: Color[];
 };
 
@@ -75,7 +74,9 @@ export async function getFramesAction(
 
 export async function getPopularFramesAction(): Promise<ServerActionReturnType<PopularFrameDataType[]>> {
     try {
-        const frames = await db.frame.findMany({
+        const fetchedFrameIds = new Set<string>();
+
+        let frames = await db.frame.findMany({
             where: {
                 OrderItem: {
                     some: {
@@ -108,6 +109,60 @@ export async function getPopularFramesAction(): Promise<ServerActionReturnType<P
             }
         });
 
+        frames.forEach(frame => fetchedFrameIds.add(frame.id));
+
+        if (frames.length < 6) {
+            const additionalFrames = await db.frame.findMany({
+                where: {
+                    id: {
+                        notIn: Array.from(fetchedFrameIds),
+                    },
+                    OrderItem: {
+                        some: {
+                            order: {
+                                order_status: {in:[
+                                    OrderStatus.Approved,
+                                    OrderStatus.Delivered,
+                                    OrderStatus.Shipped,
+                                    OrderStatus.Processing
+                                ]}
+                            }
+                        }
+                    }
+                },
+                take: 6 - frames.length,
+                select: {
+                    id: true,
+                    name: true,
+                    unit_price: true,
+                    height: true,
+                    width: true,
+                    image: true,
+                }
+            });
+            frames = frames.concat(additionalFrames);
+        }
+
+        if (frames.length < 6) {
+            const remainingFrames = await db.frame.findMany({
+                where: {
+                    id: {
+                        notIn: Array.from(fetchedFrameIds),
+                    },
+                },
+                take: 6 - frames.length,
+                select: {
+                    id: true,
+                    name: true,
+                    unit_price: true,
+                    height: true,
+                    width: true,
+                    image: true,
+                }
+            });
+            frames = frames.concat(remainingFrames);
+        }
+
         return { success: true, data: frames };
     } catch (error) {
         if (error instanceof CustomError) {
@@ -117,3 +172,4 @@ export async function getPopularFramesAction(): Promise<ServerActionReturnType<P
         return { success: false, error: "Something went wrong" };
     }
 }
+

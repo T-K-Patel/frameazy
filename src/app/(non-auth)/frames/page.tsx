@@ -14,7 +14,6 @@ function Frames() {
     const [filters, setFilters] = useState<FramesFilterType>({
         categories: [],
         collections: [],
-        aspects: [],
         colors: [],
     });
     const [totalFrames, setTotalFrames] = useState(0);
