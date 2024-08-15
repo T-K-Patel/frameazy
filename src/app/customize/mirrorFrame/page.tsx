@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import DropDown from "@/components/DropDown";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,7 +21,7 @@ const Page = () => {
         frame: { src: "0.75inch black frame", borderWidth: 0.75 },
         mirrorType: "Regular",
     });
-    const debouncedDimensions = useDebounce<{ width: number, height: number }>(mirror.dimensions, 300)
+    const debouncedDimensions = useDebounce<{ width: number; height: number }>(mirror.dimensions, 300);
     return (
         <>
             <div className="grid min-h-[calc(100vh-150px)] gap-5 pb-4 pt-10 md:grid-cols-2">

@@ -11,12 +11,15 @@ import DropDown from "@/components/DropDown";
 import { Collection, Color, Category } from "@prisma/client";
 
 type UploadImageProps = {
-    name: string
-}
-const UploadImage = forwardRef<HTMLInputElement, { name: string }>(function UploadImage({ name }: UploadImageProps, ref) {
+    name: string;
+};
+const UploadImage = forwardRef<HTMLInputElement, { name: string }>(function UploadImage(
+    { name }: UploadImageProps,
+    ref,
+) {
     const [error, setError] = useState(null as string | null);
     const [file, setFile] = useState<File | null>(null);
-    const [dataUrl, setDataUrl] = useState<{ src: string, width: number, height: number } | null>(null);
+    const [dataUrl, setDataUrl] = useState<{ src: string; width: number; height: number } | null>(null);
 
     const handleDragOver = (e: any) => {
         e.preventDefault();
@@ -64,22 +67,32 @@ const UploadImage = forwardRef<HTMLInputElement, { name: string }>(function Uplo
         <div onDragOver={handleDragOver} onDrop={handleDrop}>
             <>
                 <Label className="relative cursor-pointer">
-                    <NextImage src={dataUrl ?? Upload} width={dataUrl ? dataUrl.width : Upload.width}
+                    <NextImage
+                        src={dataUrl ?? Upload}
+                        width={dataUrl ? dataUrl.width : Upload.width}
                         height={dataUrl ? dataUrl.height : Upload.height}
-                        alt="Auth Image" className="w-full max-w-[28rem] object-contain max-h-[20rem] mx-auto"
+                        alt="Auth Image"
+                        className="mx-auto max-h-[20rem] w-full max-w-[28rem] object-contain"
                     />
-                    <input type="file" accept="image/*" ref={ref} name={name} className="hidden" onChange={handleFileChange} />
-                    {file &&
-                        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white text-center opacity-0 hover:opacity-100 transition-opacity duration-300">
+                    <input
+                        type="file"
+                        accept="image/*"
+                        ref={ref}
+                        name={name}
+                        className="hidden"
+                        onChange={handleFileChange}
+                    />
+                    {file && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-center text-white opacity-0 transition-opacity duration-300 hover:opacity-100">
                             Click to Upload new Image
-                        </div>}
+                        </div>
+                    )}
                 </Label>
                 {error && <p className="mt-3 text-center text-red-500">{error}</p>}
             </>
         </div>
     );
-}
-)
+});
 const SubmitButton = () => {
     const { pending } = useFormStatus();
     return (
@@ -96,14 +109,18 @@ const AdminDashboard = () => {
     const prodImgref = React.useRef<HTMLInputElement>(null);
     const borderImgref = React.useRef<HTMLInputElement>(null);
 
-    const [dropdownData, setDropdownData] = useState<{ color: string, category: string, collection: string }>({ color: "", category: "", collection: "" });
+    const [dropdownData, setDropdownData] = useState<{ color: string; category: string; collection: string }>({
+        color: "",
+        category: "",
+        collection: "",
+    });
 
     useEffect(() => {
         if (state?.success) {
             // Redirect to the product page
             formRef.current?.reset();
         }
-    }, [state])
+    }, [state]);
 
     return (
         <section className="mx-auto flex max-w-screen-2xl justify-center">
@@ -130,17 +147,35 @@ const AdminDashboard = () => {
                                 <div className="flex flex-col gap-y-1">
                                     <Label className="text-lg font-semibold">Frames Category</Label>
                                     <input type="hidden" name="productCategory" value={dropdownData.category} />
-                                    <DropDown items={Object.keys(Category)} value={dropdownData.category} onChange={(val: string) => { setDropdownData(d => ({ ...d, category: val })) }} />
+                                    <DropDown
+                                        items={Object.keys(Category)}
+                                        value={dropdownData.category}
+                                        onChange={(val: string) => {
+                                            setDropdownData((d) => ({ ...d, category: val }));
+                                        }}
+                                    />
                                 </div>
                                 <div className="flex flex-col gap-y-1">
                                     <Label className="text-lg font-semibold">Frames Colors</Label>
                                     <input type="hidden" name="productColor" value={dropdownData.color} />
-                                    <DropDown items={Object.keys(Color)} value={dropdownData.color} onChange={(val: string) => { setDropdownData(d => ({ ...d, color: val })) }} />
+                                    <DropDown
+                                        items={Object.keys(Color)}
+                                        value={dropdownData.color}
+                                        onChange={(val: string) => {
+                                            setDropdownData((d) => ({ ...d, color: val }));
+                                        }}
+                                    />
                                 </div>
                                 <div className="flex flex-col gap-y-1">
                                     <span className="text-lg font-semibold">Collections</span>
                                     <input type="hidden" name="productCollection" value={dropdownData.collection} />
-                                    <DropDown items={Object.keys(Collection)} value={dropdownData.collection} onChange={(val: string) => { setDropdownData(d => ({ ...d, collection: val })) }} />
+                                    <DropDown
+                                        items={Object.keys(Collection)}
+                                        value={dropdownData.collection}
+                                        onChange={(val: string) => {
+                                            setDropdownData((d) => ({ ...d, collection: val }));
+                                        }}
+                                    />
                                 </div>
                             </div>
                             <div className="grid grid-cols-2">

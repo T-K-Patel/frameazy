@@ -3,7 +3,16 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import { CustomError } from "@/lib/CustomError";
 import { db } from "@/lib/db";
 import { ServerActionReturnType } from "@/types/serverActionReturnType";
-import { Customization, CustomizationType, Printing, Stretching, Sides, Glazing, Backing, Mirror } from "@prisma/client";
+import {
+    Customization,
+    CustomizationType,
+    Printing,
+    Stretching,
+    Sides,
+    Glazing,
+    Backing,
+    Mirror,
+} from "@prisma/client";
 import { getServerSession } from "next-auth";
 async function isAuthenticated() {
     const session = await getServerSession(authOptions);
@@ -15,28 +24,36 @@ async function isAuthenticated() {
 
 function isValidNumber(num: number): boolean {
     num = Number(num);
-    return (!isNaN(num)) && (isFinite(num)) && (num > 0);
+    return !isNaN(num) && isFinite(num) && num > 0;
 }
 
 function isvalidMatOptions(options: any): boolean {
-    return (!!options) && Array.isArray(options) && options.length > 0 && (!options.some((mat: any) => {
-        if (typeof mat !== "object") {
-            return true;
-        }
-        if (!isValidNumber(mat.width)) {
-            return true;
-        }
-        if (!/\#[0-9a-f]{6}/.test(mat.color)) {
-            return true;
-        }
-        return false;
-    }))
+    return (
+        !!options &&
+        Array.isArray(options) &&
+        options.length > 0 &&
+        !options.some((mat: any) => {
+            if (typeof mat !== "object") {
+                return true;
+            }
+            if (!isValidNumber(mat.width)) {
+                return true;
+            }
+            if (!/\#[0-9a-f]{6}/.test(mat.color)) {
+                return true;
+            }
+            return false;
+        })
+    );
 }
 
-export async function addCartItemAction(data: Customization, { frameId, qty }: { frameId?: string, qty?: number } = {}): Promise<ServerActionReturnType<string>> {
+export async function addCartItemAction(
+    data: Customization,
+    { frameId, qty }: { frameId?: string; qty?: number } = {},
+): Promise<ServerActionReturnType<string>> {
     try {
         const userId = await isAuthenticated();
-        if (await db.frame.findFirst({ where: { id: frameId } }) === null) {
+        if ((await db.frame.findFirst({ where: { id: frameId } })) === null) {
             throw new CustomError("Invalid frame id");
         }
         qty = Number(qty);
@@ -145,7 +162,7 @@ export async function addCartItemAction(data: Customization, { frameId, qty }: {
                 if (!frameId) {
                     throw new CustomError("Frame is required");
                 }
-                isframeRequired = true
+                isframeRequired = true;
                 // customization.minor
                 if (!data.mirror || !Object.keys(Mirror).includes(data.mirror)) {
                     throw new CustomError("Invalid mirror option");
@@ -171,7 +188,7 @@ export async function addCartItemAction(data: Customization, { frameId, qty }: {
                 customization,
                 frameId,
                 single_unit_price,
-            }
+            },
         });
 
         if (cartItem === null) {
@@ -179,7 +196,6 @@ export async function addCartItemAction(data: Customization, { frameId, qty }: {
         }
 
         return { success: true, data: cartItem.id };
-
     } catch (error) {
         console.log(error);
         if (error instanceof CustomError) {

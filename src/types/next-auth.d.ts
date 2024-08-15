@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { DefaultSession, } from "next-auth";
+import { DefaultSession } from "next-auth";
 import { Role } from "@prisma/client";
 
 declare module "next-auth" {

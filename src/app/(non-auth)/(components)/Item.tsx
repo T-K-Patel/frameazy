@@ -23,8 +23,23 @@ function Item({ item }: { item: FrameDataType | PopularFrameDataType }) {
                 />
             </div>
             <h2 className="mt-3 text-xl">{item.name}</h2>
-            {('color' in item && 'category' in item && 'collection' in item) && (
-                <p className="text-sm items-center">{item.category.replace(/_/g, " + ").replace(/([A-Z])/g, ' $1').trim()} , {item.collection.replace(/_/g, " + ").replace(/([A-Z])/g, ' $1').trim()} , {item.color.replace(/_/g, " + ").replace(/([A-Z])/g, ' $1').trim()}</p>
+            {"color" in item && "category" in item && "collection" in item && (
+                <p className="items-center text-sm">
+                    {item.category
+                        .replace(/_/g, " + ")
+                        .replace(/([A-Z])/g, " $1")
+                        .trim()}{" "}
+                    ,{" "}
+                    {item.collection
+                        .replace(/_/g, " + ")
+                        .replace(/([A-Z])/g, " $1")
+                        .trim()}{" "}
+                    ,{" "}
+                    {item.color
+                        .replace(/_/g, " + ")
+                        .replace(/([A-Z])/g, " $1")
+                        .trim()}
+                </p>
             )}
             <p className="mb-5">{item.unit_price}</p>
             <form className="flex gap-5">
@@ -63,7 +78,7 @@ export function FrameLoading() {
             <div className="flex gap-5">
                 <Button
                     size={"sm"}
-                    onClick={() => { }}
+                    onClick={() => {}}
                     disabled
                     className="h-min w-min border border-transparent px-4 py-3 text-xl font-semibold transition-all duration-200 active:scale-90"
                 >
@@ -73,7 +88,7 @@ export function FrameLoading() {
                 <Button
                     size={"sm"}
                     disabled
-                    onClick={() => { }}
+                    onClick={() => {}}
                     variant={"outline"}
                     className="h-min w-min border border-black bg-transparent px-4 py-3 text-lg font-semibold text-black transition-all duration-200 active:scale-90"
                 >

@@ -25,13 +25,9 @@ type CanvasProps = {
     // eslint-disable-next-line no-unused-vars
     draw?: (c: CanvasRenderingContext2D) => void;
     className: string;
-}
+};
 
-function Canvas({
-    draw,
-    className,
-    ...props
-}: CanvasProps) {
+function Canvas({ draw, className, ...props }: CanvasProps) {
     const canvasRef = React.useRef<HTMLCanvasElement>(null);
     React.useEffect(() => {
         const context = canvasRef.current?.getContext("2d");
@@ -91,7 +87,7 @@ const FrameCanvas = ({ image, totalSize, frameBorder, matOptions }: FrameCanvasP
     }, [image?.src]);
 
     const frameCIS = useMemo(() => {
-        const _cis = new Image()
+        const _cis = new Image();
         _cis.src = frameBorder?.src || "";
         _cis.src = "/small_antique_golddd3.jpg";
         _cis.loading = "eager";

@@ -284,8 +284,8 @@ function Page() {
                                                     value={
                                                         option.title != "Frame"
                                                             ? (upload[
-                                                                option.title.toLowerCase() as keyof uploadOptionsProps
-                                                            ] as string)
+                                                                  option.title.toLowerCase() as keyof uploadOptionsProps
+                                                              ] as string)
                                                             : upload.frame?.src!
                                                     }
                                                     onChange={(status: string) => {

@@ -53,7 +53,7 @@ const SelectFrame = () => {
         contentDivRef.current?.scrollTo({ top: 0, behavior: "smooth" });
     }, [framingString]);
 
-    let onBack = () => { };
+    let onBack = () => {};
 
     let content: ContentType = {
         title: "Select your style of frame",

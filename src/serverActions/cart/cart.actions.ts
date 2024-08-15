@@ -15,12 +15,12 @@ async function isAuthenticated() {
 }
 export type CartItemType = {
     id: string;
-    customization: Customization
+    customization: Customization;
     quantity: number;
     frame: {
         image: string;
         name: string;
-    } | null,
+    } | null;
     single_unit_price: number;
 };
 
@@ -29,7 +29,7 @@ export async function getCartItems(): Promise<ServerActionReturnType<CartItemTyp
         const userId = await isAuthenticated();
         const cartItems = await db.cartItem.findMany({
             where: {
-                userId
+                userId,
             },
             select: {
                 id: true,
@@ -40,12 +40,12 @@ export async function getCartItems(): Promise<ServerActionReturnType<CartItemTyp
                     select: {
                         image: true,
                         name: true,
-                    }
-                }
-            }
+                    },
+                },
+            },
         });
 
-        return { success: true, data: cartItems }
+        return { success: true, data: cartItems };
     } catch (error) {
         if (error instanceof CustomError) {
             return { success: false, error: error.message };
@@ -55,10 +55,7 @@ export async function getCartItems(): Promise<ServerActionReturnType<CartItemTyp
     }
 }
 
-export async function updateCartItemQty(
-    qty: number,
-    itemId: string,
-): Promise<ServerActionReturnType<number>> {
+export async function updateCartItemQty(qty: number, itemId: string): Promise<ServerActionReturnType<number>> {
     try {
         const userId = await isAuthenticated();
         qty = Number(qty);
@@ -66,11 +63,11 @@ export async function updateCartItemQty(
         const updatedItem = await db.cartItem.update({
             where: {
                 id: itemId,
-                userId
+                userId,
             },
             data: {
                 quantity: qty,
-            }
+            },
         });
         if (!updatedItem) throw new CustomError("Item not found in cart");
         return { success: true, data: qty };

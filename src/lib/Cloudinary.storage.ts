@@ -12,13 +12,15 @@ export class CloudinaryStorage {
     static upload(file: ArrayBuffer) {
         try {
             return new Promise<UploadApiResponse | undefined>((resolve) => {
-                cloudinary.uploader.upload_stream((error, uploadResult) => {
-                    if (error) {
-                        console.error("CloudinaryStorage.upload error", error);
-                        return resolve(undefined);
-                    }
-                    return resolve(uploadResult);
-                }).end(Buffer.from(file));
+                cloudinary.uploader
+                    .upload_stream((error, uploadResult) => {
+                        if (error) {
+                            console.error("CloudinaryStorage.upload error", error);
+                            return resolve(undefined);
+                        }
+                        return resolve(uploadResult);
+                    })
+                    .end(Buffer.from(file));
             }).then((uploadResult: UploadApiResponse | undefined) => {
                 console.log(uploadResult);
                 return uploadResult?.secure_url;
@@ -46,4 +48,4 @@ export class CloudinaryStorage {
             return Promise.resolve(false);
         }
     }
-};
+}

@@ -13,7 +13,10 @@ const Checkbox = ({
     onChange: any;
     checked: boolean;
 }) => {
-    const customised_title=title.replace(/_/g, " + ").replace(/([A-Z])/g, ' $1').trim()
+    const customised_title = title
+        .replace(/_/g, " + ")
+        .replace(/([A-Z])/g, " $1")
+        .trim();
     return (
         <>
             <Label className="flex cursor-pointer gap-2">

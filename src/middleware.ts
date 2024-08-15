@@ -9,11 +9,12 @@ export default withAuth({
             const secureCookie = process.env.NEXTAUTH_URL?.startsWith("https://") ?? !!process.env.VERCEL;
             const cookieName = secureCookie ? "__Secure-next-auth.session-token" : "next-auth.session-token";
             try {
-                let session: any = (
-                    await fetch(`${process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000"}/api/auth/session`, {
+                let session: any = await fetch(
+                    `${process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000"}/api/auth/session`,
+                    {
                         method: "GET",
                         headers: { Cookie: `${cookieName}=${cookies.get(cookieName)?.value}` },
-                    })
+                    },
                 );
                 session = await session.json();
                 // console.log("Req Pathname:\n\n", req.nextUrl.pathname, "\n\n");

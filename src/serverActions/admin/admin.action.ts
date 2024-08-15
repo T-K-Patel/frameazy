@@ -2,11 +2,20 @@
 import { ServerActionReturnType } from "@/types/serverActionReturnType";
 import { db } from "@/lib/db";
 import { CustomError } from "@/lib/CustomError";
-import { Message, Transaction, Subscription, Order, Category, Color, Collection, OrderStatus, Role } from "@prisma/client";
+import {
+    Message,
+    Transaction,
+    Subscription,
+    Order,
+    Category,
+    Color,
+    Collection,
+    OrderStatus,
+    Role,
+} from "@prisma/client";
 import { CloudinaryStorage } from "@/lib/Cloudinary.storage";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
-
 
 async function isAdmin() {
     const session = await getServerSession(authOptions);
@@ -18,7 +27,6 @@ async function isAdmin() {
     }
     return;
 }
-
 
 export async function addProduct(state: any, formData: FormData) {
     try {
@@ -43,11 +51,11 @@ export async function addProduct(state: any, formData: FormData) {
             throw new CustomError("Product Price must be a number and Positive.");
         }
 
-        if (!productImage || !(productImage.type).startsWith("image/")) {
+        if (!productImage || !productImage.type.startsWith("image/")) {
             throw new CustomError("Product Image must be a valid image file (JPG, JPEG, PNG, GIF, AVIF).");
         }
 
-        if (!borderImage || !(borderImage.type).startsWith("image/")) {
+        if (!borderImage || !borderImage.type.startsWith("image/")) {
             throw new CustomError("Border Image must be a valid image file (JPEG, PNG, GIF).");
         }
 
@@ -77,8 +85,6 @@ export async function addProduct(state: any, formData: FormData) {
             throw new CustomError("Border Width must be a positive number and finite.");
         }
 
-
-
         const imageBuffer = await productImage.arrayBuffer();
         const imageUrl = await CloudinaryStorage.upload(imageBuffer);
         if (!imageUrl) {
@@ -102,11 +108,10 @@ export async function addProduct(state: any, formData: FormData) {
                 height: productHeight,
                 borderSrc: borderImageUrl,
                 borderWidth: borderWidth,
-            }
+            },
         });
 
         return { success: true, data: "Product added successfully" };
-
     } catch (error) {
         if (error instanceof CustomError) {
             return { success: false, error: error.message };
@@ -147,7 +152,6 @@ export async function getTransactionsAction(): Promise<ServerActionReturnType<Tr
     }
 }
 
-
 // LATER: Add pagination
 export async function getSubscriptionsAction(): Promise<ServerActionReturnType<Subscription[]>> {
     try {
@@ -185,11 +189,11 @@ export async function getOrderDetailsAction(id: string): Promise<ServerActionRet
         await isAdmin();
         const order = await db.order.findFirst({
             where: {
-                id
+                id,
             },
             include: {
-                order_items: true
-            }
+                order_items: true,
+            },
         });
 
         return { success: true, data: order! };
@@ -202,13 +206,18 @@ export async function getOrderDetailsAction(id: string): Promise<ServerActionRet
     }
 }
 
-export async function updateOrderStatusAction(orderId: string, status: OrderStatus): Promise<ServerActionReturnType<boolean>> {
+export async function updateOrderStatusAction(
+    orderId: string,
+    status: OrderStatus,
+): Promise<ServerActionReturnType<boolean>> {
     try {
         await isAdmin();
         if (!(status in OrderStatus)) {
             throw new CustomError("Invalid status");
         }
-        const prevStatus = await db.order.findFirst({ where: { id: orderId }, select: { order_status: true } }).then(order => order?.order_status);
+        const prevStatus = await db.order
+            .findFirst({ where: { id: orderId }, select: { order_status: true } })
+            .then((order) => order?.order_status);
         if (!prevStatus) {
             throw new CustomError("Order not found");
         }
@@ -218,11 +227,11 @@ export async function updateOrderStatusAction(orderId: string, status: OrderStat
         }
         const order = await db.order.update({
             where: {
-                id: orderId
+                id: orderId,
             },
             data: {
-                order_status: status as OrderStatus
-            }
+                order_status: status as OrderStatus,
+            },
         });
 
         if (order?.order_status !== status) {
@@ -237,4 +246,3 @@ export async function updateOrderStatusAction(orderId: string, status: OrderStat
         return { success: false, error: "Something went wrong" };
     }
 }
-

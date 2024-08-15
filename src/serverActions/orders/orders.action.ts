@@ -1,4 +1,4 @@
-"use server"
+"use server";
 import { ServerActionReturnType } from "@/types/serverActionReturnType";
 import { db } from "@/lib/db";
 import { CustomError } from "@/lib/CustomError";
@@ -16,27 +16,27 @@ async function isAuthenticated() {
 }
 
 export type UserOrders = {
-    id: string,
-    order_status: OrderStatus,
-    createdAt: Date,
-    transaction_status: PaymentStatus,
-    delivery_date: Date
-}
+    id: string;
+    order_status: OrderStatus;
+    createdAt: Date;
+    transaction_status: PaymentStatus;
+    delivery_date: Date;
+};
 
 export async function getOrdersAction(): Promise<ServerActionReturnType<UserOrders[]>> {
     try {
         const userId = await isAuthenticated();
         const orders = await db.order.findMany({
             where: {
-                userId
+                userId,
             },
             select: {
                 id: true,
                 order_status: true,
                 createdAt: true,
                 transaction_status: true,
-                delivery_date: true
-            }
+                delivery_date: true,
+            },
         });
 
         return { success: true, data: orders };
@@ -50,21 +50,21 @@ export async function getOrdersAction(): Promise<ServerActionReturnType<UserOrde
 }
 
 export type UserOrderDetails = {
-    id: string,
+    id: string;
     order_items: {
-        id: string,
-        customization: Customization
-    }[],
-    shipping_address: Address,
-    order_status: OrderStatus
-}
+        id: string;
+        customization: Customization;
+    }[];
+    shipping_address: Address;
+    order_status: OrderStatus;
+};
 export async function getOrderDetailsAction(id: string): Promise<ServerActionReturnType<UserOrderDetails>> {
     try {
         const userId = await isAuthenticated();
         const order = await db.order.findFirst({
             where: {
                 id,
-                userId
+                userId,
             },
             select: {
                 id: true,
@@ -72,10 +72,10 @@ export async function getOrderDetailsAction(id: string): Promise<ServerActionRet
                     select: {
                         id: true,
                         customization: true,
-                    }
+                    },
                 },
                 shipping_address: true,
-                order_status: true
+                order_status: true,
             },
         });
 
@@ -98,8 +98,8 @@ const AddressSchema = z.object({
     city: z.string(),
     pincode: z.string(),
     state: z.string(),
-    phone: z.string()
-})
+    phone: z.string(),
+});
 
 export async function placeOrderAction(state: any, formData: FormData): Promise<ServerActionReturnType<string>> {
     try {
@@ -111,13 +111,13 @@ export async function placeOrderAction(state: any, formData: FormData): Promise<
             city: formData.get("city") as string,
             pincode: formData.get("pincode") as string,
             state: formData.get("state") as string,
-            phone: formData.get("phone") as string
+            phone: formData.get("phone") as string,
         };
-        const delivery_charge = 30;  // NOTE: Hardcoded delivery charge
+        const delivery_charge = 30; // NOTE: Hardcoded delivery charge
         const cart = await db.cartItem.findMany({
             where: {
-                userId
-            }
+                userId,
+            },
         });
         if (cart.length == 0) {
             throw new CustomError("Cart is empty");
@@ -128,40 +128,42 @@ export async function placeOrderAction(state: any, formData: FormData): Promise<
             throw new CustomError("Address not in proper format");
         }
         const packaging = cart.reduce((acc, item) => acc + item.quantity * item.single_unit_price, 0);
-        const orderId = await db.$transaction(async (transaction) => {
-            const order = await transaction.order.create({
-                data: {
-                    userId,
-                    shipping_address: address,
-                    delivery_charge,
-                    packaging,
-                    delivery_date: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000)
-                }
-            });
+        const orderId = await db
+            .$transaction(async (transaction) => {
+                const order = await transaction.order.create({
+                    data: {
+                        userId,
+                        shipping_address: address,
+                        delivery_charge,
+                        packaging,
+                        delivery_date: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
+                    },
+                });
 
-            const orderItemsArr = cart.map(item => ({
-                orderId: order.id,
-                customization: item.customization,
-                quantity: item.quantity,
-                single_unit_price: item.single_unit_price,
-                frameId: item.frameId
-            }));
+                const orderItemsArr = cart.map((item) => ({
+                    orderId: order.id,
+                    customization: item.customization,
+                    quantity: item.quantity,
+                    single_unit_price: item.single_unit_price,
+                    frameId: item.frameId,
+                }));
 
-            await transaction.orderItem.createMany({
-                data: orderItemsArr
-            });
+                await transaction.orderItem.createMany({
+                    data: orderItemsArr,
+                });
 
-            await transaction.cartItem.deleteMany({
-                where: {
-                    userId: userId
-                }
+                await transaction.cartItem.deleteMany({
+                    where: {
+                        userId: userId,
+                    },
+                });
+                return order.id;
+            })
+            .catch(() => {
+                throw new CustomError("Failed to place order");
             });
-            return order.id;
-        }).catch(() => {
-            throw new CustomError("Failed to place order");
-        });
         if (!orderId) throw new CustomError("Failed to place order");
-        return { success: true, data: orderId }
+        return { success: true, data: orderId };
     } catch (error) {
         if (error instanceof CustomError) {
             return { success: false, error: error.message };

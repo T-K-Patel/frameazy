@@ -1,5 +1,4 @@
 import Checkbox from "@/components/Checkbox";
-import { Input } from "@/components/ui/input";
 import { FramesFilterType } from "@/serverActions/frames/frame.action";
 import { Category, Collection, Color } from "@prisma/client";
 

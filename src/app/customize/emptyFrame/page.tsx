@@ -10,7 +10,6 @@ import FrameCanvas from "../FrameCanvas";
 import { IoCloseSharp } from "react-icons/io5";
 import useDebounce from "@/lib/useDebounce";
 
-
 type CustomizeOptionsProps = {
     title: string;
     items: string[];

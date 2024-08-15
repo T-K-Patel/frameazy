@@ -20,14 +20,14 @@ export type PopularFrameDataType = {
     image: string;
 };
 export type FrameDataType = PopularFrameDataType & {
-    color: Color,
-    collection: Collection,
-    category: Category
-}
+    color: Color;
+    collection: Collection;
+    category: Category;
+};
 
 export async function getFramesAction(
     filters: FramesFilterType,
-    page: number
+    page: number,
 ): Promise<ServerActionReturnType<{ total: number; frames: FrameDataType[] }>> {
     try {
         const frames = await db.frame.findMany({
@@ -50,7 +50,7 @@ export async function getFramesAction(
                 image: true,
             },
             skip: page * 18,
-            take: 18
+            take: 18,
         });
         const total = await db.frame.count({
             where: {
@@ -86,12 +86,12 @@ export async function getPopularFramesAction(): Promise<ServerActionReturnType<P
                                     OrderStatus.Approved,
                                     OrderStatus.Delivered,
                                     OrderStatus.Shipped,
-                                    OrderStatus.Processing
-                                ]
-                            }
-                        }
-                    }
-                }
+                                    OrderStatus.Processing,
+                                ],
+                            },
+                        },
+                    },
+                },
             },
             orderBy: {
                 OrderItem: {
@@ -106,10 +106,10 @@ export async function getPopularFramesAction(): Promise<ServerActionReturnType<P
                 height: true,
                 width: true,
                 image: true,
-            }
+            },
         });
 
-        frames.forEach(frame => fetchedFrameIds.add(frame.id));
+        frames.forEach((frame) => fetchedFrameIds.add(frame.id));
 
         if (frames.length < 6) {
             const additionalFrames = await db.frame.findMany({
@@ -120,15 +120,17 @@ export async function getPopularFramesAction(): Promise<ServerActionReturnType<P
                     OrderItem: {
                         some: {
                             order: {
-                                order_status: {in:[
-                                    OrderStatus.Approved,
-                                    OrderStatus.Delivered,
-                                    OrderStatus.Shipped,
-                                    OrderStatus.Processing
-                                ]}
-                            }
-                        }
-                    }
+                                order_status: {
+                                    in: [
+                                        OrderStatus.Approved,
+                                        OrderStatus.Delivered,
+                                        OrderStatus.Shipped,
+                                        OrderStatus.Processing,
+                                    ],
+                                },
+                            },
+                        },
+                    },
                 },
                 take: 6 - frames.length,
                 select: {
@@ -138,7 +140,7 @@ export async function getPopularFramesAction(): Promise<ServerActionReturnType<P
                     height: true,
                     width: true,
                     image: true,
-                }
+                },
             });
             frames = frames.concat(additionalFrames);
         }
@@ -158,7 +160,7 @@ export async function getPopularFramesAction(): Promise<ServerActionReturnType<P
                     height: true,
                     width: true,
                     image: true,
-                }
+                },
             });
             frames = frames.concat(remainingFrames);
         }
@@ -172,4 +174,3 @@ export async function getPopularFramesAction(): Promise<ServerActionReturnType<P
         return { success: false, error: "Something went wrong" };
     }
 }
-

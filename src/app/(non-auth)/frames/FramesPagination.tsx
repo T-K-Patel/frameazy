@@ -1,10 +1,5 @@
 import React from "react";
-import {
-    Pagination,
-    PaginationContent,
-    PaginationEllipsis,
-    PaginationItem,
-} from "@/components/ui/pagination";
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem } from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
 
 type FramesPaginationPropType = {

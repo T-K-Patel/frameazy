@@ -3,7 +3,13 @@ import Select, { StylesConfig } from "react-select";
 
 const DropDown = ({ items, value, onChange }: { items: string[]; value: string; onChange: any }) => {
     const options = items.map((item) => {
-        return { value: item, label: item.replace(/_/g, " + ").replace(/([A-Z])/g, ' $1').trim() };
+        return {
+            value: item,
+            label: item
+                .replace(/_/g, " + ")
+                .replace(/([A-Z])/g, " $1")
+                .trim(),
+        };
     });
     const colourStyles: StylesConfig<any> = {
         control: (styles: any) => ({ ...styles, backgroundColor: "white", borderRadius: "8px" }),
@@ -11,8 +17,8 @@ const DropDown = ({ items, value, onChange }: { items: string[]; value: string; 
             return {
                 ...styles,
                 backgroundColor: isFocused ? "#ccc" : "white",
-                color: isDisabled ? '#ccc' : 'black',
-                fontWeight: isSelected ? 'bold' : 'normal',
+                color: isDisabled ? "#ccc" : "black",
+                fontWeight: isSelected ? "bold" : "normal",
             };
         },
     };
@@ -23,7 +29,16 @@ const DropDown = ({ items, value, onChange }: { items: string[]; value: string; 
             }}
             styles={colourStyles}
             options={options}
-            value={{ value, label: (!value || value == "") ? "--Select option--" : value.replace(/_/g, " + ").replace(/([A-Z])/g, ' $1').trim() }}
+            value={{
+                value,
+                label:
+                    !value || value == ""
+                        ? "--Select option--"
+                        : value
+                              .replace(/_/g, " + ")
+                              .replace(/([A-Z])/g, " $1")
+                              .trim(),
+            }}
         />
     );
 };
