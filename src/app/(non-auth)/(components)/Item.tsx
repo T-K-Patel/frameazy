@@ -10,8 +10,8 @@ import { getImagePlaceholder } from "@/components/imagePlaceholder";
 
 function Item({ item }: { item: FrameDataType | PopularFrameDataType }) {
     return (
-        <div className="mx-auto w-fit rounded-2xl border border-solid p-3">
-            <div className="flex items-center justify-center">
+        <div className="mx-auto grid h-full w-fit grid-cols-9 gap-1 rounded-2xl border border-solid pb-2 sm:px-2 md:grid-cols-1 md:p-3">
+            <div className="col-span-3 flex items-center justify-center">
                 <Image
                     src={item.image}
                     width={300}
@@ -19,40 +19,55 @@ function Item({ item }: { item: FrameDataType | PopularFrameDataType }) {
                     alt="frame"
                     placeholder="blur"
                     blurDataURL={getImagePlaceholder()}
-                    className="aspect-[3/4] w-full max-w-64 object-contain"
+                    className="aspect-[3/4] w-[100px] max-w-64 object-contain md:w-full"
                 />
             </div>
-            <h2 className="mt-3 text-xl">{item.name}</h2>
-            {"color" in item && "category" in item && "collection" in item && (
-                <p className="items-center text-sm">
-                    {item.category
-                        .replace(/_/g, " + ")
-                        .replace(/([A-Z])/g, " $1")
-                        .trim()}{" "}
-                    ,{" "}
-                    {item.collection
-                        .replace(/_/g, " + ")
-                        .replace(/([A-Z])/g, " $1")
-                        .trim()}{" "}
-                    ,{" "}
-                    {item.color
-                        .replace(/_/g, " + ")
-                        .replace(/([A-Z])/g, " $1")
-                        .trim()}
+            <div className="col-span-6">
+                <h2 className="mb-2 mt-3 md:text-2xl">{item.name}</h2>
+                {"color" in item && (
+                    <p className="items-center text-xs md:text-sm">
+                        <b>Color: </b>
+                        {item.color
+                            .replace(/_/g, " + ")
+                            .replace(/([A-Z])/g, " $1")
+                            .trim()}
+                    </p>
+                )}
+                {"category" in item && (
+                    <p className="items-center text-xs md:text-sm">
+                        <b>Category: </b>
+                        {item.category
+                            .replace(/_/g, " + ")
+                            .replace(/([A-Z])/g, " $1")
+                            .trim()}
+                    </p>
+                )}
+                {"collection" in item && (
+                    <p className="mb-2 items-center text-xs md:text-sm">
+                        <b>Collection: </b>
+                        {item.collection
+                            .replace(/_/g, " + ")
+                            .replace(/([A-Z])/g, " $1")
+                            .trim()}{" "}
+                    </p>
+                )}
+
+                <p className="md:text-md mb-2 text-sm md:mb-5">
+                    <b>Price per inch: </b>
+                    {item.unit_price}
                 </p>
-            )}
-            <p className="mb-5">{item.unit_price}</p>
-            <form className="flex gap-5">
-                <Button
-                    size={"lg"}
-                    variant={"outline"}
-                    type="button"
-                    className="h-min w-full border border-black bg-transparent px-4 py-3 text-lg font-semibold text-black transition-all duration-200 active:scale-90"
-                >
-                    Customise
-                    <AiFillEdit size={24} className="ml-4" />
-                </Button>
-            </form>
+                <form className="flex gap-5">
+                    <Button
+                        size={"lg"}
+                        variant={"outline"}
+                        type="button"
+                        className="h-min border border-black bg-transparent px-2 py-2 font-semibold text-black transition-all duration-200 active:scale-90 md:px-4 md:py-3 md:text-lg"
+                    >
+                        Customise
+                        <AiFillEdit size={24} className="ml-4" />
+                    </Button>
+                </form>
+            </div>
         </div>
     );
 }

@@ -48,7 +48,7 @@ function Frames() {
 
     return (
         <section className="mx-auto w-11/12 max-w-screen-2xl gap-6">
-            <div className="grid w-full gap-4 p-4 md:grid-cols-4">
+            <div className="grid w-full gap-4 md:grid-cols-4 md:p-4">
                 <aside className="col-span-1 hidden flex-col gap-y-10 py-5 md:flex">
                     <FramesSideBar filters={filters} setFilters={setFilters} />
                 </aside>
@@ -81,7 +81,7 @@ function Frames() {
                             </Dialog>
                         </div>
                     </div>
-                    <div className="grid place-content-center items-center justify-center gap-y-5 md:grid-cols-2 md:gap-x-6 lg:grid-cols-3">
+                    <div className="grid place-content-center items-center justify-center gap-y-5 sm:grid-cols-2 sm:gap-x-4 lg:grid-cols-3">
                         {frames?.map((frame, ind) => {
                             return <Item item={frame} key={ind} />;
                         })}
