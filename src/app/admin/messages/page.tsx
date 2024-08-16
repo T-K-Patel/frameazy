@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Message } from "@prisma/client";
 import { getMessagesAction } from "@/serverActions/admin/admin.action";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const MessageItem = ({ message }: { message: Message }) => {
     return (
@@ -21,6 +22,8 @@ const MessageItem = ({ message }: { message: Message }) => {
 
 const AdminContactPage = () => {
     const [messages, setMessages] = useState<Message[]>();
+    const [loading, setLoading] = useState(true);
+
     useEffect(() => {
         getMessagesAction()
             .then((data) => {
@@ -30,14 +33,24 @@ const AdminContactPage = () => {
             })
             .catch((error) => {
                 console.log(error);
+            })
+            .finally(() => {
+                setLoading(true);
             });
     }, []);
     return (
         <div className="mx-auto flex w-11/12 max-w-screen-2xl flex-col gap-y-12 py-12">
             <section className="flex flex-col gap-6 rounded-3xl border border-[#F1F1F1] p-5">
                 <h1 className="leading-12 border-b border-[#F1F1F1] pb-5 text-3xl font-semibold">Messages</h1>
-                {messages?.length == 0 ? (
-                    <p className="text-center text-lg font-semibold">No messages yet</p>
+                {loading ? (
+                    <div className="flex flex-col gap-4">
+                        <Skeleton className="h-14 rounded-xl md:h-24" />
+                        <Skeleton className="h-14 rounded-xl md:h-24" />
+                        <Skeleton className="h-14 rounded-xl md:h-24" />
+                        <Skeleton className="h-14 rounded-xl md:h-24" />
+                    </div>
+                ) : !messages || messages?.length == 0 ? (
+                    <p className="text-center text-lg font-semibold text-red-500">No messages yet</p>
                 ) : (
                     messages?.map((m) => {
                         return <MessageItem key={m.id} message={m} />;

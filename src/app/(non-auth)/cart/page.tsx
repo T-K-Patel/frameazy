@@ -136,7 +136,7 @@ function Cart() {
                         <p className="text-center text-2xl font-semibold text-red-500">{error}</p>
                     ) : (
                         cartItems.length === 0 && (
-                            <p className="font-semi-bold text-center text-2xl">Your cart is empty!</p>
+                            <p className="text-center text-2xl font-semibold">Your cart is empty!</p>
                         )
                     )}
                     <div className="flex flex-col gap-4">

@@ -17,6 +17,7 @@ const SubscribeButton = () => {
             size={"lg"}
             className="h-12 w-max rounded-l-none p-4 px-8 uppercase max-xs:w-full lg:h-14"
             disabled={pending}
+            onClick={() => {}}
         >
             Subscribe
         </Button>

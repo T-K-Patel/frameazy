@@ -271,6 +271,7 @@ model Order {
 
   // Payment and shipping
   transaction_status PaymentStatus @default(UnInitiated)
+  paymentOrderId     String?
   shipping_address   Address
   delivery_date      DateTime
   transactions       Transaction[]
@@ -295,6 +296,7 @@ enum OrderStatus {
 enum PaymentStatus {
   UnInitiated
   Pending
+  Processing
   Success
   Failed
 }
@@ -322,14 +324,14 @@ model Transaction {
 
   // Payment Gateway fields
   paymentOrderId String
-  paymentId      String
+  status         PaymentStatus @default(Pending)
+  paymentId      String?
 
   // Order and Amount
-  orderId  String        @db.ObjectId
-  order    Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId  String @db.ObjectId
+  order    Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
   amount   Float
   currency String
-  status   PaymentStatus @default(Pending)
 
   description String?
   createdAt   DateTime @default(now())

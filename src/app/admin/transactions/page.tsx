@@ -2,9 +2,11 @@
 import { useEffect, useState } from "react";
 import { PaymentStatus, Transaction } from "@prisma/client";
 import { getTransactionsAction } from "@/serverActions/admin/admin.action";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const AdminTransactionPage = () => {
     const [transactions, setTransactions] = useState<Transaction[]>();
+    const [loading, setLoading] = useState(true);
     useEffect(() => {
         getTransactionsAction()
             .then((data) => {
@@ -14,6 +16,9 @@ const AdminTransactionPage = () => {
             })
             .catch((error) => {
                 console.log(error);
+            })
+            .finally(() => {
+                setLoading(false);
             });
     }, []);
     return (
@@ -26,8 +31,15 @@ const AdminTransactionPage = () => {
                     <p className="text-center text-xl font-semibold">Date</p>
                     <p className="text-center text-xl font-semibold">Status</p>
                 </div>
-                {transactions?.length == 0 ? (
-                    <p className="text-center text-lg font-semibold">No transactions yet</p>
+                {loading ? (
+                    <div className="flex flex-col gap-2">
+                        <Skeleton className="md:h-18 h-10 rounded-xl" />
+                        <Skeleton className="md:h-18 h-10 rounded-xl" />
+                        <Skeleton className="md:h-18 h-10 rounded-xl" />
+                        <Skeleton className="md:h-18 h-10 rounded-xl" />
+                    </div>
+                ) : !transactions || transactions?.length == 0 ? (
+                    <p className="text-center text-lg font-semibold text-red-500">No transactions yet</p>
                 ) : (
                     transactions?.map((t, ind) => {
                         return (

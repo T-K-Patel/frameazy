@@ -22,7 +22,7 @@ export const authOptions: NextAuthOptions = {
         strategy: "database",
         maxAge: 24 * 60 * 60, // 1 day
         generateSessionToken() {
-            return crypto.randomBytes(128).toString("hex");
+            return crypto.randomBytes(64).toString("hex");
         },
     },
     callbacks: {

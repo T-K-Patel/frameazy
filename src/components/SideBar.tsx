@@ -3,12 +3,10 @@ import { FaTimes } from "react-icons/fa";
 import { BsCart3 } from "react-icons/bs";
 import Link from "next/link";
 import { Button } from "./ui/button";
-import { signOut } from "next-auth/react";
 
 type SideBarPropType = {
     toggle: () => void;
     links: {
-        id: string;
         name: string;
         path: string;
     }[];
@@ -39,9 +37,9 @@ const Sidebar = ({ toggle, links, showSideBar, currentUser, pathname, barRef }: 
                             className="mb-16 mt-8 inline-block cursor-pointer text-right"
                         />
                         <ul className="flex flex-col gap-5">
-                            {links.map((link) => (
+                            {links.map((link, index) => (
                                 <li
-                                    key={link.id}
+                                    key={index}
                                     className={pathname === link.path ? "text-dark-blue font-bold" : "text-[#00000084]"}
                                 >
                                     <Link href={link.path}>{link.name}</Link>
@@ -54,33 +52,35 @@ const Sidebar = ({ toggle, links, showSideBar, currentUser, pathname, barRef }: 
                             <Link href="/auth/login" className="hover:underline">
                                 Log in
                             </Link>
-                            <Link href="/auth/signup">
-                                <Button
-                                    size={"lg"}
-                                    className="h-auto w-min py-4 transition-all duration-200 active:scale-90"
-                                >
-                                    Get Started
-                                </Button>
-                            </Link>
                         </div>
                     )}
                     {currentUser && (
                         <div className="flex flex-col items-center justify-end gap-5">
-                            <Link href="/cart" className="text-dark-blue flex items-center gap-3">
-                                <BsCart3 size={30} />
-                                <p className="text-xl font-semibold">Cart</p>
-                            </Link>
-                            <>
-                                <Button
-                                    size={"lg"}
-                                    onClick={async () => {
-                                        await signOut({ redirect: true });
-                                    }}
-                                    className="h-min w-min py-4 transition-all duration-200 active:scale-90"
-                                >
-                                    Sign Out
-                                </Button>
-                            </>
+                            {!pathname.startsWith("/admin") && (
+                                <Link href="/cart" className="text-dark-blue flex items-center gap-3">
+                                    <BsCart3 size={30} />
+                                    <p className="text-xl font-semibold">Cart</p>
+                                </Link>
+                            )}
+                            {currentUser.role == "admin" ? (
+                                <Link href="/admin">
+                                    <Button
+                                        size={"sm"}
+                                        className="h-auto w-min py-4 transition-all duration-200 active:scale-90"
+                                    >
+                                        Admin
+                                    </Button>
+                                </Link>
+                            ) : (
+                                <Link href="/dashboard">
+                                    <Button
+                                        size={"sm"}
+                                        className="h-auto w-min py-4 transition-all duration-200 active:scale-90"
+                                    >
+                                        Dashboard
+                                    </Button>
+                                </Link>
+                            )}
                         </div>
                     )}
                 </div>

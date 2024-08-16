@@ -8,13 +8,27 @@ import { RxHamburgerMenu } from "react-icons/rx";
 import Logo from "@/assets/frameasy-logo.png";
 import Sidebar from "@/components/SideBar";
 import { Button } from "@/components/ui/button";
-import { signOut, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 
 const Navbar = () => {
     const [showSideBar, setShowSideBar] = useState(false);
     const pathname = usePathname();
     const sideBarRef = React.useRef<HTMLDivElement>(null);
     const session = useSession();
+    const [links, setLinks] = useState([
+        {
+            name: "Home",
+            path: "/",
+        },
+        {
+            name: "Frames",
+            path: "/frames",
+        },
+        {
+            name: "Contacts",
+            path: "/contact",
+        },
+    ]);
 
     const handleOutSideClick = useCallback(
         (e: MouseEvent) => {
@@ -30,6 +44,49 @@ const Navbar = () => {
 
     useEffect(() => {
         setShowSideBar(false);
+        if (pathname.startsWith("/admin")) {
+            setLinks([
+                {
+                    name: "Home",
+                    path: "/",
+                },
+                {
+                    name: "Add Product",
+                    path: "/admin",
+                },
+                {
+                    name: "Orders",
+                    path: "/admin/orders",
+                },
+                {
+                    name: "Messages",
+                    path: "/admin/messages",
+                },
+                {
+                    name: "Transactions",
+                    path: "/admin/transactions",
+                },
+                {
+                    name: "Subscriptions",
+                    path: "/admin/subscriptions",
+                },
+            ]);
+        } else {
+            setLinks([
+                {
+                    name: "Home",
+                    path: "/",
+                },
+                {
+                    name: "Frames",
+                    path: "/frames",
+                },
+                {
+                    name: "Contacts",
+                    path: "/contact",
+                },
+            ]);
+        }
     }, [pathname]);
 
     useEffect(() => {
@@ -43,23 +100,6 @@ const Navbar = () => {
         setShowSideBar((s) => !s);
     };
 
-    const links = [
-        {
-            id: "1",
-            name: "Home",
-            path: "/",
-        },
-        {
-            id: "2",
-            name: "Frames",
-            path: "/frames",
-        },
-        {
-            id: "3",
-            name: "Contacts",
-            path: "/contact",
-        },
-    ];
     return (
         <header className="mx-auto max-w-screen-2xl">
             <nav className="mx-auto flex h-[100px] w-11/12 items-center justify-between">
@@ -67,9 +107,9 @@ const Navbar = () => {
                     <Image src={Logo} alt="logo" priority />
                 </a>
                 <ul className="hidden gap-5 md:flex">
-                    {links.map((link) => (
+                    {links.map((link, ind) => (
                         <li
-                            key={link.id}
+                            key={ind}
                             className={
                                 pathname === link.path
                                     ? "text-dark-blue font-bold"
@@ -85,33 +125,35 @@ const Navbar = () => {
                         <Link href="/auth//login" className="hover:underline">
                             Log in
                         </Link>
-                        <Link href="auth//signup">
-                            <Button
-                                size={"sm"}
-                                className="h-auto w-min py-4 transition-all duration-200 active:scale-90"
-                            >
-                                Get Started
-                            </Button>
-                        </Link>
                     </div>
                 )}
                 {session.data?.user && (
                     <div className="hidden w-min items-center gap-5 md:flex">
-                        <Link href="/cart" className="text-dark-blue flex items-center gap-3">
-                            <BsCart3 size={30} />
-                            <p className="text-xl font-semibold">Cart</p>
-                        </Link>
-                        <>
-                            <Button
-                                size={"lg"}
-                                onClick={async () => {
-                                    await signOut({ redirect: true });
-                                }}
-                                className="h-auto w-fit px-5 py-4 transition-all duration-200 active:scale-90"
-                            >
-                                Sign Out
-                            </Button>
-                        </>
+                        {!pathname.startsWith("/admin") && (
+                            <Link href="/cart" className="text-dark-blue flex items-center gap-3">
+                                <BsCart3 size={30} />
+                                <p className="text-xl font-semibold">Cart</p>
+                            </Link>
+                        )}
+                        {session.data.user.role == "admin" ? (
+                            <Link href="/admin">
+                                <Button
+                                    size={"sm"}
+                                    className="h-auto w-min py-4 transition-all duration-200 active:scale-90"
+                                >
+                                    Admin
+                                </Button>
+                            </Link>
+                        ) : (
+                            <Link href="/dashboard">
+                                <Button
+                                    size={"sm"}
+                                    className="h-auto w-min py-4 transition-all duration-200 active:scale-90"
+                                >
+                                    Dashboard
+                                </Button>
+                            </Link>
+                        )}
                     </div>
                 )}
                 <div

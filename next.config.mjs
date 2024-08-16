@@ -1,13 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     images: {
-        // NOTE : Update this in production.
-        domains: ["loremflickr.com", "localhost", "res.cloudinary.com"],
+        domains: process.env.NODE_ENV == "development" ? ["res.cloudinary.com"] : [],
         remotePatterns: [
-            {
-                hostname: "loremflickr.com",
-                port: "443",
-            },
             {
                 hostname: "res.cloudinary.com",
                 pathname: "/dgxfuzqed/image/",

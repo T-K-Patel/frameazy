@@ -61,7 +61,7 @@ function Item({ item }: { item: FrameDataType | PopularFrameDataType }) {
                         size={"lg"}
                         variant={"outline"}
                         type="button"
-                        className="h-min border border-black bg-transparent px-2 py-2 font-semibold text-black transition-all duration-200 active:scale-90 md:px-4 md:py-3 md:text-lg"
+                        className="h-min w-full border border-black bg-transparent px-2 py-2 font-semibold text-black transition-all duration-200 active:scale-90 md:px-4 md:py-3 md:text-lg"
                     >
                         Customise
                         <AiFillEdit size={24} className="ml-4" />

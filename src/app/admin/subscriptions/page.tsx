@@ -2,9 +2,11 @@
 import { useState, useEffect } from "react";
 import { Subscription, SubscriptionStatus } from "@prisma/client";
 import { getSubscriptionsAction } from "@/serverActions/admin/admin.action";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const AdminSubscriptionPage = () => {
     const [subscriptions, setSubscriptions] = useState<Subscription[]>();
+    const [loading, setLoading] = useState(true);
     useEffect(() => {
         getSubscriptionsAction()
             .then((data) => {
@@ -14,14 +16,24 @@ const AdminSubscriptionPage = () => {
             })
             .catch((error) => {
                 console.log(error);
+            })
+            .finally(() => {
+                setLoading(false);
             });
     }, []);
     return (
         <div className="mx-auto flex w-11/12 max-w-screen-2xl flex-col gap-y-12 py-12">
             <section className="flex flex-col gap-6 rounded-3xl border border-[#F1F1F1] p-5">
                 <h1 className="leading-12 border-b border-[#F1F1F1] pb-5 text-3xl font-semibold">Subscriptions</h1>
-                {subscriptions?.length == 0 ? (
-                    <p className="text-center text-lg font-semibold">No subscriptions yet</p>
+                {loading ? (
+                    <div className="flex flex-col gap-2">
+                        <Skeleton className="md:h-18 h-10 rounded-xl" />
+                        <Skeleton className="md:h-18 h-10 rounded-xl" />
+                        <Skeleton className="md:h-18 h-10 rounded-xl" />
+                        <Skeleton className="md:h-18 h-10 rounded-xl" />
+                    </div>
+                ) : !subscriptions || subscriptions?.length == 0 ? (
+                    <p className="text-center text-lg font-semibold text-red-500">No subscriptions yet</p>
                 ) : (
                     subscriptions?.map((s, ind) => {
                         return (

@@ -21,6 +21,9 @@ export type UserOrders = {
     createdAt: Date;
     transaction_status: PaymentStatus;
     delivery_date: Date;
+    delivery_charge: number,
+    packaging: number,
+    discount: number
 };
 
 export async function getOrdersAction(): Promise<ServerActionReturnType<UserOrders[]>> {
@@ -36,6 +39,9 @@ export async function getOrdersAction(): Promise<ServerActionReturnType<UserOrde
                 createdAt: true,
                 transaction_status: true,
                 delivery_date: true,
+                delivery_charge: true,
+                packaging: true,
+                discount: true
             },
         });
 
