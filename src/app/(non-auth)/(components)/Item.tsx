@@ -10,7 +10,7 @@ import { getImagePlaceholder } from "@/components/imagePlaceholder";
 
 function Item({ item }: { item: FrameDataType | PopularFrameDataType }) {
     return (
-        <div className="mx-auto grid h-full w-full sm:w-fit grid-cols-9 sm:gap-2 rounded-2xl border border-solid pb-2 px-2 md:grid-cols-1 md:p-3">
+        <div className="mx-auto grid h-full w-full grid-cols-9 rounded-2xl border border-solid px-2 pb-2 sm:w-fit sm:gap-2 md:grid-cols-1 md:p-3">
             <div className="col-span-3 flex items-center justify-center">
                 <Image
                     src={item.image}

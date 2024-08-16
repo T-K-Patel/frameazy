@@ -73,7 +73,7 @@ function Frames() {
                                         <RiArrowDropDownLine size={24} />
                                     </Button>
                                 </DialogTrigger>
-                                <DialogContent className="max-h-[90%] w-11/12 overflow-auto rounded-lg">
+                                <DialogContent className="max-w-11/12 max-h-[90%] overflow-auto rounded-lg">
                                     <div className="flex h-fit w-auto flex-col items-center justify-start gap-y-5 overflow-y-auto md:gap-y-6">
                                         <FramesSideBar filters={filters} setFilters={setFilters} />
                                     </div>
@@ -81,15 +81,18 @@ function Frames() {
                             </Dialog>
                         </div>
                     </div>
-                    <div className="grid place-content-center items-center justify-center gap-y-5 sm:grid-cols-2 sm:gap-x-4 lg:grid-cols-3" style={{ gridTemplateRows: "subgrid" }}>
+                    <div
+                        className="grid place-content-center items-center justify-center gap-y-5 sm:grid-cols-2 sm:gap-x-4 lg:grid-cols-3"
+                        style={{ gridTemplateRows: "subgrid" }}
+                    >
                         {frames?.map((frame, ind) => {
                             return <Item item={frame} key={ind} />;
                         })}
                         {frames?.length == 0 && (
                             <>
-                            <h1 className="text-center text-2xl font-semibold md:col-span-2 lg:col-span-3">
-                                No Frames Found
-                            </h1>
+                                <h1 className="text-center text-2xl font-semibold md:col-span-2 lg:col-span-3">
+                                    No Frames Found
+                                </h1>
                             </>
                         )}
                     </div>

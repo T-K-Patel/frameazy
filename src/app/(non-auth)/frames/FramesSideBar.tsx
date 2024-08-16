@@ -76,9 +76,9 @@ function FramesSideBar({ filters, setFilters }: SidebarProps) {
                     })}
                 </div>
             </>
-            <div className="flex flex-col gap-y-1">
+            <div className="flex w-full flex-col gap-y-1">
                 <h1 className="font-semibold leading-7">Colors</h1>
-                <div className="grid grid-cols-3 gap-2 md:grid-cols-2">
+                <div className="grid grid-cols-2 sm:grid-cols-4 sm:gap-2 md:grid-cols-2">
                     {Object.values(Color).map((color) => {
                         const isChecked = filters.colors.some((col) => col === color);
                         return (
