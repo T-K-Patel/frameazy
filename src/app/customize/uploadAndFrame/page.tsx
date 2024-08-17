@@ -23,7 +23,6 @@ type CustomizeOptionsProps =
 
 type uploadOptionsProps = {
     dimensions: { width: number; height: number };
-    frame?: { id: string; borderWidth: number; borderSrc: string; name: string };
     glazing?: string;
     printing: string;
     backing?: string;
@@ -39,7 +38,7 @@ type matOptionsProps = {
 
 type ContentType = { title: string; mat: boolean; options: CustomizeOptionsProps[] };
 function Page() {
-    const { frameOptions } = useFrames();
+    const { frameOptions, customizingFrame, setCustomizingFrame } = useFrames();
     const [upload, setUpload] = useState<uploadOptionsProps>({
         dimensions: { width: 0, height: 0 },
         printing: Object.keys(Printing)[0],
@@ -68,7 +67,6 @@ function Page() {
                 case "framedWithoutMG":
                     setUpload({
                         dimensions: { width: frameOptions.data.width!, height: frameOptions.data.height! },
-                        frame: { id: "", borderWidth: 0, borderSrc: "", name: "" },
                         printing: Object.keys(Printing)[0],
                         stretching: Object.keys(Stretching)[0],
                     });
@@ -76,7 +74,6 @@ function Page() {
                 case "framedWithMG":
                     setUpload({
                         dimensions: { width: frameOptions.data.width!, height: frameOptions.data.height! },
-                        frame: { id: "", borderWidth: 0, borderSrc: "", name: "" },
                         glazing: Object.keys(Glazing)[0],
                         printing: Object.keys(Printing)[0],
                         backing: Object.keys(Backing)[0],
@@ -185,8 +182,8 @@ function Page() {
             return { ...acc };
         },
         {
-            width: frameOptions.data.width! + 2 * (upload.frame?.borderWidth || 0),
-            height: frameOptions.data.height! + 2 * (upload.frame?.borderWidth || 0),
+            width: frameOptions.data.width! + 2 * (customizingFrame?.borderWidth || 0),
+            height: frameOptions.data.height! + 2 * (customizingFrame?.borderWidth || 0),
         },
     );
     console.log(frameOptions.data.width, frameOptions.data.height);
@@ -200,7 +197,14 @@ function Page() {
                     image={{ src: frameOptions.data.croppedImage as string, ...upload.dimensions }}
                     matOptions={mat}
                     totalSize={totalSize}
-                    frameBorder={{ borderWidth: upload.frame?.borderWidth || 0, src: upload.frame?.borderSrc || "" }}
+                    frameBorder={
+                        customizingFrame
+                            ? {
+                                  borderWidth: customizingFrame.borderWidth || 0,
+                                  src: customizingFrame.borderSrc || "",
+                              }
+                            : undefined
+                    }
                 />
                 <div className="mx-auto flex w-11/12 flex-col gap-6">
                     <h1 className="leading-auto text-3xl font-semibold">{content.title}</h1>
@@ -321,7 +325,14 @@ function Page() {
                                                                         <p>{frame.name}</p>
                                                                         <p>
                                                                             <small>
-                                                                                Price per inch: {frame.unit_price}
+                                                                                Price per inch: {frame.unit_price}{" "}
+                                                                                <strong>&#8377;</strong>
+                                                                            </small>
+                                                                        </p>
+                                                                        <p>
+                                                                            <small>
+                                                                                Border Thickness: {frame.borderWidth}{" "}
+                                                                                <strong>In</strong>
                                                                             </small>
                                                                         </p>
                                                                     </div>
@@ -329,26 +340,26 @@ function Page() {
                                                             ),
                                                         };
                                                     })}
-                                                    value={{
-                                                        id: upload.frame?.id || "",
-                                                        borderSrc: upload.frame?.borderSrc || "",
-                                                        name: upload.frame?.name || "",
-                                                    }}
+                                                    value={
+                                                        customizingFrame || {
+                                                            id: "",
+                                                            borderSrc: "",
+                                                            name: "",
+                                                            unit_price: 0,
+                                                            borderWidth: 0,
+                                                        }
+                                                    }
                                                     onChange={(frameId: string) => {
                                                         const selectedFrame = frames.find(
                                                             (frame) => frame.id === frameId,
                                                         );
-                                                        setUpload((upload) => {
-                                                            return {
-                                                                ...upload,
-                                                                frame: {
-                                                                    id: frameId,
-                                                                    borderWidth: selectedFrame?.borderWidth || 0,
-                                                                    borderSrc: selectedFrame?.borderSrc || "",
-                                                                    name: selectedFrame?.name || "",
-                                                                },
-                                                            };
-                                                        });
+                                                        setCustomizingFrame(() => ({
+                                                            id: frameId,
+                                                            borderWidth: selectedFrame?.borderWidth || 0,
+                                                            borderSrc: selectedFrame?.borderSrc || "",
+                                                            name: selectedFrame?.name || "",
+                                                            unit_price: selectedFrame?.unit_price || 0,
+                                                        }));
                                                     }}
                                                 />
                                             }

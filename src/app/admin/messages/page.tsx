@@ -35,7 +35,7 @@ const AdminContactPage = () => {
                 console.log(error);
             })
             .finally(() => {
-                setLoading(true);
+                setLoading(false);
             });
     }, []);
     return (

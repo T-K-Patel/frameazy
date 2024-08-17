@@ -1,43 +1,54 @@
 "use client";
-import DropDown from "@/components/DropDown";
+import DropDown, { FrameDropdown } from "@/components/DropDown";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import React, { useState, useEffect } from "react";
 import InputField from "../InputField";
 import FrameCanvas from "../FrameCanvas";
-import useDebounce from "@/lib/useDebounce";
 import { Mirror } from "@prisma/client";
 import { getFramesForCustomizatinAction, FramesForCustomizationType } from "@/serverActions/frames/frame.action";
 import { useFrames } from "@/context/frames-context";
+import Image from "next/image";
 
 const MirrorOptions: string[] = Object.keys(Mirror);
 
 type MirrorOptions = {
     dimensions: { width: number; height: number };
-    frame: { src: string; borderWidth: number };
     mirrorType: string;
 };
 const Page = () => {
     const [mirror, setMirror] = useState<MirrorOptions>({
         dimensions: { width: 12, height: 9 },
-        frame: { src: "0.75inch black frame", borderWidth: 0.75 },
         mirrorType: MirrorOptions[0],
     });
-    const { frameOptions } = useFrames();
+    const { frameOptions, customizingFrame, setCustomizingFrame } = useFrames();
     const [frames, setFrames] = useState<FramesForCustomizationType[]>([]);
-    const debouncedDimensions = useDebounce<{ width: number; height: number }>(mirror.dimensions, 300);
 
     useEffect(() => {
         if (frameOptions.framingStyle == "mirrorFrame") {
-            getFramesForCustomizatinAction().then((data) => {
-                if (data.success) setFrames(data.data);
-            });
+            getFramesForCustomizatinAction()
+                .then((data) => {
+                    if (data.success) setFrames(data.data);
+                })
+                .catch((e) => {
+                    console.error(e);
+                });
         }
     }, [frameOptions]);
     return (
         <>
             <div className="grid min-h-[calc(100vh-150px)] gap-5 pb-4 pt-10 md:grid-cols-2">
-                <FrameCanvas totalSize={debouncedDimensions} frameBorder={mirror.frame} />
+                <FrameCanvas
+                    totalSize={mirror.dimensions}
+                    frameBorder={
+                        customizingFrame
+                            ? {
+                                  borderWidth: customizingFrame.borderWidth || 0,
+                                  src: customizingFrame.borderSrc || "",
+                              }
+                            : undefined
+                    }
+                />
                 <div className="mx-auto flex w-11/12 flex-col gap-6">
                     <h1 className="leading-auto text-3xl font-semibold">Framed mirror</h1>
                     <div className="mb-3 flex flex-col gap-y-5">
@@ -48,7 +59,7 @@ const Page = () => {
                                     <div className="flex items-center gap-4">
                                         <Input
                                             type="number"
-                                            min={1}
+                                            min={(customizingFrame?.borderWidth || 1 / 3) * 3}
                                             step={1}
                                             className="w-20 border border-gray-2 p-3 px-2 text-center"
                                             placeholder="0"
@@ -66,7 +77,7 @@ const Page = () => {
                                         <p>X</p>
                                         <Input
                                             type="number"
-                                            min={1}
+                                            min={(customizingFrame?.borderWidth || 1 / 3) * 3}
                                             step={1}
                                             className="w-20 border border-gray-2 p-3 px-2 text-center"
                                             placeholder="0"
@@ -86,6 +97,63 @@ const Page = () => {
                                 }
                             />
                             <InputField
+                                label={<strong>Frame</strong>}
+                                field={
+                                    <FrameDropdown
+                                        items={frames.map((frame) => {
+                                            return {
+                                                value: frame.id,
+                                                label: (
+                                                    <div className="flex gap-3" key={frame.name}>
+                                                        <Image
+                                                            src={frame.borderSrc}
+                                                            width={100}
+                                                            height={50}
+                                                            alt="frame"
+                                                            className="max-w-28 object-cover"
+                                                        />
+                                                        <div>
+                                                            <p>{frame.name}</p>
+                                                            <p>
+                                                                <small>
+                                                                    Price per inch: {frame.unit_price}{" "}
+                                                                    <strong>&#8377;</strong>
+                                                                </small>
+                                                            </p>
+                                                            <p>
+                                                                <small>
+                                                                    Border Thickness: {frame.borderWidth}{" "}
+                                                                    <strong>In</strong>
+                                                                </small>
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                ),
+                                            };
+                                        })}
+                                        value={
+                                            customizingFrame || {
+                                                id: "",
+                                                borderSrc: "",
+                                                name: "",
+                                                unit_price: 0,
+                                                borderWidth: 0,
+                                            }
+                                        }
+                                        onChange={(frameId: string) => {
+                                            const selectedFrame = frames.find((frame) => frame.id === frameId);
+                                            setCustomizingFrame(() => ({
+                                                id: frameId,
+                                                borderWidth: selectedFrame?.borderWidth || 0,
+                                                borderSrc: selectedFrame?.borderSrc || "",
+                                                name: selectedFrame?.name || "",
+                                                unit_price: selectedFrame?.unit_price || 0,
+                                            }));
+                                        }}
+                                    />
+                                }
+                            />
+                            <InputField
                                 label={<strong>Mirror type</strong>}
                                 field={
                                     <DropDown
@@ -94,19 +162,6 @@ const Page = () => {
                                             setMirror({ ...mirror, mirrorType: status });
                                         }}
                                         items={MirrorOptions}
-                                    />
-                                }
-                            />
-                            <InputField
-                                label={<strong>Frame</strong>}
-                                field={
-                                    <DropDown
-                                        value={mirror.frame.src}
-                                        onChange={(status: string) => {
-                                            setMirror({ ...mirror, frame: { src: status, borderWidth: 1 } });
-                                        }}
-                                        items={frames.map((frame) => frame.borderSrc)}
-                                        // items={frames}
                                     />
                                 }
                             />

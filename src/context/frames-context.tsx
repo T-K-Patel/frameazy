@@ -32,6 +32,7 @@ type CustomizingFrameType = {
     borderWidth: number;
     borderSrc: string;
     name: string;
+    unit_price: number;
 };
 
 // Create a new context for the frame options data
