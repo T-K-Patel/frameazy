@@ -39,8 +39,6 @@ export async function addProduct(state: any, formData: FormData) {
         const productColor = formData.get("productColor") as Color;
         const productCollection = formData.get("productCollection") as Collection;
 
-        let productWidth: number | null = Number(formData.get("productWidth"));
-        let productHeight: number | null = Number(formData.get("productHeight"));
         const borderWidth = Number(formData.get("borderWidth"));
 
         if (!productName || productName.length < 3) {
@@ -71,16 +69,6 @@ export async function addProduct(state: any, formData: FormData) {
             throw new CustomError("Invalid Product Category.");
         }
 
-        if (isNaN(productWidth)) productWidth = null;
-        if (isNaN(productHeight)) productHeight = null;
-        if (productWidth && (!isFinite(productWidth) || productWidth < 0)) {
-            throw new CustomError("Product Width must be a positive number.");
-        }
-
-        if (productHeight && (!isFinite(productHeight) || productHeight < 0)) {
-            throw new CustomError("Product Height must be a positive number and finite.");
-        }
-
         if (!isFinite(borderWidth) || isNaN(borderWidth) || borderWidth <= 0) {
             throw new CustomError("Border Width must be a positive number and finite.");
         }
@@ -104,8 +92,6 @@ export async function addProduct(state: any, formData: FormData) {
                 category: productCategory,
                 color: productColor,
                 collection: productCollection,
-                width: productWidth,
-                height: productHeight,
                 borderSrc: borderImageUrl,
                 borderWidth: borderWidth,
             },

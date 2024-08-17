@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     images: {
-        domains: process.env.NODE_ENV == "development" ? ["res.cloudinary.com"] : [],
+        domains: ["res.cloudinary.com"],
         remotePatterns: [
             {
                 hostname: "res.cloudinary.com",

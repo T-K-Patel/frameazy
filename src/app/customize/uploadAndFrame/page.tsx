@@ -1,5 +1,5 @@
 "use client";
-import DropDown from "@/components/DropDown";
+import DropDown, { FrameDropdown } from "@/components/DropDown";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import React, { useEffect, useState } from "react";
@@ -7,15 +7,23 @@ import { useFrames } from "@/context/frames-context";
 import InputField from "../InputField";
 import FrameCanvas from "../FrameCanvas";
 import { IoCloseSharp } from "react-icons/io5";
+import { Glazing, Printing, Backing, Stretching, Sides } from "@prisma/client";
+import { getFramesForCustomizatinAction, FramesForCustomizationType } from "@/serverActions/frames/frame.action";
+import Image from "next/image";
 
-type CustomizeOptionsProps = {
-    title: string;
-    items: string[];
-};
+type CustomizeOptionsProps =
+    | {
+          title: "Frame";
+          items: FramesForCustomizationType[];
+      }
+    | {
+          title: "Glazing" | "Printing" | "Backing" | "Stretching" | "Sides";
+          items: string[];
+      };
 
 type uploadOptionsProps = {
     dimensions: { width: number; height: number };
-    frame?: { src: string; borderWidth: number };
+    frame?: { id: string; borderWidth: number; borderSrc: string; name: string };
     glazing?: string;
     printing: string;
     backing?: string;
@@ -34,8 +42,10 @@ function Page() {
     const { frameOptions } = useFrames();
     const [upload, setUpload] = useState<uploadOptionsProps>({
         dimensions: { width: 0, height: 0 },
-        printing: "Photo Paper",
+        printing: Object.keys(Printing)[0],
     });
+
+    const [frames, setFrames] = useState<FramesForCustomizationType[]>([]);
     const [mat, setMat] = useState<matOptionsProps>([{ width: 0.75, color: "#ffffff", id: new Date().toString() }]);
     useEffect(() => {
         if (frameOptions.framingStyle === "uploadAndFrame") {
@@ -43,60 +53,72 @@ function Page() {
                 case "printOnly":
                     setUpload({
                         dimensions: { width: frameOptions.data.width!, height: frameOptions.data.height! },
-                        printing: "Photo Paper",
+                        printing: Object.keys(Printing)[0],
                     });
                     break;
                 case "canvasPrint":
                     setUpload({
                         dimensions: { width: frameOptions.data.width!, height: frameOptions.data.height! },
-                        printing: "Canvas",
-                        backing: "Pine Mdf Hardboard",
-                        stretching: "Regular",
-                        sides: "Image mirrored",
+                        printing: Object.keys(Printing)[0],
+                        backing: Object.keys(Backing)[0],
+                        stretching: Object.keys(Stretching)[0],
+                        sides: Object.keys(Sides)[0],
                     });
                     break;
                 case "framedWithoutMG":
                     setUpload({
                         dimensions: { width: frameOptions.data.width!, height: frameOptions.data.height! },
-                        frame: { src: "0.75inch black frame", borderWidth: 1 },
-                        printing: "Photo Paper",
-                        stretching: "Photo Paper",
+                        frame: { id: "", borderWidth: 0, borderSrc: "", name: "" },
+                        printing: Object.keys(Printing)[0],
+                        stretching: Object.keys(Stretching)[0],
                     });
                     break;
                 case "framedWithMG":
                     setUpload({
                         dimensions: { width: frameOptions.data.width!, height: frameOptions.data.height! },
-                        frame: { src: "0.75inch black frame", borderWidth: 1 },
-                        glazing: "Regular",
-                        printing: "Photo Paper",
-                        backing: "Pine Mdf Hardboard",
+                        frame: { id: "", borderWidth: 0, borderSrc: "", name: "" },
+                        glazing: Object.keys(Glazing)[0],
+                        printing: Object.keys(Printing)[0],
+                        backing: Object.keys(Backing)[0],
                     });
                     break;
+            }
+        }
+    }, [frameOptions, frames]);
+
+    useEffect(() => {
+        if (frameOptions.framingStyle == "uploadAndFrame") {
+            let customizeOptions = frameOptions.data.frameType;
+            if (customizeOptions == "framedWithoutMG" || customizeOptions == "framedWithMG") {
+                getFramesForCustomizatinAction().then((data) => {
+                    if (data.success) setFrames(data.data);
+                });
             }
         }
     }, [frameOptions]);
 
     if (frameOptions.framingStyle != "uploadAndFrame") return <></>;
-    let customizeOptions = frameOptions.data.frameType; //TODO Must implement a context here
+
+    let customizeOptions = frameOptions.data.frameType;
     let content: ContentType = {
         title: "Framed print with mat & glazing",
         mat: true,
         options: [
             {
                 title: "Frame",
-                items: ["0.75inch black frame"],
+                items: frames,
             },
             {
                 title: "Glazing",
-                items: ["Regular"],
+                items: Object.keys(Glazing),
             },
             {
                 title: "Printing",
-                items: ["Photo Paper", "Canvas"],
+                items: Object.keys(Printing),
             },
             {
                 title: "Backing",
-                items: ["Pine Mdf Hardboard"],
+                items: Object.keys(Backing),
             },
         ],
     };
@@ -108,15 +130,15 @@ function Page() {
             options: [
                 {
                     title: "Frame",
-                    items: ["0.75inch black frame"],
+                    items: frames,
                 },
                 {
                     title: "Printing",
-                    items: ["Photo paper", "Canvas"],
+                    items: Object.keys(Printing),
                 },
                 {
-                    title: "Streching",
-                    items: ["Photo paper"],
+                    title: "Stretching",
+                    items: Object.keys(Stretching),
                 },
             ],
         };
@@ -127,7 +149,7 @@ function Page() {
             options: [
                 {
                     title: "Printing",
-                    items: ["Photo paper", "Canvas"],
+                    items: Object.keys(Printing),
                 },
             ],
         };
@@ -138,15 +160,15 @@ function Page() {
             options: [
                 {
                     title: "Printing",
-                    items: ["Photo paper", "Canvas"],
+                    items: Object.keys(Printing),
                 },
                 {
                     title: "Stretching",
-                    items: ["regular-0.75 inch thick"],
+                    items: Object.keys(Stretching),
                 },
                 {
-                    title: "sides",
-                    items: ["Image mirrored"],
+                    title: "Sides",
+                    items: Object.keys(Sides),
                 },
             ],
         };
@@ -163,8 +185,8 @@ function Page() {
             return { ...acc };
         },
         {
-            width: frameOptions.data.width! + 2 * (upload.frame?.borderWidth||0),
-            height: frameOptions.data.height! + 2 *( upload.frame?.borderWidth||0),
+            width: frameOptions.data.width! + 2 * (upload.frame?.borderWidth || 0),
+            height: frameOptions.data.height! + 2 * (upload.frame?.borderWidth || 0),
         },
     );
     console.log(frameOptions.data.width, frameOptions.data.height);
@@ -178,7 +200,7 @@ function Page() {
                     image={{ src: frameOptions.data.croppedImage as string, ...upload.dimensions }}
                     matOptions={mat}
                     totalSize={totalSize}
-                    frameBorder={upload.frame}
+                    frameBorder={{ borderWidth: upload.frame?.borderWidth || 0, src: upload.frame?.borderSrc || "" }}
                 />
                 <div className="mx-auto flex w-11/12 flex-col gap-6">
                     <h1 className="leading-auto text-3xl font-semibold">{content.title}</h1>
@@ -195,83 +217,148 @@ function Page() {
                                 }
                             />
                             {content.mat && (
-                            <InputField
-                                label={<strong>Mat</strong>}
-                                field={
-                                    <div className="w-fit">
-                                        <div className="grid grid-cols-2 gap-6">
-                                            <p>Width(<b>Inch</b>):</p>
-                                            <p>Color:</p>
-                                        </div>
-                                        {mat.map((m, ind) => {
-                                            return (
-                                                <div
-                                                    className="mb-3 grid w-full items-center gap-6 grid-cols-2"
-                                                    key={ind}
-                                                >
-                                                    <Input
-                                                        type="number"
-                                                        min={0.25}
-                                                        step={0.25}
-                                                        className="w-20 border border-gray-2 p-3 px-2 text-center"
-                                                        placeholder="0"
-                                                        value={m.width}
-                                                        onChange={(e) => {
-                                                            setMat((_m) => {
-                                                                _m[ind].width = Number(e.target.value);
-                                                                return [..._m];
-                                                            });
-                                                        }}
-                                                        />
-                                                    <div className="flex items-center gap-x-2">
+                                <InputField
+                                    label={<strong>Mat</strong>}
+                                    field={
+                                        <div className="w-full">
+                                            <div className="grid grid-cols-2 gap-6">
+                                                <p>
+                                                    Width(<b>Inch</b>):
+                                                </p>
+                                                <p>Color:</p>
+                                            </div>
+                                            {mat.map((m, ind) => {
+                                                return (
+                                                    <div
+                                                        className="mb-3 grid w-full grid-cols-2 items-center gap-6"
+                                                        key={ind}
+                                                    >
                                                         <Input
-                                                            className="h-10 w-20 p-1"
-                                                            placeholder="white"
-                                                            value={m.color}
-                                                            type="color"
+                                                            type="number"
+                                                            min={0.25}
+                                                            step={0.25}
+                                                            className="w-full border border-gray-2 p-2 text-center"
+                                                            placeholder="0"
+                                                            value={m.width}
                                                             onChange={(e) => {
                                                                 setMat((_m) => {
-                                                                    _m[ind].color = e.target.value;
+                                                                    _m[ind].width = Number(e.target.value);
                                                                     return [..._m];
                                                                 });
                                                             }}
                                                         />
-                                                        {ind != 0 && (
-                                                            <IoCloseSharp
-                                                                className="flex-shrink-0 cursor-pointer"
-                                                                onClick={() => {
+                                                        <div className="flex items-center gap-x-2">
+                                                            <Input
+                                                                className="h-10 w-full p-1"
+                                                                placeholder="white"
+                                                                value={m.color}
+                                                                type="color"
+                                                                onChange={(e) => {
                                                                     setMat((_m) => {
-                                                                        return _m.filter((rm) => {
-                                                                            return rm.id != m.id;
-                                                                        });
+                                                                        _m[ind].color = e.target.value;
+                                                                        return [..._m];
                                                                     });
                                                                 }}
                                                             />
-                                                        )}
+                                                            {ind != 0 && (
+                                                                <IoCloseSharp
+                                                                    className="flex-shrink-0 cursor-pointer"
+                                                                    onClick={() => {
+                                                                        setMat((_m) => {
+                                                                            return _m.filter((rm) => {
+                                                                                return rm.id != m.id;
+                                                                            });
+                                                                        });
+                                                                    }}
+                                                                />
+                                                            )}
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            );
-                                        })}
-                                        <button
-                                            onClick={() => {
-                                                setMat((m) => {
-                                                    return [
-                                                        ...m,
-                                                        { width: 0.75, color: "#ffffff", id: new Date().toString() },
-                                                    ];
-                                                });
-                                            }}
-                                            className="text-blue-1"
-                                        >
-                                            {" "}
-                                            Add More Mat
-                                        </button>
-                                    </div>
-                                }
-                            />
-                        )}
+                                                );
+                                            })}
+                                            <button
+                                                onClick={() => {
+                                                    setMat((m) => {
+                                                        return [
+                                                            ...m,
+                                                            {
+                                                                width: 0.75,
+                                                                color: "#ffffff",
+                                                                id: new Date().toString(),
+                                                            },
+                                                        ];
+                                                    });
+                                                }}
+                                                className="text-blue-1"
+                                            >
+                                                {" "}
+                                                Add More Mat
+                                            </button>
+                                        </div>
+                                    }
+                                />
+                            )}
                             <div className="flex flex-col gap-y-5">
+                                {(customizeOptions === "framedWithMG" || customizeOptions == "framedWithoutMG") && (
+                                    <>
+                                        <InputField
+                                            label={<strong>Frame</strong>}
+                                            field={
+                                                <FrameDropdown
+                                                    items={frames.map((frame) => {
+                                                        return {
+                                                            value: frame.id,
+                                                            label: (
+                                                                <div className="flex gap-3" key={frame.name}>
+                                                                    <Image
+                                                                        src={frame.borderSrc}
+                                                                        width={100}
+                                                                        height={50}
+                                                                        alt="frame"
+                                                                        className="max-w-20 object-cover"
+                                                                    />
+                                                                    <div>
+                                                                        <p>{frame.name}</p>
+                                                                        <p>
+                                                                            <small>
+                                                                                Price per inch: {frame.unit_price}
+                                                                            </small>
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
+                                                            ),
+                                                        };
+                                                    })}
+                                                    value={{
+                                                        id: upload.frame?.id || "",
+                                                        borderSrc: upload.frame?.borderSrc || "",
+                                                        name: upload.frame?.name || "",
+                                                    }}
+                                                    onChange={(frameId: string) => {
+                                                        const selectedFrame = frames.find(
+                                                            (frame) => frame.id === frameId,
+                                                        );
+                                                        setUpload((upload) => {
+                                                            return {
+                                                                ...upload,
+                                                                frame: {
+                                                                    id: frameId,
+                                                                    borderWidth: selectedFrame?.borderWidth || 0,
+                                                                    borderSrc: selectedFrame?.borderSrc || "",
+                                                                    name: selectedFrame?.name || "",
+                                                                },
+                                                            };
+                                                        });
+                                                    }}
+                                                />
+                                            }
+                                        />
+                                    </>
+                                )}
                                 {content.options.map((option, index) => {
+                                    if (option.title === "Frame") {
+                                        return <></>;
+                                    }
                                     return (
                                         <InputField
                                             key={index}
@@ -279,26 +366,15 @@ function Page() {
                                             field={
                                                 <DropDown
                                                     value={
-                                                        option.title != "Frame"
-                                                            ? (upload[
-                                                                  option.title.toLowerCase() as keyof uploadOptionsProps
-                                                              ] as string)
-                                                            : upload.frame?.src!
+                                                        upload[
+                                                            option.title.toLowerCase() as keyof uploadOptionsProps
+                                                        ] as string
                                                     }
                                                     onChange={(status: string) => {
                                                         setUpload((upload) => {
-                                                            if (option.title != "Frame") {
-                                                                return {
-                                                                    ...upload,
-                                                                    [option.title.toLowerCase()]: status,
-                                                                };
-                                                            }
                                                             return {
                                                                 ...upload,
-                                                                [option.title.toLowerCase()]: {
-                                                                    src: status,
-                                                                    borderWidth: 1,
-                                                                },
+                                                                [option.title.toLowerCase()]: status,
                                                             };
                                                         });
                                                     }}
@@ -308,10 +384,6 @@ function Page() {
                                         />
                                     );
                                 })}
-                                {/* <InputField
-                                    label={<strong>Printing</strong>}
-                                    field={<span>No Printing</span>}
-                                /> */}
                             </div>
                             <InputField
                                 label={<strong>Total Size</strong>}

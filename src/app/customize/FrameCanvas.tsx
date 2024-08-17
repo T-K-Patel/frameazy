@@ -1,25 +1,19 @@
 import React, { useCallback, useMemo } from "react";
 
 const CANVAS_WIDTH = 2048;
-const CANVAS_HEIGHT = CANVAS_WIDTH;
-// const CANVAS_HEIGHT = (CANVAS_WIDTH * 3) / 4;
-// const INCH_TO_PIXEL = 96;
+const CANVAS_HEIGHT = 2048;
 const SIZE_FACTOR = 1.1;
 
 type FrameCanvasProps = {
     image?: { src: string; width: number; height: number };
     frameBorder?: { src: string; borderWidth: number };
     matOptions?: { width: number; color: string }[];
-    // stretching?: string;
-    // sides?: string;
     totalSize: {
         width: number;
         height: number;
     };
     isMirror?: boolean;
 };
-
-// https://09vt97f6-3000.inc1.devtunnels.ms/
 
 type CanvasProps = {
     // eslint-disable-next-line no-unused-vars
@@ -75,10 +69,6 @@ class WorkLocation {
 }
 
 const FrameCanvas = ({ image, totalSize, frameBorder, matOptions }: FrameCanvasProps) => {
-    /**
-     * SF*th<ch
-     * SF*tw<cw
-     */
     const cis = useMemo(() => {
         const _cis = new Image();
         _cis.src = image?.src || "";
@@ -89,7 +79,6 @@ const FrameCanvas = ({ image, totalSize, frameBorder, matOptions }: FrameCanvasP
     const frameCIS = useMemo(() => {
         const _cis = new Image();
         _cis.src = frameBorder?.src || "";
-        _cis.src = "/small_antique_golddd3.jpg";
         _cis.loading = "eager";
         return _cis;
     }, [frameBorder?.src]);
@@ -140,11 +129,6 @@ const FrameCanvas = ({ image, totalSize, frameBorder, matOptions }: FrameCanvasP
 
             // Draw Frame
             if (frameBorder) {
-                // const frameCIS = new Image();
-                // // frameCIS.src = "http://localhost:3000/small_antique_golddd3.jpg";
-                // frameCIS.src = "http://localhost:3000/small-brown-gold-875-b.jpg";
-                // frameCIS.loading = "eager";
-
                 const fWL = wL.copy();
                 fWL.shrink = () => null;
                 wL.shrink(frameBorder.borderWidth);
@@ -242,7 +226,7 @@ const FrameCanvas = ({ image, totalSize, frameBorder, matOptions }: FrameCanvasP
             });
             ctx.fillStyle = "white";
             ctx.fillRect(wL.x, wL.y, wL.w, wL.h);
-            if (image) {
+            if (image?.src) {
                 // Draw Image
                 ctx.drawImage(cis, wL.x, wL.y, wL.w, wL.h);
                 cis.onload = () => {

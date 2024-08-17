@@ -4,7 +4,9 @@ import Personal2 from "@/assets/personal2.png";
 import Personal3 from "@/assets/personal3.png";
 import Image, { StaticImageData } from "next/image";
 import { getImagePlaceholder } from "@/components/imagePlaceholder";
-import SelectFrame from "@/components/customizing/SelectFrame";
+import { Button } from "@/components/ui/button";
+import { useFrames } from "@/context/frames-context";
+import { BsArrowRight } from "react-icons/bs";
 
 type PersonalArtItemProps = {
     img: StaticImageData;
@@ -31,6 +33,7 @@ const PersonalArtItem = ({ img, title, desc }: PersonalArtItemProps) => {
 };
 
 const PersonalizeFrame = () => {
+    const { setDialogOpen } = useFrames();
     return (
         <section className="bg-blue-1 py-20 text-white">
             <div className="mx-auto w-11/12 max-w-screen-2xl">
@@ -60,15 +63,15 @@ const PersonalizeFrame = () => {
                     />
                 </div>
                 <div className="flex justify-center pt-8">
-                    {/* <Button
+                    <Button
                         size={"sm"}
-                        variant={"outline"}
-                        className="h-auto bg-transparent !px-8 !py-4 text-xl font-semibold text-white transition-all duration-200 active:scale-90"
+                        variant={"secondary"}
+                        onClick={() => setDialogOpen(true)}
+                        className="mt-8 h-min w-min px-8 py-4 text-xl font-semibold text-black transition-all duration-200 active:scale-90"
                     >
-                        Get Started&nbsp;
+                        Start Framing&nbsp;
                         <BsArrowRight />
-                    </Button> */}
-                    <SelectFrame />
+                    </Button>
                 </div>
             </div>
         </section>

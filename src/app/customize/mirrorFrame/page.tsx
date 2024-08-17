@@ -2,13 +2,15 @@
 import DropDown from "@/components/DropDown";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import InputField from "../InputField";
 import FrameCanvas from "../FrameCanvas";
 import useDebounce from "@/lib/useDebounce";
+import { Mirror } from "@prisma/client";
+import { getFramesForCustomizatinAction, FramesForCustomizationType } from "@/serverActions/frames/frame.action";
+import { useFrames } from "@/context/frames-context";
 
-const MirrorOptions: string[] = ["Regular"];
-const frames: string[] = ["0.75inch black frame"];
+const MirrorOptions: string[] = Object.keys(Mirror);
 
 type MirrorOptions = {
     dimensions: { width: number; height: number };
@@ -19,9 +21,19 @@ const Page = () => {
     const [mirror, setMirror] = useState<MirrorOptions>({
         dimensions: { width: 12, height: 9 },
         frame: { src: "0.75inch black frame", borderWidth: 0.75 },
-        mirrorType: "Regular",
+        mirrorType: MirrorOptions[0],
     });
+    const { frameOptions } = useFrames();
+    const [frames, setFrames] = useState<FramesForCustomizationType[]>([]);
     const debouncedDimensions = useDebounce<{ width: number; height: number }>(mirror.dimensions, 300);
+
+    useEffect(() => {
+        if (frameOptions.framingStyle == "mirrorFrame") {
+            getFramesForCustomizatinAction().then((data) => {
+                if (data.success) setFrames(data.data);
+            });
+        }
+    }, [frameOptions]);
     return (
         <>
             <div className="grid min-h-[calc(100vh-150px)] gap-5 pb-4 pt-10 md:grid-cols-2">
@@ -93,7 +105,8 @@ const Page = () => {
                                         onChange={(status: string) => {
                                             setMirror({ ...mirror, frame: { src: status, borderWidth: 1 } });
                                         }}
-                                        items={frames}
+                                        items={frames.map((frame) => frame.borderSrc)}
+                                        // items={frames}
                                     />
                                 }
                             />

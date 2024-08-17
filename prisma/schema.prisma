@@ -96,13 +96,11 @@ model Frame {
   name        String      @unique
   image       String
   borderSrc   String
-  borderWidth Int
+  borderWidth Float
   unit_price  Float
   category    Category
   color       Color
   collection  Collection
-  width       Int?
-  height      Int?
   CartItem    CartItem[]
   OrderItem   OrderItem[]
   createdAt   DateTime    @default(now())
@@ -211,7 +209,7 @@ type Address {
 
 type MatOptions {
   color Color
-  width Int
+  width Float
 }
 
 enum CustomizationType {
@@ -227,8 +225,8 @@ enum CustomizationType {
 type Customization {
   type       CustomizationType
   glazing    Glazing?
-  width      Int
-  height     Int
+  width      Float
+  height     Float
   mat        MatOptions[]
   mirror     Mirror?
   image      String?

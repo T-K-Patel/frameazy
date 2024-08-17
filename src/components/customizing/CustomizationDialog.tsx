@@ -1,8 +1,7 @@
 "use client";
-import React, { ReactNode, useEffect, useRef, useState } from "react";
+import React, { ReactNode, useEffect, useRef } from "react";
 import { Button } from "../ui/button";
-import { BsArrowRight } from "react-icons/bs";
-import { DialogContent, Dialog, DialogTrigger, DialogHeader } from "../ui/dialog";
+import { DialogContent, Dialog, DialogHeader } from "../ui/dialog";
 import Image, { StaticImageData } from "next/image";
 import Upload from "@/assets/uploadImage.svg";
 import Empty from "@/assets/empty.svg";
@@ -34,10 +33,14 @@ const FrameOption = ({ title, image, ...props }: FrameOptionProps) => {
 
 type ContentType = { title: string; desc: string; options?: FrameOptionProps[]; component?: ReactNode };
 
-const SelectFrame = () => {
-    const { frameOptions: framing, setFrameOptions, resetFrames } = useFrames();
-    const [isOpen, setIsOpen] = useState(false);
-
+const CustomizationDialog = ({
+    frameOptions: framing,
+    setFrameOptions,
+    resetFrames,
+    dialogOpen: isOpen,
+    setDialogOpen: setIsOpen,
+}: ReturnType<typeof useFrames>) => {
+    console.log("Framing option:", framing);
     const router = useRouter();
     const session = useSession();
     const contentDivRef = useRef<HTMLDivElement>(null);
@@ -46,12 +49,10 @@ const SelectFrame = () => {
         setIsOpen(false);
     }
 
-    const framingString = JSON.stringify(framing);
-
     useEffect(() => {
         // on re-render, scroll content div to top
         contentDivRef.current?.scrollTo({ top: 0, behavior: "smooth" });
-    }, [framingString]);
+    }, [framing]);
 
     let onBack = () => {};
 
@@ -90,6 +91,8 @@ const SelectFrame = () => {
             },
         ],
     };
+
+    if (!framing) return <></>;
 
     if (framing.framingStyle == "emptyFrame") {
         content = {
@@ -213,17 +216,6 @@ const SelectFrame = () => {
 
     return (
         <Dialog onOpenChange={setIsOpen} open={isOpen}>
-            <DialogTrigger asChild>
-                <Button
-                    size={"sm"}
-                    variant={"outline"}
-                    onClick={() => setIsOpen(true)}
-                    className="mt-8 h-min w-min bg-transparent px-8 py-4 text-xl font-semibold transition-all duration-200 active:scale-90"
-                >
-                    Start Framing&nbsp;
-                    <BsArrowRight />
-                </Button>
-            </DialogTrigger>
             <DialogContent
                 className={cn(
                     "flex max-h-[90%] min-h-[70%] w-5/6 max-w-screen-2xl flex-col px-5 max-md:w-11/12 md:max-h-[90%] md:px-10",
@@ -284,4 +276,4 @@ const SelectFrame = () => {
     );
 };
 
-export default SelectFrame;
+export default CustomizationDialog;

@@ -9,6 +9,7 @@ import { BiX } from "react-icons/bi";
 import FrameCanvas from "../FrameCanvas";
 import { IoCloseSharp } from "react-icons/io5";
 import useDebounce from "@/lib/useDebounce";
+import { Glazing } from "@prisma/client";
 
 type CustomizeOptionsProps = {
     title: string;
@@ -51,7 +52,7 @@ function Page() {
                     setFrame({
                         dimensions: { width: 12, height: 9 },
                         frame: { src: "0.75 inch black frame", borderWidth: 0.75 },
-                        glazing: "Regular",
+                        glazing: Object.keys(Glazing)[0],
                     });
                     break;
             }
@@ -68,7 +69,7 @@ function Page() {
         options: [
             {
                 title: "Glazing",
-                items: ["Regular"],
+                items: Object.keys(Glazing),
             },
             {
                 title: "Frame",
@@ -161,13 +162,15 @@ function Page() {
                                 field={
                                     <div className="w-fit">
                                         <div className="grid grid-cols-2 gap-6">
-                                            <p>Width(<b>Inch</b>):</p>
+                                            <p>
+                                                Width(<b>Inch</b>):
+                                            </p>
                                             <p>Color:</p>
                                         </div>
                                         {mat.map((m, ind) => {
                                             return (
                                                 <div
-                                                    className="mb-3 grid w-full items-center gap-6 grid-cols-2"
+                                                    className="mb-3 grid w-full grid-cols-2 items-center gap-6"
                                                     key={ind}
                                                 >
                                                     <Input
@@ -183,7 +186,7 @@ function Page() {
                                                                 return [..._m];
                                                             });
                                                         }}
-                                                        />
+                                                    />
                                                     <div className="flex items-center gap-x-2">
                                                         <Input
                                                             className="h-10 w-20 p-1"

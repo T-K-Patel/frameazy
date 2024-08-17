@@ -1,10 +1,13 @@
 import Image from "next/image";
 import React from "react";
 import heroImage from "@/assets/hero_img.png";
-import SelectFrame from "@/components/customizing/SelectFrame";
 import { getImagePlaceholder } from "@/components/imagePlaceholder";
+import { Button } from "@/components/ui/button";
+import { useFrames } from "@/context/frames-context";
+import { BsArrowRight } from "react-icons/bs";
 
 function Hero() {
+    const { setDialogOpen } = useFrames();
     return (
         <>
             <section className="bg-blue-1">
@@ -15,7 +18,15 @@ function Hero() {
                             Frameazy Where Your Imagination Meets Our Craftsmanship. Our Passion is Crafting Beautiful
                             Frames, Personalized Just for You. Explore Endless Possibilities
                         </p>
-                        <SelectFrame />
+                        <Button
+                            size={"sm"}
+                            variant={"secondary"}
+                            onClick={() => setDialogOpen(true)}
+                            className="mt-8 h-min w-min px-8 py-4 text-xl font-semibold text-black transition-all duration-200 active:scale-90"
+                        >
+                            Start Framing&nbsp;
+                            <BsArrowRight />
+                        </Button>
                     </div>
                     <div className="flex w-full flex-1 justify-center md:justify-end">
                         <Image

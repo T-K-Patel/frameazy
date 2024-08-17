@@ -1,149 +1,180 @@
-// import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
-// import { CustomError } from "@/lib/CustomError";
-// import { db } from "@/lib/db";
-// import { ServerActionReturnType } from "@/types/serverActionReturnType";
-// import { PaymentStatus } from "@prisma/client";
-// import { getServerSession } from "next-auth";
-// import Razorpay from "razorpay";
+import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
+import { CustomError } from "@/lib/CustomError";
+import { db } from "@/lib/db";
+import { ServerActionReturnType } from "@/types/serverActionReturnType";
+import { PaymentStatus } from "@prisma/client";
+import { getServerSession } from "next-auth";
+import Razorpay from "razorpay";
 
-// async function isAuthenticated() {
-//     const session = await getServerSession(authOptions);
-//     if (!session?.user?.id) {
-//         throw new CustomError("Unauthorized");
-//     }
-//     return session.user.id;
-// }
+async function isAuthenticated() {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+        throw new CustomError("Unauthorized");
+    }
+    return session.user.id;
+}
 
-// async function updateOrderStatus(orderId: string, status: PaymentStatus) {
-//     await db.order.update({
-//         where: {
-//             id: orderId
-//         },
-//         data: {
-//             transaction_status: status
-//         }
-//     });
-// }
+async function updateOrderStatus(orderId: string, status: PaymentStatus) {
+    await db.order.update({
+        where: {
+            id: orderId,
+        },
+        data: {
+            transaction_status: status,
+        },
+    });
+}
 
-// async function updateTransactionStatus(transactionId: string, status: PaymentStatus) {
-//     await db.transaction.update({
-//         where: {
-//             id: transactionId
-//         },
-//         data: {
-//             status
-//         }
-//     });
-// }
+async function updateTransactionStatus(transactionId: string, status: PaymentStatus, payId?: string) {
+    const data: { status: PaymentStatus, paymentId?: string } = { status };
+    if (payId) {
+        data.paymentId = payId;
+    }
+    await db.transaction.update({
+        where: {
+            id: transactionId,
+        },
+        data
+    });
+}
 
-// async function updateOrderAndTransactionStatus(orderId: string, transactionId: string, status: PaymentStatus) {
-//     await updateOrderStatus(orderId, status);
-//     await updateTransactionStatus(transactionId, status);
-// }
+const rzpInstance = new Razorpay({ key_id: "YOUR_KEY_ID", key_secret: "YOUR_SECRET" }); // TODO: Replace with your key and secret
 
-// const rzpInstance = new Razorpay({ key_id: 'YOUR_KEY_ID', key_secret: 'YOUR_SECRET' })
+type InitiatePaymentForOrderReturnType =
+    | {
+        orderId: string;
+        transactionId: string;
+        paymentOrderId: string;
+        amount: number;
+    }
+    | string;
 
-// type PayForOrderReturnType = {
-//     orderId: string;
-//     transactionId: string;
-//     paymentOrderId: string;
-// } | string;
+export async function initiatePaymentForOrder(orderId: string): Promise<ServerActionReturnType<InitiatePaymentForOrderReturnType>> {
+    try {
+        const userId = await isAuthenticated();
+        const order = await db.order.findFirst({
+            where: {
+                id: orderId,
+                userId,
+            },
+            include: {
+                transactions: {
+                    where: {
+                        status: { in: ["Pending", "Processing"] },
+                    },
+                    select: {
+                        id: true,
+                        paymentId: true,
+                        paymentOrderId: true,
+                        status: true,
+                    },
+                },
+            },
+        });
+        if (!order) {
+            throw new CustomError("Order not found");
+        }
+        if (order.order_status != "Approved") {
+            throw new CustomError("Order not approved yet");
+        }
+        if (order.transaction_status == "Success") {
+            throw new CustomError("Already paid for an order");
+        }
+        if (order.transaction_status == "Processing") {
+            throw new CustomError("Payment is being processed");
+        }
+        const orderAmount = (order.delivery_charge + order.packaging - order.discount); // Amount in paise
 
-// export async function payForAnOrder(orderId: string): Promise<ServerActionReturnType<PayForOrderReturnType>> {
-//     try {
-//         const userId = await isAuthenticated();
-//         const order = await db.order.findFirst({
-//             where: {
-//                 id: orderId,
-//                 userId,
-//             },
-//             include: {
-//                 transactions: {
-//                     where: {
-//                         status: { in: ["Pending", "Processing"] }
-//                     },
-//                     select: {
-//                         id: true,
-//                         paymentId: true,
-//                         paymentOrderId: true,
-//                         status: true,
-//                     }
-//                 }
-//             }
-//         });
-//         if (!order) {
-//             throw new CustomError("Order not found");
-//         }
-//         if (order.order_status != "Approved") {
-//             throw new CustomError("Order not approved");
-//         }
-//         if (order.transaction_status == "Success") {
-//             throw new CustomError("Order already paid");
-//         }
-//         if (order.transaction_status == "Processing") {
-//             throw new CustomError("Payment is being processed");
-//         }
-//         if (order.paymentOrderId && order.transactions.length > 0) {
-//             // Mark transactions as Failed
-//             const payments = await rzpInstance.orders.fetchPayments(order.paymentOrderId);
-//             payments.items.forEach(async (payment) => {
-//                 // TODO: update transaction status
-//             });
+        if (order.transactions.length > 0) {
+            const transaction = order.transactions[0];
+            const rzpOrderStatus = await rzpInstance.orders.fetch(order.paymentOrderId!);
+            const payments = (await rzpInstance.orders.fetchPayments(order.paymentOrderId!)).items.sort(
+                (a, b) => a.created_at - b.created_at,
+            );
+            if (rzpOrderStatus.status == "paid") {
+                await updateOrderStatus(orderId, "Success");
+                const pId = payments.find((payment) => payment.status == "captured")?.id || "";
+                await updateTransactionStatus(transaction.id, "Success", pId);
 
-//         }
+                throw new CustomError("Already paid for an order");
+            } else if (rzpOrderStatus.status == "attempted") {
+                if (payments.some((p) => p.status == "authorized")) {
+                    await updateOrderStatus(orderId, "Processing");
+                    await updateTransactionStatus(transaction.id, "Processing", payments.findLast((p) => p.status == "authorized")?.id || undefined);
 
-//         // Create an new order on payment gateway.
-//         const orderAmount = Math.ceil((order.delivery_charge + order.packaging - order.discount) * 100)
+                    throw new CustomError("Payment is being processed");
+                } else if (payments.some((p) => p.status == "created")) {
+                    throw new CustomError("Payment Pending");
+                } else {
+                    await updateTransactionStatus(transaction.id, "Failed", payments[payments.length - 1].id);
 
-//         const rzpOrder = await rzpInstance.orders.create({
-//             amount: orderAmount,
-//             currency: "INR",
-//             partial_payment: false,
-//         })
-//         const paymentId = "PAYMENT_ID" || rzpOrder.id;
-//         const paymentOrderId = "PAYMENT_ORDER_ID";
+                }
+            } else {
+                return {
+                    success: true,
+                    data: {
+                        orderId,
+                        transactionId: transaction.id,
+                        paymentOrderId: order.paymentOrderId!,
+                        amount: orderAmount,
+                    },
+                };
+            }
+        }
 
-//         // Create a new transaction
-//         const transaction = await db.transaction.create({
-//             data: {
-//                 orderId,
-//                 amount: orderAmount,
-//                 currency: "INR",
-//                 paymentId,
-//                 paymentOrderId,
-//             }
-//         });
+        // Create an new order on payment gateway.
 
-//         // Update order
-//         await db.order.update({
-//             where: {
-//                 id: orderId
-//             },
-//             data: {
-//                 transaction_status: "Pending",
-//                 transactions: {
-//                     connect: {
-//                         id: transaction.id
-//                     }
-//                 }
-//             }
-//         });
+        const rzpOrder = await rzpInstance.orders.create({
+            amount: orderAmount,
+            currency: "INR",
+            partial_payment: false,
+        });
+        const paymentOrderId = rzpOrder.id;
 
-//         return {
-//             success: true, data: {
-//                 orderId,
-//                 transactionId: transaction.id,
-//                 paymentOrderId,
-//             }
-//         };
-//     } catch (error) {
-//         if (error instanceof CustomError) {
-//             return { success: false, error: error.message };
-//         }
-//         console.error("payForAnOrder error", error);
-//         return { success: false, error: "Something went wrong" };
-//     }
-// }
+        // Create a new transaction
+        const transaction = await db.transaction.create({
+            data: {
+                orderId,
+                amount: orderAmount,
+                currency: "INR",
+                paymentOrderId,
+                status: "Pending",
+            },
+        });
+
+        // Update order
+        await db.order.update({
+            where: {
+                id: orderId,
+            },
+            data: {
+                transaction_status: "Pending",
+                paymentOrderId,
+                transactions: {
+                    connect: {
+                        id: transaction.id,
+                    },
+                },
+            },
+        });
+
+        return {
+            success: true,
+            data: {
+                orderId,
+                transactionId: transaction.id,
+                paymentOrderId,
+                amount: orderAmount,
+            },
+        };
+    } catch (error) {
+        if (error instanceof CustomError) {
+            return { success: false, error: error.message };
+        }
+        console.error("initiatePaymentForOrder error", error);
+        return { success: false, error: "Something went wrong" };
+    }
+}
 
 // type VerifyPaymentReturnType = {
 //     orderId: string;
@@ -152,70 +183,14 @@
 //     paymentOrderId: string;
 // };
 
-// export async function verifyPayment(orderId: string, paymentOrderId: string, paymentId: string): Promise<ServerActionReturnType<VerifyPaymentReturnType>> {
+// export async function verifyPayment(
+//     orderId: string,
+//     paymentOrderId: string,
+//     paymentId: string,
+// ): Promise<ServerActionReturnType<VerifyPaymentReturnType>> {
 //     try {
-//         const userId = await isAuthenticated();
 
-//         // Verify order belongs to user
-//         const order = await db.order.findFirst({
-//             where: {
-//                 id: orderId,
-//                 userId,
-//             },
-//             include: {
-//                 transactions: {
-//                     where: {
-//                         status: "Pending"
-//                     }
-//                 }
-//             }
-//         });
-
-//         if (!order) {
-//             throw new CustomError("Order not found");
-//         }
-
-//         const rzpPayments = await rzpInstance.payments.fetch(paymentId);
-
-
-//         if (rzpPayments.status == "authorized") {
-//             if (order.transaction_status == "Pending") {
-//                 await updateOrderStatus(orderId, "Processing");
-//                 for (const transaction of order.transactions) {
-//                     await updateTransactionStatus(transaction.id, transaction.paymentId == paymentId ? "Processing" : "Failed")
-//                 }
-//             }
-//             throw new CustomError("Payment is being processed");
-//         } else if (rzpPayments.status == "created") {
-//             throw new CustomError("Payment Pending");
-//         } else if (rzpPayments.status == "captured") {
-//             await updateOrderStatus(orderId, "Success");
-//             for (const transaction of order.transactions) {
-//                 await updateTransactionStatus(transaction.id, transaction.paymentId == paymentId ? "Success" : "Failed")
-//             }
-//         }
-
-
-//         const transaction = await db.transaction.findFirst({
-//             where: {
-//                 paymentOrderId,
-//                 paymentId,
-//                 status: "Pending",
-//             },
-//             include: {
-//                 order: {
-//                     select: {
-//                         id: true,
-//                         transaction_status: true,
-//                     }
-//                 }
-//             }
-//         });
-
-//         console.log(transaction);
-
-//         return { success: true, data: { orderId, transactionId: transaction?.id || "", paymentId, paymentOrderId } };
-
+//         return { success: true, data: { orderId, transactionId: "", paymentId, paymentOrderId } };
 //     } catch (error) {
 //         if (error instanceof CustomError) {
 //             return { success: false, error: error.message };

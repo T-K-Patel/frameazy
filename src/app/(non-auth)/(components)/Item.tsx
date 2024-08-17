@@ -1,17 +1,17 @@
 "use client";
 import React from "react";
 import Frame from "@/assets/frame-1.png";
-import { BsCart3 } from "react-icons/bs";
 import { AiFillEdit } from "react-icons/ai";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { FrameDataType, PopularFrameDataType } from "@/serverActions/frames/frame.action";
 import { getImagePlaceholder } from "@/components/imagePlaceholder";
+import { Skeleton } from "@/components/ui/skeleton";
 
 function Item({ item }: { item: FrameDataType | PopularFrameDataType }) {
     return (
-        <div className="mx-auto grid h-full w-full grid-cols-9 rounded-2xl border border-solid px-2 pb-2 sm:w-fit sm:gap-2 md:grid-cols-1 md:p-3">
-            <div className="col-span-3 flex items-center justify-center">
+        <div className="mx-auto grid h-full w-full grid-cols-1 gap-3 rounded-2xl border border-solid px-2 pb-2 max-md:grid-cols-9 sm:w-fit md:p-3">
+            <div className="flex items-center justify-center max-md:col-span-3">
                 <Image
                     src={item.image}
                     width={300}
@@ -19,10 +19,10 @@ function Item({ item }: { item: FrameDataType | PopularFrameDataType }) {
                     alt="frame"
                     placeholder="blur"
                     blurDataURL={getImagePlaceholder()}
-                    className="aspect-[3/4] w-[100px] max-w-64 object-contain md:w-full"
+                    className="h-auto w-full max-w-64 object-contain md:w-full"
                 />
             </div>
-            <div className="col-span-6">
+            <div className="align-baseline max-md:col-span-6">
                 <h2 className="mb-2 mt-3 md:text-2xl">{item.name}</h2>
                 {"color" in item && (
                     <p className="items-center text-xs md:text-sm">
@@ -56,7 +56,7 @@ function Item({ item }: { item: FrameDataType | PopularFrameDataType }) {
                     <b>Price per inch: </b>
                     {item.unit_price}
                 </p>
-                <form className="flex gap-5">
+                <form>
                     <Button
                         size={"lg"}
                         variant={"outline"}
@@ -88,28 +88,21 @@ export function FrameLoading() {
                     className="aspect-[3/4] w-full max-w-64"
                 />
             </div>
-            <h2 className="mt-3 text-xl"> </h2>
-            <p className="mb-5"> </p>
-            <div className="flex gap-5">
+            <Skeleton className="h-5 w-full" />
+            <Skeleton className="h-5 w-full" />
+            <Skeleton className="h-5 w-full" />
+            <Skeleton className="h-5 w-full" />
+            <form className="flex gap-5">
                 <Button
-                    size={"sm"}
-                    onClick={() => {}}
-                    disabled
-                    className="h-min w-min border border-transparent px-4 py-3 text-xl font-semibold transition-all duration-200 active:scale-90"
-                >
-                    <BsCart3 size={24} />
-                    Add to cart
-                </Button>
-                <Button
-                    size={"sm"}
-                    disabled
-                    onClick={() => {}}
+                    size={"lg"}
                     variant={"outline"}
-                    className="h-min w-min border border-black bg-transparent px-4 py-3 text-lg font-semibold text-black transition-all duration-200 active:scale-90"
+                    type="button"
+                    className="h-min w-full border border-black bg-transparent px-2 py-2 font-semibold text-black transition-all duration-200 active:scale-90 md:px-4 md:py-3 md:text-lg"
                 >
-                    <AiFillEdit size={24} />
+                    Customise
+                    <AiFillEdit size={24} className="ml-4" />
                 </Button>
-            </div>
+            </form>
         </div>
     );
 }

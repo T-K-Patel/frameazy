@@ -60,9 +60,20 @@ export type UserOrderDetails = {
     order_items: {
         id: string;
         customization: Customization;
+        frame: {
+            name: string;
+            image: string;
+        } | null;
+        quantity: number;
+        single_unit_price: number;
     }[];
-    shipping_address: Address;
-    order_status: OrderStatus;
+    shipping_address: Address,
+    order_status: OrderStatus,
+    delivery_charge: number,
+    packaging: number,
+    discount: number,
+    transaction_status: PaymentStatus,
+    delivery_date: Date,
 };
 export async function getOrderDetailsAction(id: string): Promise<ServerActionReturnType<UserOrderDetails>> {
     try {
@@ -78,10 +89,23 @@ export async function getOrderDetailsAction(id: string): Promise<ServerActionRet
                     select: {
                         id: true,
                         customization: true,
+                        frame: {
+                            select: {
+                                name: true,
+                                image: true,
+                            },
+                        },
+                        quantity: true,
+                        single_unit_price: true,
                     },
                 },
                 shipping_address: true,
                 order_status: true,
+                delivery_charge: true,
+                packaging: true,
+                discount: true,
+                transaction_status: true,
+                delivery_date: true,
             },
         });
 
@@ -175,6 +199,36 @@ export async function placeOrderAction(state: any, formData: FormData): Promise<
             return { success: false, error: error.message };
         }
         console.error("placeOrderAction error", error);
+        return { success: false, error: "Something went wrong" };
+    }
+}
+
+
+export async function cancelOrderAction(orderId: string): Promise<ServerActionReturnType<string>> {
+    try {
+        const userId = await isAuthenticated();
+        const order = await db.order.findFirst({
+            where: {
+                id: orderId,
+                userId
+            }
+        });
+        if (!order) throw new CustomError("Order not found");
+        if (!([OrderStatus.Approved, OrderStatus.Received] as OrderStatus[]).includes(order.order_status)) throw new CustomError("Order cannot be cancelled");
+        await db.order.update({
+            where: {
+                id: orderId
+            },
+            data: {
+                order_status: "Canceled"
+            }
+        });
+        return { success: true, data: "Order cancelled successfully" };
+    } catch (error) {
+        if (error instanceof CustomError) {
+            return { success: false, error: error.message };
+        }
+        console.error("cancelOrderAction error", error);
         return { success: false, error: "Something went wrong" };
     }
 }

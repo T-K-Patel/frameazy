@@ -1,5 +1,6 @@
 "use client";
 import Loading from "@/app/loading";
+import CustomizationDialog from "@/components/customizing/CustomizationDialog";
 import { useSession } from "next-auth/react";
 import React, { createContext, ReactNode, useState } from "react";
 
@@ -26,20 +27,34 @@ type FrameOptions =
           data: {};
       };
 
+type CustomizingFrameType = {
+    id: string;
+    borderWidth: number;
+    borderSrc: string;
+    name: string;
+};
+
 // Create a new context for the frame options data
 const FramesContext = createContext<
     | {
           frameOptions: FrameOptions;
           setFrameOptions: React.Dispatch<React.SetStateAction<FrameOptions>>;
           resetFrames: () => void;
+          dialogOpen: boolean;
+          setDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
+          customizingFrame: CustomizingFrameType | null;
+          setCustomizingFrame: React.Dispatch<React.SetStateAction<CustomizingFrameType | null>>;
       }
     | undefined
 >(undefined);
 
 function FramesProvider({ children }: { children: ReactNode }) {
     const session = useSession();
-
+    // dialogOpen:isOpen,setDialogOpen:setIsOpen
     const [frameOptions, setFrameOptions] = useState<FrameOptions>({ framingStyle: "none" });
+    const [dialogOpen, setDialogOpen] = useState(false);
+
+    const [customizingFrame, setCustomizingFrame] = useState<CustomizingFrameType | null>(null);
 
     if (session.status == "loading") {
         return <Loading />;
@@ -49,8 +64,29 @@ function FramesProvider({ children }: { children: ReactNode }) {
         setFrameOptions({ framingStyle: "none" });
     }
     return (
-        <FramesContext.Provider value={{ frameOptions, setFrameOptions, resetFrames }}>
+        <FramesContext.Provider
+            value={{
+                frameOptions,
+                setFrameOptions,
+                resetFrames,
+                setDialogOpen,
+                dialogOpen,
+                customizingFrame,
+                setCustomizingFrame,
+            }}
+        >
             {children}
+            {frameOptions && (
+                <CustomizationDialog
+                    frameOptions={frameOptions}
+                    setDialogOpen={setDialogOpen}
+                    dialogOpen={dialogOpen}
+                    setFrameOptions={setFrameOptions}
+                    resetFrames={resetFrames}
+                    customizingFrame={customizingFrame}
+                    setCustomizingFrame={setCustomizingFrame}
+                />
+            )}
         </FramesContext.Provider>
     );
 }

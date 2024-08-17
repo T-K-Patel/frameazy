@@ -11,11 +11,10 @@ export default function Error() {
             <h1 className="text-3xl font-bold">500 | Internal server occured</h1>
             <Button
                 variant={"outline"}
-                className="h-auto w-auto border border-black p-4"
+                className="flex h-auto w-auto gap-3 border border-black p-4"
                 onClick={() => router.refresh()}
             >
-                <RxReload />
-                Reload
+                <RxReload /> Reload
             </Button>
         </div>
     );

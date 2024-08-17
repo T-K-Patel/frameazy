@@ -15,8 +15,6 @@ export type PopularFrameDataType = {
     id: string;
     name: string;
     unit_price: number;
-    height: number | null;
-    width: number | null;
     image: string;
 };
 export type FrameDataType = PopularFrameDataType & {
@@ -42,8 +40,6 @@ export async function getFramesAction(
                 id: true,
                 name: true,
                 unit_price: true,
-                height: true,
-                width: true,
                 color: true,
                 collection: true,
                 category: true,
@@ -72,26 +68,67 @@ export async function getFramesAction(
     }
 }
 
+export type FramesForCustomizationType = {
+    id: string;
+    name: string;
+    borderSrc: string;
+    borderWidth: number;
+    unit_price: number;
+}
+
+export async function getFramesForCustomizatinAction(): Promise<ServerActionReturnType<FramesForCustomizationType[]>> {
+    try {
+
+        // LATER: Caching needed
+        const frames = await db.frame.findMany({
+            select: {
+                id: true,
+                name: true,
+                unit_price: true,
+                borderSrc: true,
+                borderWidth: true,
+            },
+        });
+
+        return { success: true, data: frames };
+    } catch (error) {
+        if (error instanceof CustomError) {
+            return { success: false, error: error.message };
+        }
+        console.error("getFramesForCustomizatinAction error", error);
+        return { success: false, error: "Something went wrong" };
+    }
+}
+
 export async function getPopularFramesAction(): Promise<ServerActionReturnType<PopularFrameDataType[]>> {
     try {
-        const fetchedFrameIds = new Set<string>();
+        // const fetchedFrameIds = new Set<string>();
 
-        let frames = await db.frame.findMany({
+        const frames = await db.frame.findMany({
             where: {
-                OrderItem: {
-                    some: {
-                        order: {
-                            order_status: {
-                                in: [
-                                    OrderStatus.Approved,
-                                    OrderStatus.Delivered,
-                                    OrderStatus.Shipped,
-                                    OrderStatus.Processing,
-                                ],
+                OR: [
+                    {
+                        OrderItem: {
+                            some: {
+                                order: {
+                                    order_status: {
+                                        in: [
+                                            OrderStatus.Approved,
+                                            OrderStatus.Delivered,
+                                            OrderStatus.Shipped,
+                                            OrderStatus.Processing,
+                                        ],
+                                    },
+                                },
                             },
                         },
                     },
-                },
+                    {
+                        OrderItem: {
+                            none: {},
+                        },
+                    },
+                ],
             },
             orderBy: {
                 OrderItem: {
@@ -103,67 +140,10 @@ export async function getPopularFramesAction(): Promise<ServerActionReturnType<P
                 id: true,
                 name: true,
                 unit_price: true,
-                height: true,
-                width: true,
                 image: true,
             },
         });
 
-        frames.forEach((frame) => fetchedFrameIds.add(frame.id));
-
-        if (frames.length < 6) {
-            const additionalFrames = await db.frame.findMany({
-                where: {
-                    id: {
-                        notIn: Array.from(fetchedFrameIds),
-                    },
-                    OrderItem: {
-                        some: {
-                            order: {
-                                order_status: {
-                                    in: [
-                                        OrderStatus.Approved,
-                                        OrderStatus.Delivered,
-                                        OrderStatus.Shipped,
-                                        OrderStatus.Processing,
-                                    ],
-                                },
-                            },
-                        },
-                    },
-                },
-                take: 6 - frames.length,
-                select: {
-                    id: true,
-                    name: true,
-                    unit_price: true,
-                    height: true,
-                    width: true,
-                    image: true,
-                },
-            });
-            frames = frames.concat(additionalFrames);
-        }
-
-        if (frames.length < 6) {
-            const remainingFrames = await db.frame.findMany({
-                where: {
-                    id: {
-                        notIn: Array.from(fetchedFrameIds),
-                    },
-                },
-                take: 6 - frames.length,
-                select: {
-                    id: true,
-                    name: true,
-                    unit_price: true,
-                    height: true,
-                    width: true,
-                    image: true,
-                },
-            });
-            frames = frames.concat(remainingFrames);
-        }
 
         return { success: true, data: frames };
     } catch (error) {
