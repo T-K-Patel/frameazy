@@ -1,7 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import Item from "../(components)/Item";
-
+import Item, { FrameLoading } from "../(components)/Item";
 import { Button } from "@/components/ui/button";
 import { RiArrowDropDownLine } from "react-icons/ri";
 import { getFramesAction, FrameDataType, FramesFilterType } from "@/serverActions/frames/frame.action";
@@ -20,6 +19,7 @@ function Frames() {
     const [page, setPage] = useState(1);
     const [sidebarHidden, setSidebarHidden] = useState(true);
     const [frames, setFrames] = useState<FrameDataType[]>();
+    const [loading, setLoading] = useState(true);
 
     const debouncedFilters = useDebounce(filters, 800);
     useEffect(() => {
@@ -29,6 +29,10 @@ function Frames() {
                 setFrames(data.data.frames);
                 setTotalFrames(data.data.total);
             }
+        }).catch((error) => {
+            console.log(error);
+        }).finally(() => {
+            setLoading(false);
         });
     }, [debouncedFilters, page]);
 
@@ -85,16 +89,17 @@ function Frames() {
                         className="grid place-content-center items-center justify-center gap-y-5 sm:grid-cols-2 sm:gap-x-4 lg:grid-cols-3"
                         style={{ gridTemplateRows: "subgrid" }}
                     >
-                        {frames?.map((frame, ind) => {
-                            return <Item item={frame} key={ind} />;
-                        })}
-                        {frames?.length == 0 && (
+                        {loading?Array.from({length:6}).map((_,ind)=>{
+                            return <FrameLoading key={ind} />;
+                        }):frames?.length == 0 ? (
                             <>
                                 <h1 className="text-center text-2xl font-semibold md:col-span-2 lg:col-span-3">
                                     No Frames Found
                                 </h1>
                             </>
-                        )}
+                        ):frames?.map((frame, ind) => {
+                            return <Item item={frame} key={ind} />;
+                        })}
                     </div>
                     <FramesPagination page={page} totalPages={totalPages} setPage={setPage} />
                 </div>

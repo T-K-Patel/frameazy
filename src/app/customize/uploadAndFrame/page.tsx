@@ -163,10 +163,13 @@ function Page() {
             return { ...acc };
         },
         {
-            width: frameOptions.data.width! + 2 * upload.frame?.borderWidth!,
-            height: frameOptions.data.height! + 2 * upload.frame?.borderWidth!,
+            width: frameOptions.data.width! + 2 * (upload.frame?.borderWidth||0),
+            height: frameOptions.data.height! + 2 *( upload.frame?.borderWidth||0),
         },
     );
+    console.log(frameOptions.data.width, frameOptions.data.height);
+    console.log(totalSize);
+    console.log(upload);
 
     return (
         <>
@@ -192,87 +195,81 @@ function Page() {
                                 }
                             />
                             {content.mat && (
-                                <InputField
-                                    label={<strong>Mat</strong>}
-                                    field={
-                                        <div>
-                                            {mat.map((m, ind) => {
-                                                return (
-                                                    <div
-                                                        className="mb-3 grid w-full items-center gap-4 md:grid-cols-2"
-                                                        key={ind}
-                                                    >
-                                                        <div className="flex items-center gap-x-2">
-                                                            <p className="">Width:</p>
-                                                            <Input
-                                                                type="number"
-                                                                min={0.25}
-                                                                step={0.25}
-                                                                className="w-20 border border-gray-2 p-3 px-2 text-center"
-                                                                placeholder="0"
-                                                                value={m.width}
-                                                                onChange={(e) => {
-                                                                    setMat((_m) => {
-                                                                        _m[ind].width = Number(e.target.value);
-                                                                        return [..._m];
-                                                                    });
-                                                                }}
-                                                            />
-                                                            <span>
-                                                                <strong>In</strong>
-                                                            </span>
-                                                        </div>
-                                                        <div className="flex items-center gap-x-2">
-                                                            <p>Color:</p>
-                                                            <Input
-                                                                className="h-10 w-20 p-1"
-                                                                placeholder="white"
-                                                                value={m.color}
-                                                                type="color"
-                                                                onChange={(e) => {
-                                                                    setMat((_m) => {
-                                                                        _m[ind].color = e.target.value;
-                                                                        return [..._m];
-                                                                    });
-                                                                }}
-                                                            />
-                                                            {ind != 0 && (
-                                                                <IoCloseSharp
-                                                                    className="flex-shrink-0"
-                                                                    onClick={() => {
-                                                                        setMat((_m) => {
-                                                                            return _m.filter((rm) => {
-                                                                                return rm.id != m.id;
-                                                                            });
-                                                                        });
-                                                                    }}
-                                                                />
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                );
-                                            })}
-                                            <button
-                                                onClick={() => {
-                                                    setMat((m) => {
-                                                        return [
-                                                            ...m,
-                                                            {
-                                                                width: 0.75,
-                                                                color: "#ffffff",
-                                                                id: new Date().toString(),
-                                                            },
-                                                        ];
-                                                    });
-                                                }}
-                                                className="text-blue-1"
-                                            >
-                                                Add More Mat
-                                            </button>
+                            <InputField
+                                label={<strong>Mat</strong>}
+                                field={
+                                    <div className="w-fit">
+                                        <div className="grid grid-cols-2 gap-6">
+                                            <p>Width(<b>Inch</b>):</p>
+                                            <p>Color:</p>
                                         </div>
-                                    }
-                                />
-                            )}
+                                        {mat.map((m, ind) => {
+                                            return (
+                                                <div
+                                                    className="mb-3 grid w-full items-center gap-6 grid-cols-2"
+                                                    key={ind}
+                                                >
+                                                    <Input
+                                                        type="number"
+                                                        min={0.25}
+                                                        step={0.25}
+                                                        className="w-20 border border-gray-2 p-3 px-2 text-center"
+                                                        placeholder="0"
+                                                        value={m.width}
+                                                        onChange={(e) => {
+                                                            setMat((_m) => {
+                                                                _m[ind].width = Number(e.target.value);
+                                                                return [..._m];
+                                                            });
+                                                        }}
+                                                        />
+                                                    <div className="flex items-center gap-x-2">
+                                                        <Input
+                                                            className="h-10 w-20 p-1"
+                                                            placeholder="white"
+                                                            value={m.color}
+                                                            type="color"
+                                                            onChange={(e) => {
+                                                                setMat((_m) => {
+                                                                    _m[ind].color = e.target.value;
+                                                                    return [..._m];
+                                                                });
+                                                            }}
+                                                        />
+                                                        {ind != 0 && (
+                                                            <IoCloseSharp
+                                                                className="flex-shrink-0 cursor-pointer"
+                                                                onClick={() => {
+                                                                    setMat((_m) => {
+                                                                        return _m.filter((rm) => {
+                                                                            return rm.id != m.id;
+                                                                        });
+                                                                    });
+                                                                }}
+                                                            />
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                        <button
+                                            onClick={() => {
+                                                setMat((m) => {
+                                                    return [
+                                                        ...m,
+                                                        { width: 0.75, color: "#ffffff", id: new Date().toString() },
+                                                    ];
+                                                });
+                                            }}
+                                            className="text-blue-1"
+                                        >
+                                            {" "}
+                                            Add More Mat
+                                        </button>
+                                    </div>
+                                }
+                            />
+                        )}
                             <div className="flex flex-col gap-y-5">
                                 {content.options.map((option, index) => {
                                     return (

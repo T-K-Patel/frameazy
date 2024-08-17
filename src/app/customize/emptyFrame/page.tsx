@@ -159,35 +159,32 @@ function Page() {
                             <InputField
                                 label={<strong>Mat</strong>}
                                 field={
-                                    <div>
+                                    <div className="w-fit">
+                                        <div className="grid grid-cols-2 gap-6">
+                                            <p>Width(<b>Inch</b>):</p>
+                                            <p>Color:</p>
+                                        </div>
                                         {mat.map((m, ind) => {
                                             return (
                                                 <div
-                                                    className="mb-3 grid w-full items-center gap-4 md:grid-cols-2"
+                                                    className="mb-3 grid w-full items-center gap-6 grid-cols-2"
                                                     key={ind}
                                                 >
-                                                    <div className="flex items-center gap-x-2">
-                                                        <p className="">Width:</p>
-                                                        <Input
-                                                            type="number"
-                                                            min={0.25}
-                                                            step={0.25}
-                                                            className="w-20 border border-gray-2 p-3 px-2 text-center"
-                                                            placeholder="0"
-                                                            value={m.width}
-                                                            onChange={(e) => {
-                                                                setMat((_m) => {
-                                                                    _m[ind].width = Number(e.target.value);
-                                                                    return [..._m];
-                                                                });
-                                                            }}
+                                                    <Input
+                                                        type="number"
+                                                        min={0.25}
+                                                        step={0.25}
+                                                        className="w-20 border border-gray-2 p-3 px-2 text-center"
+                                                        placeholder="0"
+                                                        value={m.width}
+                                                        onChange={(e) => {
+                                                            setMat((_m) => {
+                                                                _m[ind].width = Number(e.target.value);
+                                                                return [..._m];
+                                                            });
+                                                        }}
                                                         />
-                                                        <span>
-                                                            <strong>In</strong>
-                                                        </span>
-                                                    </div>
                                                     <div className="flex items-center gap-x-2">
-                                                        <p>Color:</p>
                                                         <Input
                                                             className="h-10 w-20 p-1"
                                                             placeholder="white"
@@ -202,7 +199,7 @@ function Page() {
                                                         />
                                                         {ind != 0 && (
                                                             <IoCloseSharp
-                                                                className="flex-shrink-0"
+                                                                className="flex-shrink-0 cursor-pointer"
                                                                 onClick={() => {
                                                                     setMat((_m) => {
                                                                         return _m.filter((rm) => {
