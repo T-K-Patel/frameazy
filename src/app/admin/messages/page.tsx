@@ -23,16 +23,22 @@ const MessageItem = ({ message }: { message: Message }) => {
 const AdminContactPage = () => {
     const [messages, setMessages] = useState<Message[]>();
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<null | string>(null);
 
     useEffect(() => {
         getMessagesAction()
             .then((data) => {
                 if (data.success) {
                     setMessages(data.data);
+                    setError(null);
+                } else {
+                    setError(data.error);
+                    setMessages([]);
                 }
             })
             .catch((error) => {
-                console.log(error);
+                setError(error);
+                setMessages([]);
             })
             .finally(() => {
                 setLoading(false);
@@ -40,23 +46,29 @@ const AdminContactPage = () => {
     }, []);
     return (
         <div className="mx-auto flex w-11/12 max-w-screen-2xl flex-col gap-y-12 py-12">
-            <section className="flex flex-col gap-6 rounded-3xl border border-[#F1F1F1] p-5">
-                <h1 className="leading-12 border-b border-[#F1F1F1] pb-5 text-3xl font-semibold">Messages</h1>
-                {loading ? (
-                    <div className="flex flex-col gap-4">
-                        <Skeleton className="h-14 rounded-xl md:h-24" />
-                        <Skeleton className="h-14 rounded-xl md:h-24" />
-                        <Skeleton className="h-14 rounded-xl md:h-24" />
-                        <Skeleton className="h-14 rounded-xl md:h-24" />
-                    </div>
-                ) : !messages || messages?.length == 0 ? (
-                    <p className="text-center text-lg font-semibold text-red-500">No messages yet</p>
-                ) : (
-                    messages?.map((m) => {
-                        return <MessageItem key={m.id} message={m} />;
-                    })
-                )}
-            </section>
+            {error ? (
+                <p className="text-center text-2xl font-semibold text-red-500">{error ?? "No orders yet"}</p>
+            ) : (
+                messages && (
+                    <section className="flex flex-col gap-6 rounded-3xl border border-[#F1F1F1] p-5">
+                        <h1 className="leading-12 border-b border-[#F1F1F1] pb-5 text-3xl font-semibold">Messages</h1>
+                        {loading ? (
+                            <div className="flex flex-col gap-4">
+                                <Skeleton className="h-14 rounded-xl md:h-24" />
+                                <Skeleton className="h-14 rounded-xl md:h-24" />
+                                <Skeleton className="h-14 rounded-xl md:h-24" />
+                                <Skeleton className="h-14 rounded-xl md:h-24" />
+                            </div>
+                        ) : !messages || messages?.length == 0 ? (
+                            <p className="text-center text-lg font-semibold text-red-500">No messages yet</p>
+                        ) : (
+                            messages?.map((m) => {
+                                return <MessageItem key={m.id} message={m} />;
+                            })
+                        )}
+                    </section>
+                )
+            )}
         </div>
     );
 };

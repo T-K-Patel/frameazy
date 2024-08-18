@@ -140,10 +140,10 @@ enum Collection {
 }
 
 enum Mirror {
-  A
-  B
-  C
-  D
+  Beveled
+  NonBeveled
+  Antique
+  Plain
 }
 
 enum MessageStatus {
@@ -163,38 +163,37 @@ model Message {
 }
 
 enum Glazing {
-  A
-  B
-  C
-  D
+  RegularGlass
+  Acrylic
+  UVGlass
+  NonGlareGlass
+  MuseumGlass
 }
 
 enum Printing {
-  A
-  B
-  C
-  D
+  PaperGSM
+  CanvasGSM
 }
 
 enum Backing {
-  A
-  B
-  C
-  D
+  Cardboard
+  Foamcore
+  MDF
 }
 
 enum Stretching {
-  A
-  B
-  C
-  D
+  StretcherBar
+  GalleryWrap
+  MuseumWrap
+  FloatFrame
 }
 
 enum Sides {
-  A
-  B
-  C
-  D
+  White
+  Black
+  Image
+  Custom
+  Mirror
 }
 
 type Address {
@@ -208,7 +207,7 @@ type Address {
 }
 
 type MatOptions {
-  color Color
+  color String
   width Float
 }
 
@@ -222,7 +221,8 @@ enum CustomizationType {
   FramedMirror
 }
 
-type Customization {
+model Customization {
+  id         String            @id @default(auto()) @map("_id") @db.ObjectId
   type       CustomizationType
   glazing    Glazing?
   width      Float
@@ -234,6 +234,9 @@ type Customization {
   backing    Backing?
   stretching Stretching?
   sides      Sides?
+
+  OrderItem OrderItem[]
+  CartItem  CartItem[]
 }
 
 model CartItem {
@@ -242,8 +245,9 @@ model CartItem {
   user              User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   frameId           String?       @db.ObjectId
   frame             Frame?        @relation(fields: [frameId], references: [id], onDelete: Restrict)
-  customization     Customization
-  single_unit_price Float
+  customizationId   String        @db.ObjectId
+  customization     Customization @relation(fields: [customizationId], references: [id])
+  single_unit_price Int
 
   quantity  Int      @default(1)
   createdAt DateTime @default(now())
@@ -303,9 +307,10 @@ model OrderItem {
   id                String        @id @default(auto()) @map("_id") @db.ObjectId
   frameId           String?       @db.ObjectId
   frame             Frame?        @relation(fields: [frameId], references: [id], onDelete: Restrict)
-  customization     Customization
+  customizationId   String        @db.ObjectId
+  customization     Customization @relation(fields: [customizationId], references: [id])
   quantity          Int
-  single_unit_price Float
+  single_unit_price Int
   orderId           String        @db.ObjectId
   order             Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
@@ -328,7 +333,7 @@ model Transaction {
   // Order and Amount
   orderId  String @db.ObjectId
   order    Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  amount   Float
+  amount   Int
   currency String
 
   description String?

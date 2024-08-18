@@ -5,17 +5,23 @@ import { getSubscriptionsAction } from "@/serverActions/admin/admin.action";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const AdminSubscriptionPage = () => {
-    const [subscriptions, setSubscriptions] = useState<Subscription[]>();
+    const [subscriptions, setSubscriptions] = useState<Omit<Subscription, "unsubscribeToken">[]>();
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     useEffect(() => {
         getSubscriptionsAction()
             .then((data) => {
                 if (data.success) {
                     setSubscriptions(data.data);
+                    setError(null);
+                } else {
+                    setError(data.error);
+                    setSubscriptions([]);
                 }
             })
             .catch((error) => {
-                console.log(error);
+                setError(error);
+                setSubscriptions([]);
             })
             .finally(() => {
                 setLoading(false);
@@ -32,8 +38,8 @@ const AdminSubscriptionPage = () => {
                         <Skeleton className="md:h-18 h-10 rounded-xl" />
                         <Skeleton className="md:h-18 h-10 rounded-xl" />
                     </div>
-                ) : !subscriptions || subscriptions?.length == 0 ? (
-                    <p className="text-center text-lg font-semibold text-red-500">No subscriptions yet</p>
+                ) : error || subscriptions?.length == 0 ? (
+                    <p className="text-center text-lg font-semibold text-red-500">{error ?? "No subscriptions yet"}</p>
                 ) : (
                     subscriptions?.map((s, ind) => {
                         return (

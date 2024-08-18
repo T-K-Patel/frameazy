@@ -12,21 +12,31 @@ import { PopularFrameDataType, getPopularFramesAction } from "@/serverActions/fr
 const PopularItems = () => {
     const [popularFrames, setPopularFrames] = useState<PopularFrameDataType[]>([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
     useEffect(() => {
         setLoading(true);
         getPopularFramesAction()
             .then((data) => {
                 if (data.success) {
                     setPopularFrames(data.data);
+                    setError(null);
+                } else {
+                    setError(data.error);
+                    setPopularFrames([]);
                 }
             })
             .catch((error) => {
                 console.log(error);
+                setError("Something went wrong");
+                setPopularFrames([]);
             })
             .finally(() => {
                 setLoading(false);
             });
     }, []);
+
+    if (error) return null;
 
     return (
         <div className="mx-auto w-11/12 max-w-screen-2xl items-center" id="explore">

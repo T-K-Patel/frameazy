@@ -7,15 +7,21 @@ import { Skeleton } from "@/components/ui/skeleton";
 const AdminTransactionPage = () => {
     const [transactions, setTransactions] = useState<Transaction[]>();
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     useEffect(() => {
         getTransactionsAction()
             .then((data) => {
                 if (data.success) {
                     setTransactions(data.data);
+                    setError(null);
+                } else {
+                    setError(data.error);
+                    setTransactions([]);
                 }
             })
             .catch((error) => {
-                console.log(error);
+                setError(error);
+                setTransactions([]);
             })
             .finally(() => {
                 setLoading(false);
@@ -38,8 +44,8 @@ const AdminTransactionPage = () => {
                         <Skeleton className="md:h-18 h-10 rounded-xl" />
                         <Skeleton className="md:h-18 h-10 rounded-xl" />
                     </div>
-                ) : !transactions || transactions?.length == 0 ? (
-                    <p className="text-center text-lg font-semibold text-red-500">No transactions yet</p>
+                ) : error || transactions?.length == 0 ? (
+                    <p className="text-center text-lg font-semibold text-red-500">{error ?? "No transactions yet"}</p>
                 ) : (
                     transactions?.map((t, ind) => {
                         return (

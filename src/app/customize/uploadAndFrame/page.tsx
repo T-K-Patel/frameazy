@@ -7,9 +7,10 @@ import { useFrames } from "@/context/frames-context";
 import InputField from "../InputField";
 import FrameCanvas from "../FrameCanvas";
 import { IoCloseSharp } from "react-icons/io5";
-import { Glazing, Printing, Backing, Stretching, Sides } from "@prisma/client";
+import { Glazing, Printing, Backing, Stretching, Sides, CustomizationType, Customization } from "@prisma/client";
 import { getFramesForCustomizatinAction, FramesForCustomizationType } from "@/serverActions/frames/frame.action";
 import Image from "next/image";
+import { addCartItemAction } from "@/serverActions/cart/addCartItem.action";
 
 type CustomizeOptionsProps =
     | {
@@ -23,11 +24,11 @@ type CustomizeOptionsProps =
 
 type uploadOptionsProps = {
     dimensions: { width: number; height: number };
-    glazing?: string;
-    printing: string;
-    backing?: string;
-    stretching?: string;
-    sides?: string;
+    glazing?: Glazing;
+    printing: Printing;
+    backing?: Backing;
+    stretching?: Stretching;
+    sides?: Sides;
 };
 
 type matOptionsProps = {
@@ -41,46 +42,50 @@ function Page() {
     const { frameOptions, customizingFrame, setCustomizingFrame } = useFrames();
     const [upload, setUpload] = useState<uploadOptionsProps>({
         dimensions: { width: 0, height: 0 },
-        printing: Object.keys(Printing)[0],
+        printing: Object.keys(Printing)[0] as Printing,
     });
 
     const [frames, setFrames] = useState<FramesForCustomizationType[]>([]);
     const [mat, setMat] = useState<matOptionsProps>([{ width: 0.75, color: "#ffffff", id: new Date().toString() }]);
+
+    const [error, setError] = useState<string | null>(null);
+
     useEffect(() => {
         if (frameOptions.framingStyle === "uploadAndFrame") {
             switch (frameOptions.data.frameType) {
                 case "printOnly":
                     setUpload({
                         dimensions: { width: frameOptions.data.width!, height: frameOptions.data.height! },
-                        printing: Object.keys(Printing)[0],
+                        printing: Object.keys(Printing)[0] as Printing,
                     });
                     break;
                 case "canvasPrint":
                     setUpload({
                         dimensions: { width: frameOptions.data.width!, height: frameOptions.data.height! },
-                        printing: Object.keys(Printing)[0],
-                        backing: Object.keys(Backing)[0],
-                        stretching: Object.keys(Stretching)[0],
-                        sides: Object.keys(Sides)[0],
+                        printing: Object.keys(Printing)[0] as Printing,
+                        backing: Object.keys(Backing)[0] as Backing,
+                        stretching: Object.keys(Stretching)[0] as Stretching,
+                        sides: Object.keys(Sides)[0] as Sides,
                     });
                     break;
                 case "framedWithoutMG":
                     setUpload({
                         dimensions: { width: frameOptions.data.width!, height: frameOptions.data.height! },
-                        printing: Object.keys(Printing)[0],
-                        stretching: Object.keys(Stretching)[0],
+                        printing: Object.keys(Printing)[0] as Printing,
+                        stretching: Object.keys(Stretching)[0] as Stretching,
                     });
                     break;
                 case "framedWithMG":
                     setUpload({
                         dimensions: { width: frameOptions.data.width!, height: frameOptions.data.height! },
-                        glazing: Object.keys(Glazing)[0],
-                        printing: Object.keys(Printing)[0],
-                        backing: Object.keys(Backing)[0],
+                        glazing: Object.keys(Glazing)[0] as Glazing,
+                        printing: Object.keys(Printing)[0] as Printing,
+                        backing: Object.keys(Backing)[0] as Backing,
                     });
                     break;
             }
         }
+        setError(null);
     }, [frameOptions, frames]);
 
     useEffect(() => {
@@ -186,9 +191,50 @@ function Page() {
             height: frameOptions.data.height! + 2 * (customizingFrame?.borderWidth || 0),
         },
     );
-    console.log(frameOptions.data.width, frameOptions.data.height);
-    console.log(totalSize);
-    console.log(upload);
+
+    const addToCart = () => {
+        let custType: CustomizationType = "ImageCanvasPrint";
+        switch (frameOptions.data.frameType) {
+            case "printOnly":
+                custType = "ImagePrintOnly";
+                break;
+            case "canvasPrint":
+                custType = "ImageCanvasPrint";
+                break;
+            case "framedWithoutMG":
+                custType = "ImageWithoutMatAndGlazing";
+                break;
+            case "framedWithMG":
+                custType = "ImageWithMatAndGlazing";
+                break;
+        }
+        const data: Omit<Customization, "id"> = {
+            type: custType,
+            width: totalSize.width,
+            height: totalSize.height,
+            image: frameOptions.data.croppedImage as string,
+            mirror: null,
+            glazing: upload.glazing || null,
+            printing: upload.printing || null,
+            backing: upload.backing || null,
+            stretching: upload.stretching || null,
+            sides: upload.sides || null,
+            mat: mat.map((m) => ({ color: m.color, width: m.width })),
+        };
+
+        addCartItemAction(data, { frameId: customizingFrame?.id || "" })
+            .then((data) => {
+                if (data.success) {
+                    console.log("Added to cart");
+                } else {
+                    setError(data.error);
+                }
+            })
+            .catch((error) => {
+                console.log(error);
+                setError("Something went wrong");
+            });
+    };
 
     return (
         <>
@@ -413,9 +459,14 @@ function Page() {
                                 </span>
                                 <span className="text-2xl font-bold max-md:col-span-2">$ 2,00.00</span>
                             </div>
-                            <Button size={"lg"} className="h-auto w-full py-4">
-                                Add to Cart
-                            </Button>
+                            <div>
+                                <Button size={"lg"} className="h-auto w-full py-4" onClick={addToCart}>
+                                    Add to Cart
+                                </Button>
+                                <div className="flex flex-col gap-y-2">
+                                    {error && <p className="text-red-500">{error}</p>}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

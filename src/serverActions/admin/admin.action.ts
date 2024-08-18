@@ -6,12 +6,14 @@ import {
     Message,
     Transaction,
     Subscription,
-    Order,
     Category,
     Color,
     Collection,
     OrderStatus,
     Role,
+    PaymentStatus,
+    Address,
+    Customization
 } from "@prisma/client";
 import { CloudinaryStorage } from "@/lib/Cloudinary.storage";
 import { getServerSession } from "next-auth";
@@ -139,11 +141,18 @@ export async function getTransactionsAction(): Promise<ServerActionReturnType<Tr
 }
 
 // LATER: Add pagination
-export async function getSubscriptionsAction(): Promise<ServerActionReturnType<Subscription[]>> {
+export async function getSubscriptionsAction(): Promise<ServerActionReturnType<(Omit<Subscription, "unsubscribeToken">)[]>> {
     try {
         await isAdmin();
-        const subscriptions = await db.subscription.findMany();
-
+        const subscriptions = await db.subscription.findMany({
+            select: {
+                id: true,
+                email: true,
+                status: true,
+                createdAt: true,
+                updatedAt: true,
+            },
+        });
         return { success: true, data: subscriptions };
     } catch (error) {
         if (error instanceof CustomError) {
@@ -154,12 +163,33 @@ export async function getSubscriptionsAction(): Promise<ServerActionReturnType<S
     }
 }
 
+export type AdminOrdersType = {
+    id: string;
+    order_status: OrderStatus;
+    createdAt: Date;
+    delivery_charge: number;
+    packaging: number;
+    discount: number;
+    delivery_date: Date;
+    transaction_status: string;
+};
+
 // LATER: Add pagination
-export async function getOrdersAction(): Promise<ServerActionReturnType<Order[]>> {
+export async function getOrdersAction(): Promise<ServerActionReturnType<AdminOrdersType[]>> {
     try {
         await isAdmin();
-        const orders = await db.order.findMany();
-
+        const orders = await db.order.findMany({
+            select: {
+                id: true,
+                order_status: true,
+                createdAt: true,
+                delivery_charge: true,
+                packaging: true,
+                discount: true,
+                delivery_date: true,
+                transaction_status: true,
+            }
+        });
         return { success: true, data: orders };
     } catch (error) {
         if (error instanceof CustomError) {
@@ -170,19 +200,81 @@ export async function getOrdersAction(): Promise<ServerActionReturnType<Order[]>
     }
 }
 
-export async function getOrderDetailsAction(id: string): Promise<ServerActionReturnType<Order>> {
+export type AdminOrderDetailsType = {
+    id: string,
+    order_status: OrderStatus,
+    createdAt: Date,
+    delivery_charge: number,
+    packaging: number,
+    discount: number,
+    delivery_date: Date,
+    transaction_status: PaymentStatus,
+    shipping_address: Address,
+    order_items: {
+        frame: {
+            name: string,
+            image: string,
+        } | null,
+        quantity: number,
+        customization: Customization,
+        single_unit_price: number,
+    }[],
+    user: {
+        name: string | null,
+        email: string | null,
+    },
+}
+
+export async function getOrderDetailsAction(id: string): Promise<ServerActionReturnType<AdminOrderDetailsType>> {
     try {
+        //66bcac7689557b7850a882cd
+        const regex = /^[0-9a-fA-F]{24}$/;
+        if (!regex.test(id)) {
+            throw new CustomError("Invalid order ID");
+        }
         await isAdmin();
         const order = await db.order.findFirst({
             where: {
                 id,
             },
-            include: {
-                order_items: true,
+            select: {
+                id: true,
+                order_status: true,
+                createdAt: true,
+                delivery_charge: true,
+                packaging: true,
+                discount: true,
+                delivery_date: true,
+                transaction_status: true,
+                shipping_address: true,
+                order_items: {
+                    select: {
+                        frame: {
+                            select: {
+                                name: true,
+                                image: true,
+                            },
+                        },
+                        quantity: true,
+                        customization: true,
+                        single_unit_price: true,
+                    },
+                },
+                user: {
+                    select: {
+                        name: true,
+                        email: true,
+                    }
+                },
+
             },
         });
 
-        return { success: true, data: order! };
+        if (!order) {
+            throw new CustomError("Order not found");
+        }
+
+        return { success: true, data: order };
     } catch (error) {
         if (error instanceof CustomError) {
             return { success: false, error: error.message };
@@ -200,6 +292,9 @@ export async function updateOrderStatusAction(
         await isAdmin();
         if (!(status in OrderStatus)) {
             throw new CustomError("Invalid status");
+        }
+        if (status === OrderStatus.Canceled) {
+            throw new CustomError("You can't cancel an order");
         }
         const prevStatus = await db.order
             .findFirst({ where: { id: orderId }, select: { order_status: true } })

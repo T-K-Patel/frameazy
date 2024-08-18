@@ -10,7 +10,7 @@ import { CartItemType, clearCartAction, getCartItems } from "@/serverActions/car
 import { placeOrderAction } from "@/serverActions/orders/orders.action";
 import { useFormState, useFormStatus } from "react-dom";
 import LoadingCart from "./(components)/LoadingCart";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 const ClearCartButton = ({ disabled }: { disabled: boolean }) => {
     const { pending } = useFormStatus();
@@ -40,6 +40,8 @@ function Cart() {
     const [placeOrderState, placeOrder] = useFormState(placeOrderAction, null);
     const addressFormRef = useRef<HTMLFormElement>(null);
 
+    const router = useRouter();
+
     const fetchCartItems = useCallback(() => {
         setLoading(true);
         getCartItems()
@@ -47,6 +49,7 @@ function Cart() {
                 console.log(res);
                 if (res.success) {
                     setCartItems(res.data);
+                    setError(null);
                 } else {
                     setCartItems([]);
                     setError(res.error);
@@ -97,12 +100,11 @@ function Cart() {
         if (placeOrderState?.success) {
             setCartItems([]);
             addressFormRef.current?.reset();
-        }
-    }, [placeOrderState]);
-
-    useEffect(() => {
-        if (placeOrderState?.success) {
             setShowDialog(true);
+        }
+        if (placeOrderState?.success == false) {
+            console.log(placeOrderState);
+            alert(placeOrderState.error);
         }
     }, [placeOrderState]);
 
@@ -111,7 +113,8 @@ function Cart() {
     }, [showDialog]);
 
     if (!session?.data?.user?.id) {
-        redirect(`/auth/login?callbackUrl=${encodeURIComponent(window.location.href)}`);
+        router.push(`/auth/login?callbackUrl=${encodeURIComponent(window.location.href)}`);
+        return <></>;
     }
     if (loading) {
         return <LoadingCart />;
@@ -296,7 +299,7 @@ function Cart() {
                                             <h1 className="text-3xl font-semibold">Order Placed</h1>
                                             <p className="text-lg">Your order has been placed successfully.</p>
                                             <>
-                                                <p>Order ID: 1</p>
+                                                <p>Order ID: {placeOrderState.data}</p>
                                                 <p>Amount: 20</p>
                                                 <div className="grid grid-cols-2 gap-4">
                                                     <Button
@@ -310,7 +313,7 @@ function Cart() {
                                                     <Button
                                                         size={"lg"}
                                                         className="mt-5"
-                                                        onClick={() => redirect("/dashboard")}
+                                                        onClick={() => router.push(`/orders/${placeOrderState.data}`)}
                                                     >
                                                         Go to Orders Page
                                                     </Button>

@@ -20,20 +20,28 @@ function Frames() {
     const [sidebarHidden, setSidebarHidden] = useState(true);
     const [frames, setFrames] = useState<FrameDataType[]>();
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     const debouncedFilters = useDebounce(filters, 800);
     useEffect(() => {
-        getFramesAction(debouncedFilters, page - 1).then((data) => {
-            if (data.success) {
-                // setPage(1);
-                setFrames(data.data.frames);
-                setTotalFrames(data.data.total);
-            }
-        }).catch((error) => {
-            console.log(error);
-        }).finally(() => {
-            setLoading(false);
-        });
+        getFramesAction(debouncedFilters, page - 1)
+            .then((data) => {
+                if (data.success) {
+                    // setPage(1);
+                    setFrames(data.data.frames);
+                    setTotalFrames(data.data.total);
+                    setError(null);
+                } else {
+                    setError(data.error);
+                    setFrames([]);
+                }
+            })
+            .catch((error) => {
+                console.log(error);
+            })
+            .finally(() => {
+                setLoading(false);
+            });
     }, [debouncedFilters, page]);
 
     const [winWidth, setWinWidth] = useState(window.innerWidth);
@@ -52,58 +60,68 @@ function Frames() {
 
     return (
         <section className="mx-auto w-11/12 max-w-screen-2xl gap-6">
-            <div className="grid w-full gap-4 md:grid-cols-4 md:p-4">
-                <aside className="col-span-1 hidden flex-col gap-y-10 py-5 md:flex">
-                    <FramesSideBar filters={filters} setFilters={setFilters} />
-                </aside>
-                <div className="flex flex-col gap-y-2 md:col-span-3">
-                    <div className="flex h-auto w-full justify-between">
-                        <div>
-                            {" "}
-                            <h2 className="text-2xl font-semibold leading-9">Frames</h2>
-                            <h4>
-                                Showing {(page - 1) * 18 + 1} - {Math.min(page * 18, totalFrames)} of {totalFrames}{" "}
-                                frames
-                            </h4>
-                        </div>
-                        <div className="relative md:hidden">
-                            <Dialog
-                                open={!sidebarHidden && winWidth < 786}
-                                onOpenChange={() => setSidebarHidden(!sidebarHidden)}
+            {error ? (
+                <p className="text-center text-2xl font-semibold text-red-500">{error ?? "No Frames"}</p>
+            ) : (
+                frames && (
+                    <div className="grid w-full gap-4 md:grid-cols-4 md:p-4">
+                        <aside className="col-span-1 hidden flex-col gap-y-10 py-5 md:flex">
+                            <FramesSideBar filters={filters} setFilters={setFilters} />
+                        </aside>
+                        <div className="flex flex-col gap-y-2 md:col-span-3">
+                            <div className="flex h-auto w-full justify-between">
+                                <div>
+                                    {" "}
+                                    <h2 className="text-2xl font-semibold leading-9">Frames</h2>
+                                    <h4>
+                                        Showing {(page - 1) * 18 + 1} - {Math.min(page * 18, totalFrames)} of{" "}
+                                        {totalFrames} frames
+                                    </h4>
+                                </div>
+                                <div className="relative md:hidden">
+                                    <Dialog
+                                        open={!sidebarHidden && winWidth < 786}
+                                        onOpenChange={() => setSidebarHidden(!sidebarHidden)}
+                                    >
+                                        <DialogTrigger asChild={true}>
+                                            <Button variant={"outline"} className="w-30 flex h-9 gap-2 p-2 md:hidden">
+                                                <h1 className="text-xs font-semibold leading-4">Filters</h1>
+                                                <RiArrowDropDownLine size={24} />
+                                            </Button>
+                                        </DialogTrigger>
+                                        <DialogContent className="max-w-11/12 max-h-[90%] overflow-auto rounded-lg">
+                                            <div className="flex h-fit w-auto flex-col items-center justify-start gap-y-5 overflow-y-auto md:gap-y-6">
+                                                <FramesSideBar filters={filters} setFilters={setFilters} />
+                                            </div>
+                                        </DialogContent>
+                                    </Dialog>
+                                </div>
+                            </div>
+                            <div
+                                className="grid place-content-center items-center justify-center gap-y-5 sm:grid-cols-2 sm:gap-x-4 lg:grid-cols-3"
+                                style={{ gridTemplateRows: "subgrid" }}
                             >
-                                <DialogTrigger asChild={true}>
-                                    <Button variant={"outline"} className="w-30 flex h-9 gap-2 p-2 md:hidden">
-                                        <h1 className="text-xs font-semibold leading-4">Filters</h1>
-                                        <RiArrowDropDownLine size={24} />
-                                    </Button>
-                                </DialogTrigger>
-                                <DialogContent className="max-w-11/12 max-h-[90%] overflow-auto rounded-lg">
-                                    <div className="flex h-fit w-auto flex-col items-center justify-start gap-y-5 overflow-y-auto md:gap-y-6">
-                                        <FramesSideBar filters={filters} setFilters={setFilters} />
-                                    </div>
-                                </DialogContent>
-                            </Dialog>
+                                {loading ? (
+                                    Array.from({ length: 6 }).map((_, ind) => {
+                                        return <FrameLoading key={ind} />;
+                                    })
+                                ) : frames?.length == 0 ? (
+                                    <>
+                                        <h1 className="text-center text-2xl font-semibold md:col-span-2 lg:col-span-3">
+                                            No Frames Found
+                                        </h1>
+                                    </>
+                                ) : (
+                                    frames?.map((frame, ind) => {
+                                        return <Item item={frame} key={ind} />;
+                                    })
+                                )}
+                            </div>
+                            <FramesPagination page={page} totalPages={totalPages} setPage={setPage} />
                         </div>
                     </div>
-                    <div
-                        className="grid place-content-center items-center justify-center gap-y-5 sm:grid-cols-2 sm:gap-x-4 lg:grid-cols-3"
-                        style={{ gridTemplateRows: "subgrid" }}
-                    >
-                        {loading?Array.from({length:6}).map((_,ind)=>{
-                            return <FrameLoading key={ind} />;
-                        }):frames?.length == 0 ? (
-                            <>
-                                <h1 className="text-center text-2xl font-semibold md:col-span-2 lg:col-span-3">
-                                    No Frames Found
-                                </h1>
-                            </>
-                        ):frames?.map((frame, ind) => {
-                            return <Item item={frame} key={ind} />;
-                        })}
-                    </div>
-                    <FramesPagination page={page} totalPages={totalPages} setPage={setPage} />
-                </div>
-            </div>
+                )
+            )}
         </section>
     );
 }

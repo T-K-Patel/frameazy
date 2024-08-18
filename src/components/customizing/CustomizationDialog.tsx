@@ -40,7 +40,6 @@ const CustomizationDialog = ({
     dialogOpen: isOpen,
     setDialogOpen: setIsOpen,
 }: ReturnType<typeof useFrames>) => {
-    console.log("Framing option:", framing);
     const router = useRouter();
     const session = useSession();
     const contentDivRef = useRef<HTMLDivElement>(null);

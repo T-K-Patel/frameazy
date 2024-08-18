@@ -48,7 +48,7 @@ function isvalidMatOptions(options: any): boolean {
 }
 
 export async function addCartItemAction(
-    data: Customization,
+    data: Omit<Customization, "id">,
     { frameId, qty }: { frameId?: string; qty?: number } = {},
 ): Promise<ServerActionReturnType<string>> {
     try {
@@ -56,17 +56,21 @@ export async function addCartItemAction(
         if ((await db.frame.findFirst({ where: { id: frameId } })) === null) {
             throw new CustomError("Invalid frame id");
         }
-        qty = Number(qty);
+        qty = Number(qty || 1);
         if (!Number.isInteger(qty) || !Number.isSafeInteger(qty) || qty < 1) {
             throw new CustomError("Quantity must be greater than 0");
         }
+
         let customization: Customization = {} as Customization;
+
         if (!isValidNumber(data.width)) {
             throw new CustomError("Invalid width");
         }
         if (!isValidNumber(data.height)) {
             throw new CustomError("Invalid height");
         }
+        customization.width = data.width;
+        customization.height = data.height;
         let isframeRequired = false;
         switch (data.type) {
             case CustomizationType.ImagePrintOnly:
@@ -173,7 +177,12 @@ export async function addCartItemAction(
                 throw new CustomError("Invalid customization type");
         }
         customization.type = data.type;
-
+        if (customization.type.startsWith("Image")) {
+            if (!data.image) {
+                throw new CustomError("Image is required");
+            }
+            customization.image = data.image;
+        }
         let frame = isframeRequired ? await db.frame.findFirst({ where: { id: frameId } }) : null;
 
         if (isframeRequired && frame === null) {
@@ -181,13 +190,22 @@ export async function addCartItemAction(
         }
 
         const single_unit_price = 5425; // TODO:calculate price based on customization
+        const custId = await db.customization.create({
+            data: {
+                ...customization,
+                mat: {
+                    set: customization.mat,
+                }
+            },
+        }).then((data) => data.id);
 
         const cartItem = await db.cartItem.create({
             data: {
                 userId,
-                customization,
+                customizationId: custId,
                 frameId,
                 single_unit_price,
+                quantity: qty,
             },
         });
 

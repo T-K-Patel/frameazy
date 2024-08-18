@@ -136,14 +136,13 @@ export async function placeOrderAction(state: any, formData: FormData): Promise<
         const userId = await isAuthenticated();
         const address = {
             name: formData.get("name") as string,
-            addressL1: formData.get("addressL1") as string,
-            addressL2: formData.get("addressL2") as string,
+            addressL1: formData.get("address-line-1") as string,
+            addressL2: formData.get("address-line-2") as string,
             city: formData.get("city") as string,
-            pincode: formData.get("pincode") as string,
+            pincode: formData.get("pin-code") as string,
             state: formData.get("state") as string,
             phone: formData.get("phone") as string,
         };
-        const delivery_charge = 30; // NOTE: Hardcoded delivery charge
         const cart = await db.cartItem.findMany({
             where: {
                 userId,
@@ -155,9 +154,11 @@ export async function placeOrderAction(state: any, formData: FormData): Promise<
 
         const addressValidate = AddressSchema.safeParse(address);
         if (!addressValidate.success) {
+            console.log(addressValidate.error.format());
             throw new CustomError("Address not in proper format");
         }
         const packaging = cart.reduce((acc, item) => acc + item.quantity * item.single_unit_price, 0);
+        const delivery_charge = 30; // NOTE: Hardcoded delivery charge
         const orderId = await db
             .$transaction(async (transaction) => {
                 const order = await transaction.order.create({
@@ -172,7 +173,7 @@ export async function placeOrderAction(state: any, formData: FormData): Promise<
 
                 const orderItemsArr = cart.map((item) => ({
                     orderId: order.id,
-                    customization: item.customization,
+                    customizationId: item.customizationId,
                     quantity: item.quantity,
                     single_unit_price: item.single_unit_price,
                     frameId: item.frameId,
