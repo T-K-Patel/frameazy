@@ -22,7 +22,7 @@ function Item({ item }: { item: FrameDataType | PopularFrameDataType }) {
                     className="h-auto w-full max-w-64 object-contain md:w-full"
                 />
             </div>
-            <div className="align-baseline max-md:col-span-6">
+            <div className="align-baseline max-md:col-span-6 max-w-64">
                 <h2 className="mb-2 mt-3 md:text-2xl">{item.name}</h2>
                 {"color" in item && (
                     <p className="items-center text-xs md:text-sm">

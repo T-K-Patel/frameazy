@@ -25,7 +25,7 @@ const Navbar = () => {
             path: "/frames",
         },
         {
-            name: "Contacts",
+            name: "Contact Us",
             path: "/contact",
         },
     ]);
@@ -82,7 +82,7 @@ const Navbar = () => {
                     path: "/frames",
                 },
                 {
-                    name: "Contacts",
+                    name: "Contact Us",
                     path: "/contact",
                 },
             ]);

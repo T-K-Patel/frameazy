@@ -34,7 +34,8 @@ function Hero() {
                             placeholder="blur"
                             blurDataURL={getImagePlaceholder(heroImage.width, heroImage.height)}
                             alt="hero"
-                            loading="lazy"
+                            loading="eager"
+                            priority={true}
                             className="w-full object-cover max-md:h-[375px] md:max-h-screen"
                         />
                     </div>

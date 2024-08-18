@@ -1,5 +1,4 @@
 "use client";
-import DropDown from "@/components/DropDown";
 import { OrderStatus, Customization } from "@prisma/client";
 import Image from "next/image";
 import React, { useState, useEffect } from "react";
@@ -10,7 +9,6 @@ const capitalizeFirstLetter = (str: string) => {
 };
 
 const OrderDetails = ({ params }: { params: { id: string } }) => {
-    console.log(params);
     const [order, setOrder] = useState<UserOrderDetails>({
         id: "",
         order_items: [],
@@ -133,8 +131,12 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                 </div>
             </section>
             <section className="flex flex-col gap-2 rounded-lg border border-[#F1F1F1] p-3">
-                <p className="border-b border-[#F1F1F1] text-2xl font-semibold leading-6">Update Order Status</p>
-                <DropDown items={Object.keys(OrderStatus)} value={order?.order_status!} onChange={() => {}} />
+                <p className="border-b border-[#F1F1F1] text-2xl font-semibold leading-6">Order Status</p>
+                <p
+                    className={`text-lg font-semibold ${order?.transaction_status==="Success"?"text-[#008C0E]":order?.transaction_status === "Pending" ? "text-[#D68D00]" : "text-red-500"}`}
+                >
+                    {order?.order_status}
+                </p>
             </section>
             <section className="flex flex-col gap-2 rounded-lg border border-[#F1F1F1] p-3">
                 <p className="border-b border-[#F1F1F1] text-2xl font-semibold leading-6">Payment</p>
@@ -142,6 +144,14 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                     className={`text-lg font-semibold ${order?.transaction_status === "Pending" ? "text-[#D68D00]" : "text-[#008C0E]"}`}
                 >
                     {order?.transaction_status}
+                </p>
+            </section>
+            <section className="flex flex-col gap-2 rounded-lg border border-[#F1F1F1] p-3">
+                <p className="border-b border-[#F1F1F1] text-2xl font-semibold leading-6">Delivery by</p>
+                <p
+                    className={`text-lg font-semibold`}
+                >
+                    {order?.delivery_date.toDateString()}
                 </p>
             </section>
             <section className="flex flex-col rounded-lg border border-[#F1F1F1] p-3">
