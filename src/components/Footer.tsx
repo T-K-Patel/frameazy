@@ -101,7 +101,7 @@ const Footer = () => {
                 </div>
             </div>
             <div className="mx-auto w-11/12 border-t-2 border-solid border-[#f1f1f1]">
-                <div className="mx-auto my-9 flex flex-col justify-start gap-5 font-semibold md:flex-row md:justify-between">
+                <div className="mx-auto py-9 flex flex-col justify-start gap-5 font-semibold md:flex-row md:justify-between">
                     <p>&copy;{new Date().getFullYear()} Copyright by Frameazy</p>
                     <Image src={Logo} alt="logo" loading="lazy" className="w-36" />
                     <p>Terms, Privacy policy</p>

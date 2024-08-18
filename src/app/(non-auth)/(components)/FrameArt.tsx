@@ -1,6 +1,9 @@
 import Image from "next/image";
 import ArtImg from "@/assets/art_1.png";
 import { getImagePlaceholder } from "@/components/imagePlaceholder";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { BsArrowRight } from "react-icons/bs";
 
 const FrameArt = () => {
     return (
@@ -12,14 +15,16 @@ const FrameArt = () => {
                     frame is not just a border for your artwork; it&apos;s an essential piece of the artwork itself.
                     Each frame we create is a testament to our commitment to artistry and craftsmanship.
                 </p>
-                {/* <Button
-                    size={"sm"}
-                    variant={"outline"}
-                    className="mt-8 h-auto border border-black bg-transparent px-8 py-4 text-xl font-semibold text-black transition-all duration-200 active:scale-90"
-                >
-                    Get Started&nbsp;
-                    <BsArrowRight />
-                </Button> */}
+                <Link href="/frames">
+                    <Button
+                        size={"sm"}
+                        variant={"outline"}
+                        className="mt-8 h-min w-min border border-black bg-transparent px-8 py-4 text-xl font-semibold text-black transition-all duration-200 active:scale-90"
+                    >
+                        Get Framing&nbsp;
+                        <BsArrowRight />
+                    </Button>
+                </Link>
             </div>
             <div className="flex flex-1 justify-end">
                 <Image
