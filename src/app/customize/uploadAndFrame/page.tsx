@@ -1,6 +1,5 @@
 "use client";
 import DropDown, { FrameDropdown } from "@/components/DropDown";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import React, { useEffect, useState } from "react";
 import { useFrames } from "@/context/frames-context";
@@ -11,6 +10,8 @@ import { Glazing, Printing, Backing, Stretching, Sides, CustomizationType, Custo
 import { getFramesForCustomizatinAction, FramesForCustomizationType } from "@/serverActions/frames/frame.action";
 import Image from "next/image";
 import { addCartItemAction } from "@/serverActions/cart/addCartItem.action";
+import { useRouter } from "next/navigation";
+import AddToCartDialog from "../AddToCartDialog";
 
 type CustomizeOptionsProps =
     | {
@@ -49,6 +50,9 @@ function Page() {
     const [mat, setMat] = useState<matOptionsProps>([{ width: 0.75, color: "#ffffff", id: new Date().toString() }]);
 
     const [error, setError] = useState<string | null>(null);
+    const [addingToCart, setAddingToCart] = useState(false);
+
+    const router = useRouter();
 
     useEffect(() => {
         if (frameOptions.framingStyle === "uploadAndFrame") {
@@ -192,7 +196,7 @@ function Page() {
         },
     );
 
-    const addToCart = () => {
+    const addToCart = (qty: number) => {
         let custType: CustomizationType = "ImageCanvasPrint";
         switch (frameOptions.data.frameType) {
             case "printOnly":
@@ -222,10 +226,41 @@ function Page() {
             mat: mat.map((m) => ({ color: m.color, width: m.width })),
         };
 
-        addCartItemAction(data, { frameId: customizingFrame?.id || "" })
+        if (!data.glazing && customizeOptions === "framedWithMG") {
+            setError("Please select a glazing option");
+            return;
+        }
+        if (!data.printing) {
+            setError("Please select a printing option");
+            return;
+        }
+        if (!data.backing && customizeOptions === "framedWithMG") {
+            setError("Please select a backing option");
+            return;
+        }
+        if (!data.stretching && (customizeOptions === "canvasPrint" || customizeOptions === "framedWithoutMG")) {
+            setError("Please select a stretching option");
+            return;
+        }
+        if (!data.sides && customizeOptions === "canvasPrint") {
+            setError("Please select a sides option");
+            return;
+        }
+
+        if (customizingFrame && frameOptions.data.frameType?.startsWith("framed") && !customizingFrame.id) {
+            setError("Please select a frame");
+            return;
+        }
+
+        setAddingToCart(true);
+        addCartItemAction(data, {
+            frameId: customizingFrame && frameOptions.data.frameType?.startsWith("framed") ? customizingFrame.id : "",
+            qty,
+        })
             .then((data) => {
                 if (data.success) {
                     console.log("Added to cart");
+                    router.push("/cart");
                 } else {
                     setError(data.error);
                 }
@@ -233,6 +268,9 @@ function Page() {
             .catch((error) => {
                 console.log(error);
                 setError("Something went wrong");
+            })
+            .finally(() => {
+                setAddingToCart(false);
             });
     };
 
@@ -244,7 +282,7 @@ function Page() {
                     matOptions={mat}
                     totalSize={totalSize}
                     frameBorder={
-                        customizingFrame
+                        customizingFrame && frameOptions.data.frameType?.startsWith("framed")
                             ? {
                                   borderWidth: customizingFrame.borderWidth || 0,
                                   src: customizingFrame.borderSrc || "",
@@ -452,6 +490,11 @@ function Page() {
                                 }
                             />
                         </div>
+                        {error && (
+                            <div className="flex flex-col gap-y-2">
+                                <p className="text-red-500">{error}</p>
+                            </div>
+                        )}
                         <div className="grid items-center gap-4 md:grid-cols-2">
                             <div className="grid justify-between max-md:grid-cols-3 md:flex">
                                 <span>
@@ -460,12 +503,7 @@ function Page() {
                                 <span className="text-2xl font-bold max-md:col-span-2">$ 2,00.00</span>
                             </div>
                             <div>
-                                <Button size={"lg"} className="h-auto w-full py-4" onClick={addToCart}>
-                                    Add to Cart
-                                </Button>
-                                <div className="flex flex-col gap-y-2">
-                                    {error && <p className="text-red-500">{error}</p>}
-                                </div>
+                                <AddToCartDialog addToCart={addToCart} addingToCart={addingToCart} />
                             </div>
                         </div>
                     </div>

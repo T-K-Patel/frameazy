@@ -6,7 +6,7 @@ import { OrderStatus, PaymentStatus, Customization, Address } from "@prisma/clie
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import { z } from "zod";
-
+import { ObjectIdValidation } from "@/utils/validators";
 async function isAuthenticated() {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
@@ -20,7 +20,7 @@ export type UserOrders = {
     order_status: OrderStatus;
     createdAt: Date;
     transaction_status: PaymentStatus;
-    delivery_date: Date;
+    delivery_date: Date | null;
     delivery_charge: number,
     packaging: number,
     discount: number
@@ -70,14 +70,16 @@ export type UserOrderDetails = {
     shipping_address: Address,
     order_status: OrderStatus,
     delivery_charge: number,
+    createdAt: Date,
     packaging: number,
     discount: number,
     transaction_status: PaymentStatus,
-    delivery_date: Date,
+    delivery_date: Date | null,
 };
 export async function getOrderDetailsAction(id: string): Promise<ServerActionReturnType<UserOrderDetails>> {
     try {
         const userId = await isAuthenticated();
+        ObjectIdValidation(id, "Invalid Order Id");
         const order = await db.order.findFirst({
             where: {
                 id,
@@ -106,10 +108,11 @@ export async function getOrderDetailsAction(id: string): Promise<ServerActionRet
                 discount: true,
                 transaction_status: true,
                 delivery_date: true,
+                createdAt: true,
             },
         });
 
-        if (!order) throw new CustomError("Item not found in cart");
+        if (!order) throw new CustomError("Order Not found");
 
         return { success: true, data: order };
     } catch (error) {
@@ -122,13 +125,13 @@ export async function getOrderDetailsAction(id: string): Promise<ServerActionRet
 }
 
 const AddressSchema = z.object({
-    name: z.string(),
-    addressL1: z.string(),
-    addressL2: z.string(),
-    city: z.string(),
-    pincode: z.string(),
-    state: z.string(),
-    phone: z.string(),
+    name: z.string().min(3),
+    addressL1: z.string().min(3),
+    addressL2: z.string().min(3),
+    city: z.string().min(3),
+    pincode: z.string().regex(/^\d{6}$/, "Invalid pincode"),
+    state: z.string().min(3),
+    phone: z.string().regex(/^\d{10}$/, "Invalid phone number"),
 });
 
 export async function placeOrderAction(state: any, formData: FormData): Promise<ServerActionReturnType<string>> {
@@ -167,7 +170,6 @@ export async function placeOrderAction(state: any, formData: FormData): Promise<
                         shipping_address: address,
                         delivery_charge,
                         packaging,
-                        delivery_date: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
                     },
                 });
 

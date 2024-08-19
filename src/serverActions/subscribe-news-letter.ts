@@ -3,7 +3,7 @@
 import { CustomError } from "@/lib/CustomError";
 import { db } from "../lib/db";
 import { ServerActionReturnType } from "@/types/serverActionReturnType";
-import { validateEmail } from "./utils/validators";
+import { validateEmail } from "../utils/validators";
 import { randomBytes } from "crypto";
 
 export async function subscribeNewsLetterAction(

@@ -110,6 +110,9 @@ function Cart() {
 
     useEffect(() => {
         document.body.classList.toggle("overflow-hidden", showDialog);
+        return () => {
+            document.body.classList.remove("overflow-hidden");
+        };
     }, [showDialog]);
 
     if (!session?.data?.user?.id) {
@@ -300,7 +303,6 @@ function Cart() {
                                             <p className="text-lg">Your order has been placed successfully.</p>
                                             <>
                                                 <p>Order ID: {placeOrderState.data}</p>
-                                                <p>Amount: 20</p>
                                                 <div className="grid grid-cols-2 gap-4">
                                                     <Button
                                                         size={"lg"}

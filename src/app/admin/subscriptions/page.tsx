@@ -29,8 +29,8 @@ const AdminSubscriptionPage = () => {
     }, []);
     return (
         <div className="mx-auto flex w-11/12 max-w-screen-2xl flex-col gap-y-12 py-12">
-            <section className="flex flex-col gap-6 rounded-3xl border border-[#F1F1F1] p-5">
-                <h1 className="leading-12 border-b border-[#F1F1F1] pb-5 text-3xl font-semibold">Subscriptions</h1>
+            <section className="flex flex-col gap-6 rounded-3xl border border-[#F1F1F1] p-3">
+                <h1 className="leading-12 pb-5 text-2xl font-semibold">Subscriptions</h1>
                 {loading ? (
                     <div className="flex flex-col gap-2">
                         <Skeleton className="md:h-18 h-10 rounded-xl" />
@@ -41,20 +41,42 @@ const AdminSubscriptionPage = () => {
                 ) : error || subscriptions?.length == 0 ? (
                     <p className="text-center text-lg font-semibold text-red-500">{error ?? "No subscriptions yet"}</p>
                 ) : (
-                    subscriptions?.map((s, ind) => {
-                        return (
-                            <div key={ind} className="flex w-full items-center justify-between">
-                                <p className="text-xl font-semibold">{ind + 1}</p>
-                                <p className="text-xl font-semibold">{s.email}</p>
-                                <p className="text-xl font-semibold">{s.createdAt.toDateString()}</p>
-                                <p
-                                    className={`text-xl font-semibold ${s.status === SubscriptionStatus.Subscribed ? "text-green-500" : "text-red-500"}`}
-                                >
-                                    {s.status}
-                                </p>
-                            </div>
-                        );
-                    })
+                    <div className="w-full overflow-x-auto">
+                        <table className="w-full">
+                            <tbody className="w-full">
+                                {subscriptions?.map((s, ind) => {
+                                    return (
+                                        <tr
+                                            key={ind}
+                                            className="w-fit items-center gap-x-8 rounded-lg border-b border-[#F1F1F1] *:p-3"
+                                        >
+                                            <td className="text-nowrap text-center font-semibold md:text-xl">
+                                                {ind + 1}
+                                            </td>
+                                            <td className="text-nowrap text-center font-semibold md:text-xl">
+                                                {s.email}
+                                            </td>
+                                            <td className="text-nowrap text-center font-semibold md:text-xl">
+                                                {s.createdAt.toLocaleString("en-in", {
+                                                    weekday: "short",
+                                                    year: "numeric",
+                                                    month: "short",
+                                                    day: "numeric",
+                                                    hour: "numeric",
+                                                    minute: "numeric",
+                                                })}
+                                            </td>
+                                            <td
+                                                className={`text-nowrap text-center font-semibold md:text-xl ${s.status === SubscriptionStatus.Subscribed ? "text-green-500" : "text-red-500"}`}
+                                            >
+                                                {s.status}
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
                 )}
             </section>
         </div>

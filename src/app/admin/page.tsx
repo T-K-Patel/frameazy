@@ -178,53 +178,15 @@ const AdminDashboard = () => {
                                     />
                                 </div>
                             </div>
-                            <div className="grid grid-cols-2">
-                                <div className="mt-5">
-                                    <div className="flex flex-col gap-y-1">
-                                        <span className="text-xl font-semibold">Border Thickness</span>
-                                        <ul className="flex flex-col gap-y-5">
-                                            <li className="flex items-center gap-x-11">
-                                                <p>Thickenss:</p>
-                                                <div className="flex items-center gap-x-4">
-                                                    <Input
-                                                        name="borderWidth"
-                                                        className="h-8 w-14 overflow-hidden rounded-lg bg-[#F5F4F4] text-center"
-                                                        placeholder="0"
-                                                    />
-                                                    <span className="font-semibold">In</span>
-                                                </div>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div className="mt-5">
-                                    <div className="flex flex-col gap-y-1">
-                                        <span className="text-xl font-semibold">Standard size(optional)</span>
-                                        <ul className="flex flex-col gap-y-5">
-                                            <li className="flex items-center gap-x-11">
-                                                <p>Width:</p>
-                                                <div className="flex items-center gap-x-4">
-                                                    <Input
-                                                        name="productWidth"
-                                                        className="h-8 w-14 overflow-hidden rounded-lg bg-[#F5F4F4] text-center"
-                                                        placeholder="0"
-                                                    />
-                                                    <span className="font-semibold">In</span>
-                                                </div>
-                                            </li>
-                                            <li className="flex items-center gap-x-10">
-                                                <p>Height:</p>
-                                                <div className="flex items-center gap-x-4">
-                                                    <Input
-                                                        name="productHeight"
-                                                        className="h-8 w-14 overflow-hidden rounded-lg bg-[#F5F4F4] text-center"
-                                                        placeholder="0"
-                                                    />
-                                                    <span className="align-center font-semibold">In</span>
-                                                </div>
-                                            </li>
-                                        </ul>
-                                    </div>
+                            <div className="flex justify-between p-3">
+                                <span className="text-xl font-semibold">Border Thickness</span>
+                                <div className="flex items-center gap-x-4">
+                                    <Input
+                                        name="borderWidth"
+                                        className="h-8 w-14 overflow-hidden rounded-lg bg-[#F5F4F4] text-center"
+                                        placeholder="0"
+                                    />
+                                    <span className="font-semibold">In</span>
                                 </div>
                             </div>
                         </div>

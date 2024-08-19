@@ -275,7 +275,7 @@ model Order {
   transaction_status PaymentStatus @default(UnInitiated)
   paymentOrderId     String?
   shipping_address   Address
-  delivery_date      DateTime
+  delivery_date      DateTime?
   transactions       Transaction[]
 
   createdAt DateTime @default(now())

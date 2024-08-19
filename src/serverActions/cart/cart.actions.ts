@@ -84,6 +84,8 @@ export async function deleteCartItem(itemId: string): Promise<ServerActionReturn
     try {
         const userId = await isAuthenticated();
 
+
+        // TODO: delete customization also
         const deletedItem = await db.cartItem.delete({ where: { id: itemId, userId } });
 
         if (!deletedItem) throw new CustomError("Item not found in cart");
@@ -101,6 +103,7 @@ export async function clearCartAction(): Promise<ServerActionReturnType<string>>
     try {
         const userId = await isAuthenticated();
 
+        // TODO: delete customization also
         await db.cartItem.deleteMany({ where: { userId: userId } });
         return { success: true, data: "Cart cleared" };
     } catch (error) {

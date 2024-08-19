@@ -3,78 +3,12 @@ import { Customization } from "@prisma/client";
 import Image from "next/image";
 import React, { useState, useEffect } from "react";
 import { getOrderDetailsAction, UserOrderDetails } from "@/serverActions/orders/orders.action";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { IoMdOpen } from "react-icons/io";
+import { LoadingSkeleton } from "./LoadingSkeleton";
 
 const capitalizeFirstLetter = (str: string) => {
     return str.charAt(0).toUpperCase() + str.slice(1);
-};
-
-const LoadingComp = () => {
-    return (
-        <>
-            <section className="flex flex-col gap-2 rounded-lg border border-[#F1F1F1] p-3">
-                <p className="border-b border-[#F1F1F1] text-2xl font-semibold">Order Items</p>
-                <ul className="flex flex-col gap-2 border-b border-[#F1F1F1]">
-                    <Skeleton className="h-8" />
-                    <Skeleton className="h-8" />
-                    <Skeleton className="h-8" />
-                    <Skeleton className="h-8" />
-                </ul>
-                <div className="flex flex-col items-end gap-2 border-b border-[#F1F1F1]">
-                    <div className="grid grid-cols-2 gap-x-5">
-                        <p className="text-sm font-semibold leading-5 text-[#A3A1A1]">Discount</p>
-                        <p className={`font-semibold leading-6`}>
-                            <Skeleton className="h-5 w-8" />
-                        </p>
-                        <p className="text-sm font-semibold leading-5 text-[#A3A1A1]">Delivery</p>
-                        <p className={`font-semibold leading-6`}>
-                            <Skeleton className="h-5 w-8" />
-                        </p>
-                        <p className="text-sm font-semibold leading-5 text-[#A3A1A1]">Package</p>
-                        <p className={`font-semibold leading-6`}>
-                            <Skeleton className="h-5 w-8" />
-                        </p>
-                    </div>
-                </div>
-                <div className="flex w-full flex-col items-end align-middle">
-                    <div className="grid grid-cols-2 gap-x-5">
-                        <p className="text-sm font-semibold leading-5 text-[#A3A1A1]">Total</p>
-                        <p className={`text-lg font-bold leading-6`}>
-                            <Skeleton className="h-5 w-8" />
-                        </p>
-                    </div>
-                </div>
-            </section>
-            <section className="flex flex-col gap-2 rounded-lg border border-[#F1F1F1] p-3">
-                <p className="border-b border-[#F1F1F1] text-2xl font-semibold leading-6">Order Status</p>
-                <Skeleton className="w-30 h-10" />
-            </section>
-            <section className="flex flex-col gap-2 rounded-lg border border-[#F1F1F1] p-3">
-                <p className="border-b border-[#F1F1F1] text-2xl font-semibold leading-6">Payment</p>
-                <Skeleton className="w-15 h-10" />
-            </section>
-            <section className="flex flex-col rounded-lg border border-[#F1F1F1] p-3">
-                <p className="border-b border-[#F1F1F1] pb-2 text-2xl font-semibold leading-6">Delivery Address</p>
-                <p className="text-md font-semibold text-[#A3A1A1]">
-                    <Skeleton className="h-8 w-10" />
-                </p>
-                <p className="text-md font-semibold text-[#A3A1A1]">
-                    <Skeleton className="h-8 w-10" />
-                </p>
-                <p className="text-md font-semibold text-[#A3A1A1]">
-                    <Skeleton className="h-8 w-10" />
-                </p>
-                <p className="text-md font-semibold text-[#A3A1A1]">
-                    <Skeleton className="h-8 w-10" />
-                </p>
-                <p className="text-md font-semibold text-[#A3A1A1]">
-                    <Skeleton className="h-8 w-10" />
-                </p>
-            </section>
-        </>
-    );
 };
 
 const OrderDetails = ({ params }: { params: { id: string } }) => {
@@ -105,43 +39,71 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
     return (
         <div className="mx-auto flex w-11/12 max-w-screen-2xl flex-col gap-8 py-5">
             {loading ? (
-                <LoadingComp />
+                <LoadingSkeleton />
             ) : error ? (
                 <p className="text-center text-2xl font-semibold text-red-500">{error ?? "No new orders"}</p>
             ) : (
                 order && (
                     <>
+                        <section className="flex flex-col rounded-lg border border-[#F1F1F1] p-3">
+                            <p className="p border-b border-[#F1F1F1] pb-3 text-2xl font-semibold leading-6">
+                                Order Details
+                            </p>
+                            <p className="text-md py-3 font-semibold text-[#A3A1A1]">
+                                <b className="pr-5 text-black">Order Id: </b>
+                                {order.id}
+                            </p>
+                            <p className="text-md font-semibold text-[#A3A1A1]">
+                                <b className="pr-5 text-black">Order Date: </b>
+                                {order.createdAt.toLocaleString("en-in", {
+                                    weekday: "short",
+                                    year: "numeric",
+                                    month: "short",
+                                    day: "numeric",
+                                    hour: "numeric",
+                                    minute: "numeric",
+                                })}
+                            </p>
+                        </section>
                         <section className="flex flex-col gap-2 rounded-lg border border-[#F1F1F1] p-3">
                             <p className="items-center border-b border-[#F1F1F1] pb-3 text-2xl font-semibold">
                                 Order Items
                             </p>
-                            <ul className="flex flex-col gap-2 border-b border-[#F1F1F1]">
+                            <ul className="flex flex-col gap-2">
                                 {order?.order_items.map((item) => {
                                     return (
-                                        <div className="flex flex-col gap-1 rounded-lg border border-[#F1F1F1]" key={item.id}>
+                                        <div
+                                            className="flex flex-col gap-1 rounded-lg border border-[#F1F1F1]"
+                                            key={item.id}
+                                        >
                                             <div className="flex items-center gap-8 border-b border-[#F1F1F1] p-3 text-center">
-                                                {item.frame && (
+                                                {(item.frame?.image || item.customization.image) && (
                                                     <>
                                                         <Image
-                                                            src={item.frame?.image!}
+                                                            src={item.customization.image || item.frame?.image || ""}
                                                             width={100}
                                                             height={100}
-                                                            alt={item.frame?.name!}
+                                                            alt={item.frame?.name || ""}
                                                             className="h-20 w-20 object-contain"
                                                         />
-                                                        <p className="w-full text-start text-xl font-semibold leading-6">
-                                                            {item.frame.name},
-                                                            <p className="text-base text-[#A3A1A1]">
-                                                                {item.customization.type}
-                                                            </p>
-                                                        </p>
                                                     </>
                                                 )}
-                                                <p className="font-semibold leading-6 text-[#A3A1A1] md:text-lg">
-                                                    {item.quantity}x
-                                                </p>
+                                                <div className="w-full">
+                                                    <p className="w-full text-start text-xl font-semibold leading-6">
+                                                        {item.frame?.name || "No Frame"}
+                                                    </p>
+                                                    <p className="w-full text-start text-base text-[#A3A1A1]">
+                                                        {item.customization.type}
+                                                    </p>
+                                                </div>
                                                 <p className="font-semibold leading-6 md:text-lg">
                                                     {item.single_unit_price}
+                                                </p>
+                                                <p className="font-semibold leading-6 text-[#A3A1A1] md:text-lg">
+                                                    x{item.quantity}
+                                                </p>
+                                                <p className="font-semibold leading-6 md:text-lg">
+                                                    {item.single_unit_price * item.quantity}
                                                 </p>
                                             </div>
                                             <div className="flex flex-wrap justify-start gap-2 border-b border-[#F1F1F1] p-2">
@@ -182,29 +144,34 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                                                     </strong>
                                                 </p>
                                             </div>
-                                            <div className="flex flex-wrap items-center gap-10 p-3">
-                                                <b className="pb-7">Mat: </b>
-                                                {item.customization.mat.map((mat: any, ind: number) => {
-                                                    return (
-                                                        <div
-                                                            className="flex flex-col items-center gap-2 text-center"
-                                                            key={ind}
-                                                        >
+                                            {item.customization.mat.length == 0 ? (
+                                                <></>
+                                            ) : (
+                                                <div className="flex flex-wrap items-center gap-10 p-3">
+                                                    <b className="pb-7">Mat: </b>
+                                                    {item.customization.mat.map((mat: any, ind: number) => {
+                                                        return (
                                                             <div
-                                                                className="h-5 w-5 overflow-hidden rounded-md border border-black"
-                                                                style={{ backgroundColor: mat.colour }}
-                                                            ></div>
-                                                            <p className="font-semibold">{mat.width.toFixed(2)}</p>
-                                                        </div>
-                                                    );
-                                                })}
-                                            </div>
+                                                                className="flex flex-col items-center gap-2 text-center"
+                                                                key={ind}
+                                                            >
+                                                                <div
+                                                                    title={mat.colour}
+                                                                    className="h-5 w-5 overflow-hidden rounded-md border border-black"
+                                                                    style={{ backgroundColor: mat.colour }}
+                                                                ></div>
+                                                                <p className="font-semibold">{mat.width.toFixed(2)}</p>
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            )}
                                         </div>
                                     );
                                 })}
                             </ul>
-                            <div className="flex justify-end gap-2 border-b border-[#F1F1F1]">
-                                <div className="grid grid-cols-2 gap-x-10">
+                            <div className="flex justify-end gap-2">
+                                <div className="grid grid-cols-2 gap-x-10 py-3">
                                     <p className="text-lg font-semibold leading-5 text-[#A3A1A1]">Discount</p>
                                     <p className={`text-end font-semibold leading-6`}>
                                         {(order.discount / 100).toFixed(2)}
@@ -224,7 +191,7 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                                 </div>
                             </div>
                         </section>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
                             <section className="flex flex-col gap-2 rounded-lg border border-[#F1F1F1] p-3">
                                 <p className="border-b border-[#F1F1F1] pb-3 text-2xl font-semibold leading-6">
                                     Order Status
@@ -236,14 +203,16 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                                 </p>
                             </section>
                             <section className="flex flex-col gap-2 rounded-lg border border-[#F1F1F1] p-3">
-                                <p className="border-b border-[#F1F1F1] pb-3 text-2xl font-semibold leading-6">Payment</p>
-                                <div className="flex justify-center gap-x-5">
+                                <p className="border-b border-[#F1F1F1] pb-3 text-2xl font-semibold leading-6">
+                                    Payment
+                                </p>
+                                <div className="flex gap-x-5">
                                     {order?.order_status === "Received" ? (
                                         <p className={`text-lg font-semibold text-red-500`}>Not Approved yet</p>
                                     ) : order.order_status == "Approved" ? (
                                         <>
                                             <Button size={"lg"}>
-                                                Pay Now&nbsp;
+                                                Pay with Razorpay&nbsp;
                                                 <IoMdOpen size={20} />
                                             </Button>
                                         </>
@@ -256,9 +225,13 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                                     )}
                                 </div>
                             </section>
-                            <section className="flex flex-col gap-2 rounded-lg border border-[#F1F1F1] p-3">
-                                <p className="border-b border-[#F1F1F1] text-2xl font-semibold leading-6">Delivery by</p>
-                                <p className={`text-lg font-semibold`}>{order?.delivery_date.toDateString()}</p>
+                            <section className="flex flex-col gap-2 rounded-lg border border-[#F1F1F1] p-3 sm:col-span-2 lg:col-span-1">
+                                <p className="border-b border-[#F1F1F1] pb-3 text-2xl font-semibold leading-6">
+                                    Delivery by
+                                </p>
+                                <p className={`text-lg font-semibold`}>
+                                    {order?.delivery_date?.toDateString() || "Not Scheduled"}
+                                </p>
                             </section>
                         </div>
                         <section className="flex flex-col rounded-lg border border-[#F1F1F1] p-3">

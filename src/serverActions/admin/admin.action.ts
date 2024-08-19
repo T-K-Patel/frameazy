@@ -4,7 +4,6 @@ import { db } from "@/lib/db";
 import { CustomError } from "@/lib/CustomError";
 import {
     Message,
-    Transaction,
     Subscription,
     Category,
     Color,
@@ -124,11 +123,31 @@ export async function getMessagesAction(): Promise<ServerActionReturnType<Messag
     }
 }
 
+export type TransactionType = {
+    id: string;
+    orderId: string;
+    paymentOrderId: string;
+    paymentId: string | null;
+    amount: number;
+    status: PaymentStatus;
+    updatedAt: Date;
+};
+
 // LATER: Add pagination
-export async function getTransactionsAction(): Promise<ServerActionReturnType<Transaction[]>> {
+export async function getTransactionsAction(): Promise<ServerActionReturnType<TransactionType[]>> {
     try {
         await isAdmin();
-        const transactions = await db.transaction.findMany();
+        const transactions = await db.transaction.findMany({
+            select: {
+                id: true,
+                amount: true,
+                status: true,
+                orderId: true,
+                paymentOrderId: true,
+                paymentId: true,
+                updatedAt: true,
+            }
+        });
 
         return { success: true, data: transactions };
     } catch (error) {
@@ -170,7 +189,7 @@ export type AdminOrdersType = {
     delivery_charge: number;
     packaging: number;
     discount: number;
-    delivery_date: Date;
+    delivery_date: Date | null;
     transaction_status: string;
 };
 
@@ -207,7 +226,7 @@ export type AdminOrderDetailsType = {
     delivery_charge: number,
     packaging: number,
     discount: number,
-    delivery_date: Date,
+    delivery_date: Date | null,
     transaction_status: PaymentStatus,
     shipping_address: Address,
     order_items: {
@@ -285,11 +304,13 @@ export async function getOrderDetailsAction(id: string): Promise<ServerActionRet
 }
 
 export async function updateOrderStatusAction(
-    orderId: string,
-    status: OrderStatus,
-): Promise<ServerActionReturnType<boolean>> {
+    state: any,
+    formData: FormData,
+): Promise<ServerActionReturnType<OrderStatus>> {
     try {
         await isAdmin();
+        const orderId = formData.get("orderId") as string;
+        const status: OrderStatus = formData.get("status") as OrderStatus;
         if (!(status in OrderStatus)) {
             throw new CustomError("Invalid status");
         }
@@ -318,12 +339,67 @@ export async function updateOrderStatusAction(
         if (order?.order_status !== status) {
             throw new CustomError("Failed to update order status");
         }
-        return { success: true, data: true };
+        return { success: true, data: status };
     } catch (error) {
         if (error instanceof CustomError) {
             return { success: false, error: error.message };
         }
         console.error("updateOrderStatusAction error", error);
+        return { success: false, error: "Something went wrong" };
+    }
+}
+
+
+export async function updateDeliveryDateAction(state: any,
+    formData: FormData,
+): Promise<ServerActionReturnType<Date>> {
+    try {
+
+        await isAdmin();
+        const orderId = formData.get("orderId") as string;
+        const deliveryDate = formData.get("deliveryDate") as string;
+        if (!deliveryDate) {
+            throw new CustomError("Delivery Date is required");
+        }
+        let parsedDeliveryDate: Date | null = null;
+        try {
+            parsedDeliveryDate = new Date(deliveryDate);
+            if (isNaN(parsedDeliveryDate.getTime())) {
+                throw new CustomError("Invalid delivery date");
+            }
+            if (parsedDeliveryDate.getTime() < new Date().getTime()) {
+                throw new CustomError("Invalid delivery date");
+            }
+
+        } catch (error) {
+            throw new CustomError("Invalid delivery date");
+        }
+        const order = await db.order.update({
+            where: {
+                id: orderId,
+            },
+            data: {
+                delivery_date: parsedDeliveryDate,
+            },
+            select: {
+                delivery_date: true,
+            },
+        });
+
+        if (!order) {
+            throw new CustomError("Failed to update delivery date");
+        }
+        if (!order.delivery_date) {
+            throw new CustomError("Failed to update delivery date");
+        }
+
+        return { success: true, data: order.delivery_date };
+
+    } catch (error) {
+        if (error instanceof CustomError) {
+            return { success: false, error: error.message };
+        }
+        console.error("updateDeliveryDate error", error);
         return { success: false, error: "Something went wrong" };
     }
 }

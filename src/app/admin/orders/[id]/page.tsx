@@ -7,22 +7,67 @@ import {
     getOrderDetailsAction,
     updateOrderStatusAction,
     AdminOrderDetailsType,
+    updateDeliveryDateAction,
 } from "@/serverActions/admin/admin.action";
 import { Button } from "@/components/ui/button";
 
 import { LoadingSkeleton } from "./LoadingSkeleton";
+import { useFormState } from "react-dom";
+import { useFormStatus } from "react-dom";
+import { Input } from "@/components/ui/input";
 
 const capitalizeFirstLetter = (str: string) => {
     return str.charAt(0).toUpperCase() + str.slice(1);
+};
+
+const UpdateButton = ({ disabled }: { disabled: boolean }) => {
+    const { pending } = useFormStatus();
+    return <Button disabled={disabled || pending}>{pending ? "Updating" : "Update"}</Button>;
 };
 
 const OrderDetails = ({ params }: { params: { id: string } }) => {
     const [order, setOrder] = useState<AdminOrderDetailsType | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+
     const [status, setStatus] = useState<OrderStatus>(OrderStatus.Received);
+    const [deliveryDate, setDeliveryDate] = useState<Date | null>(new Date());
 
     const [updateStatusError, setUpdateStatusError] = useState<string | null>(null);
+    const [deliveryStatusError, setDeliveryStatusError] = useState<string | null>(null);
+
+    const [statusUpdateState, statusUpdateAction] = useFormState(updateOrderStatusAction, null);
+    const [deliveryUpdateState, deliveryUpdateAction] = useFormState(updateDeliveryDateAction, null);
+
+    useEffect(() => {
+        if (!statusUpdateState) return;
+        if (statusUpdateState?.success) {
+            setOrder((o: AdminOrderDetailsType | null) => (o ? { ...o, order_status: statusUpdateState.data } : null));
+            setUpdateStatusError(null);
+            return;
+        }
+        if (statusUpdateState?.success == false) {
+            setUpdateStatusError(statusUpdateState.error);
+            return;
+        }
+        setUpdateStatusError("Something went wrong");
+    }, [statusUpdateState]);
+
+    useEffect(() => {
+        if (!deliveryUpdateState) return;
+        if (deliveryUpdateState?.success) {
+            setOrder((o: AdminOrderDetailsType | null) =>
+                o ? { ...o, delivery_date: deliveryUpdateState.data } : null,
+            );
+            setDeliveryStatusError(null);
+            return;
+        }
+        if (deliveryUpdateState?.success == false) {
+            setDeliveryStatusError(deliveryUpdateState.error);
+            return;
+        }
+        setDeliveryStatusError("Something went wrong");
+    }, [deliveryUpdateState]);
 
     useEffect(() => {
         getOrderDetailsAction(params.id)
@@ -30,6 +75,7 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                 if (data.success) {
                     setOrder(data.data);
                     setStatus(data.data.order_status);
+                    setDeliveryDate(data.data.delivery_date);
                     setError(null);
                 } else {
                     setError(data.error);
@@ -42,7 +88,7 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                 setOrder(null);
             })
             .finally(() => {
-                setLoading(false);
+                setLoading(false); //TODO Editting LoadingSkeleton
             });
     }, [params.id]);
 
@@ -66,35 +112,67 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                                 {order.user.email}
                             </p>
                         </section>
+                        <section className="flex flex-col rounded-lg border border-[#F1F1F1] p-3">
+                            <p className="p border-b border-[#F1F1F1] pb-3 text-2xl font-semibold leading-6">
+                                Order Details
+                            </p>
+                            <p className="text-md py-3 font-semibold text-[#A3A1A1]">
+                                <b className="pr-5 text-black">Order Id: </b>
+                                {order.id}
+                            </p>
+                            <p className="text-md font-semibold text-[#A3A1A1]">
+                                <b className="pr-5 text-black">Order Date: </b>
+                                {order.createdAt.toLocaleString("en-in", {
+                                    weekday: "short",
+                                    year: "numeric",
+                                    month: "short",
+                                    day: "numeric",
+                                    hour: "numeric",
+                                    minute: "numeric",
+                                })}
+                            </p>
+                            <p className="text-md font-semibold text-[#A3A1A1]">
+                                <b className="pr-5 text-black">Delivery Date: </b>
+                                {order.delivery_date?.toDateString() || "Not Scheduled"}
+                            </p>
+                        </section>
                         <section className="flex flex-col gap-2 rounded-lg border border-[#F1F1F1] p-3">
                             <p className="border-b border-[#F1F1F1] pb-3 text-2xl font-semibold">Order Items</p>
                             <ul className="flex flex-col gap-2 border-b border-[#F1F1F1]">
                                 {order.order_items.map((item: any) => {
                                     return (
-                                        <div className="flex flex-col gap-1" key={item.id}>
+                                        <div
+                                            className="flex flex-col gap-1 rounded-lg border border-[#F1F1F1]"
+                                            key={item.id}
+                                        >
                                             <div className="flex items-center gap-8 border-b border-[#F1F1F1] p-3 text-center">
-                                                {item.frame && (
+                                                {(item.frame?.image || item.customization.image) && (
                                                     <>
                                                         <Image
-                                                            src={item.frame?.image!}
+                                                            src={item.customization.image || item.frame?.image || ""}
                                                             width={100}
                                                             height={100}
-                                                            alt={item.frame?.name!}
+                                                            alt={item.frame?.name || ""}
                                                             className="h-20 w-20 object-contain"
                                                         />
-                                                        <p className="w-full text-start text-xl font-semibold leading-6">
-                                                            {item.frame.name},
-                                                            <p className="text-base text-[#A3A1A1]">
-                                                                {item.customization.type}
-                                                            </p>
-                                                        </p>
                                                     </>
                                                 )}
-                                                <p className="font-semibold leading-6 text-[#A3A1A1] md:text-lg">
-                                                    {item.quantity}x
-                                                </p>
+                                                <div className="w-full">
+                                                    <p className="w-full text-start text-xl font-semibold leading-6">
+                                                        {item.frame?.name || "No Frame"}
+                                                    </p>
+                                                    <p className="w-full text-start text-base text-[#A3A1A1]">
+                                                        {item.customization.type}
+                                                    </p>
+                                                </div>
                                                 <p className="font-semibold leading-6 md:text-lg">
                                                     {item.single_unit_price}
+                                                </p>
+                                                <p className="font-semibold leading-6 text-[#A3A1A1] md:text-lg">
+                                                    x{item.quantity}
+                                                </p>
+                                                <p className="font-semibold leading-6 md:text-lg">
+                                                    {item.single_unit_price * item.quantity}
                                                 </p>
                                             </div>
                                             <div className="flex flex-wrap justify-start gap-2 border-b border-[#F1F1F1] p-2">
@@ -135,28 +213,33 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                                                     </strong>
                                                 </p>
                                             </div>
-                                            <div className="flex flex-wrap items-center gap-3 p-3">
-                                                <b className="pb-7">Mat: </b>
-                                                {item.customization.mat.map((mat: any, ind: number) => {
-                                                    return (
-                                                        <div
-                                                            className="flex flex-col items-center gap-2 text-center"
-                                                            key={ind}
-                                                        >
+                                            {item.customization.mat.length == 0 ? (
+                                                <></>
+                                            ) : (
+                                                <div className="flex flex-wrap items-center gap-10 p-3">
+                                                    <b className="pb-7">Mat: </b>
+                                                    {item.customization.mat.map((mat: any, ind: number) => {
+                                                        return (
                                                             <div
-                                                                className="h-5 w-5 overflow-hidden rounded-md border border-black"
-                                                                style={{ backgroundColor: mat.colour }}
-                                                            ></div>
-                                                            <p className="font-semibold">{mat.width.toFixed(2)}</p>
-                                                        </div>
-                                                    );
-                                                })}
-                                            </div>
+                                                                className="flex flex-col items-center gap-2 text-center"
+                                                                key={ind}
+                                                            >
+                                                                <div
+                                                                    title={mat.colour}
+                                                                    className="h-5 w-5 overflow-hidden rounded-md border border-black"
+                                                                    style={{ backgroundColor: mat.colour }}
+                                                                ></div>
+                                                                <p className="font-semibold">{mat.width.toFixed(2)}</p>
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            )}
                                         </div>
                                     );
                                 })}
                             </ul>
-                            <div className="flex justify-end gap-2 border-b border-[#F1F1F1]">
+                            <div className="flex justify-end gap-2 border-b border-[#F1F1F1] py-3">
                                 <div className="grid grid-cols-2 gap-x-10">
                                     <p className="text-lg font-semibold leading-5 text-[#A3A1A1]">Discount</p>
                                     <p className={`text-end font-semibold leading-6`}>
@@ -177,39 +260,30 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                                 </div>
                             </div>
                         </section>
-                        <section className="grid gap-4 md:grid-cols-2">
+                        <section className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
                             <div className="flex flex-col gap-2 rounded-lg border border-[#F1F1F1] p-3">
                                 <p className="border-b border-[#F1F1F1] pb-3 text-2xl font-semibold">
                                     Update Order Status
                                 </p>
-                                <DropDown items={Object.keys(OrderStatus)} value={status || ""} onChange={setStatus} />
-                                {updateStatusError && (
-                                    <>
-                                        <p className="text-red-400">{updateStatusError}</p>
-                                    </>
-                                )}
-                                <Button
-                                    disabled={status === order.order_status}
-                                    onClick={() => {
-                                        updateOrderStatusAction(order.id, status!)
-                                            .then((data) => {
-                                                if (data.success) {
-                                                    setOrder((o: AdminOrderDetailsType | null) =>
-                                                        o ? { ...o, order_status: status! } : null,
-                                                    );
-                                                    setUpdateStatusError(null);
-                                                } else {
-                                                    setUpdateStatusError(data.error);
-                                                }
-                                            })
-                                            .catch((error) => {
-                                                console.log(error);
-                                                setUpdateStatusError("Something went wrong");
-                                            });
-                                    }}
-                                >
-                                    Update
-                                </Button>
+                                <form action={statusUpdateAction} className="grid grid-cols-2 gap-2">
+                                    <div className="hidden">
+                                        <input type="text" name="orderId" value={order.id} />
+                                        <input type="text" name="status" value={status} />
+                                    </div>
+                                    <div>
+                                        <DropDown
+                                            items={Object.keys(OrderStatus)}
+                                            value={status || ""}
+                                            onChange={setStatus}
+                                        />
+                                        {updateStatusError && (
+                                            <>
+                                                <p className="text-red-400">{updateStatusError}</p>
+                                            </>
+                                        )}
+                                    </div>
+                                    <UpdateButton disabled={status === order.order_status} />
+                                </form>
                             </div>
                             <div className="flex flex-col gap-2 rounded-lg border border-[#F1F1F1] p-3">
                                 <p className="border-b border-[#F1F1F1] pb-3 text-2xl font-semibold leading-6">
@@ -220,6 +294,33 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                                 >
                                     {order.transaction_status}
                                 </p>
+                            </div>
+                            <div className="flex flex-col gap-2 rounded-lg border border-[#F1F1F1] p-3 sm:col-span-2 lg:col-span-1">
+                                <p className="border-b border-[#F1F1F1] pb-3 text-2xl font-semibold">
+                                    Update Delivery Date
+                                </p>
+                                <form action={deliveryUpdateAction} className="grid grid-cols-2 gap-2">
+                                    <div className="hidden">
+                                        <input type="text" name="orderId" value={order.id} />
+                                    </div>
+                                    <div>
+                                        <Input
+                                            type="date"
+                                            name="deliveryDate"
+                                            value={deliveryDate?.toISOString().split("T")[0]}
+                                            onChange={(e) => {
+                                                setDeliveryDate(new Date(e.target.value));
+                                            }}
+                                            className="h-full w-full px-3"
+                                        />
+                                        {deliveryStatusError && (
+                                            <>
+                                                <p className="text-red-400">{deliveryStatusError}</p>
+                                            </>
+                                        )}
+                                    </div>
+                                    <UpdateButton disabled={order.delivery_date == deliveryDate} />
+                                </form>
                             </div>
                         </section>
                         <section className="flex flex-col rounded-lg border border-[#F1F1F1] p-3">

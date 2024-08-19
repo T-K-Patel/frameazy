@@ -9,7 +9,7 @@ export type FramesFilterType = {
     categories: Category[];
     collections: Collection[];
     colors: Color[];
-    name:string;
+    name: string;
 };
 
 export type PopularFrameDataType = {
@@ -27,15 +27,21 @@ export type FrameDataType = PopularFrameDataType & {
 export async function getFramesAction(
     filters: FramesFilterType,
     page: number,
-): Promise<ServerActionReturnType<{ total: number; frames: FrameDataType[] }>> {
+): Promise<ServerActionReturnType<{ total: number; page: number; frames: FrameDataType[] }>> {
     try {
+        const validatedFilters = {
+            categories: filters.categories.filter((cat) => { return Category[cat] }).sort(),
+            collections: filters.collections.filter((col) => { return Collection[col] }).sort(),
+            colors: filters.colors.filter((col) => { return Color[col] }).sort(),
+            name: filters.name
+        }
         const frames = await db.frame.findMany({
             where: {
                 AND: [
-                    filters.categories.length > 0 ? { category: { in: filters.categories } } : {},
-                    filters.collections.length > 0 ? { collection: { in: filters.collections } } : {},
-                    filters.colors.length > 0 ? { color: { in: filters.colors } } : {},
-                    filters.name ? { name: { contains: filters.name, mode: 'insensitive' } } : {},
+                    validatedFilters.categories.length > 0 ? { category: { in: validatedFilters.categories } } : {},
+                    validatedFilters.collections.length > 0 ? { collection: { in: validatedFilters.collections } } : {},
+                    validatedFilters.colors.length > 0 ? { color: { in: validatedFilters.colors } } : {},
+                    validatedFilters.name ? { name: { contains: validatedFilters.name, mode: 'insensitive' } } : {},
                 ],
             },
             select: {
@@ -53,15 +59,15 @@ export async function getFramesAction(
         const total = await db.frame.count({
             where: {
                 AND: [
-                    filters.categories.length > 0 ? { category: { in: filters.categories } } : {},
-                    filters.collections.length > 0 ? { collection: { in: filters.collections } } : {},
-                    filters.colors.length > 0 ? { color: { in: filters.colors } } : {},
-                    filters.name ? { name: { contains: filters.name, mode: 'insensitive' } } : {},
+                    validatedFilters.categories.length > 0 ? { category: { in: validatedFilters.categories } } : {},
+                    validatedFilters.collections.length > 0 ? { collection: { in: validatedFilters.collections } } : {},
+                    validatedFilters.colors.length > 0 ? { color: { in: validatedFilters.colors } } : {},
+                    validatedFilters.name ? { name: { contains: validatedFilters.name, mode: 'insensitive' } } : {},
                 ],
             },
         });
 
-        return { success: true, data: { total, frames } };
+        return { success: true, data: { total, page, frames } };
     } catch (error) {
         if (error instanceof CustomError) {
             return { success: false, error: error.message };
@@ -110,29 +116,21 @@ export async function getPopularFramesAction(): Promise<ServerActionReturnType<P
 
         const frames = await db.frame.findMany({
             where: {
-                OR: [
-                    {
-                        OrderItem: {
-                            some: {
-                                order: {
-                                    order_status: {
-                                        in: [
-                                            OrderStatus.Approved,
-                                            OrderStatus.Delivered,
-                                            OrderStatus.Shipped,
-                                            OrderStatus.Processing,
-                                        ],
-                                    },
-                                },
+                OrderItem: {
+                    some: {
+                        order: {
+                            order_status: {
+                                in: [
+                                    OrderStatus.Approved,
+                                    OrderStatus.Delivered,
+                                    OrderStatus.Shipped,
+                                    OrderStatus.Processing,
+                                ],
                             },
                         },
                     },
-                    {
-                        OrderItem: {
-                            none: {},
-                        },
-                    },
-                ],
+
+                },
             },
             orderBy: {
                 OrderItem: {

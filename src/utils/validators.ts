@@ -1,3 +1,5 @@
+import { CustomError } from "@/lib/CustomError";
+
 export function validateEmail(email: string) {
     let error = null;
 
@@ -32,4 +34,16 @@ export function validatePassword(password: string) {
     }
 
     return error;
+}
+
+
+export function ObjectIdValidation(id: string | undefined, message: string = "Invalid Id") {
+    try {
+        if (!id || !/^[0-9a-f]{24}$/.test(id)) {
+            throw new CustomError(message);
+        }
+    } catch (error) {
+        throw new CustomError(message);
+    }
+    return true;
 }

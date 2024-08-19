@@ -1,6 +1,5 @@
 "use client";
 import DropDown, { FrameDropdown } from "@/components/DropDown";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import React, { useEffect, useState } from "react";
 import { useFrames } from "@/context/frames-context";
@@ -13,6 +12,8 @@ import { Customization, CustomizationType, Glazing } from "@prisma/client";
 import Image from "next/image";
 import { FramesForCustomizationType, getFramesForCustomizatinAction } from "@/serverActions/frames/frame.action";
 import { addCartItemAction } from "@/serverActions/cart/addCartItem.action";
+import AddToCartDialog from "../AddToCartDialog";
+import { useRouter } from "next/navigation";
 
 type CustomizeOptionsProps = {
     title: string;
@@ -35,13 +36,16 @@ function Page() {
     const { frameOptions, customizingFrame, setCustomizingFrame } = useFrames();
     const [upload, setUpload] = useState<emptyFrameProps>({
         dimensions: { width: 12, height: 9 },
-        glazing: Object.keys(Glazing)[0] as Glazing
+        glazing: Object.keys(Glazing)[0] as Glazing,
     });
     const [frames, setFrames] = useState<FramesForCustomizationType[]>([]);
     const [mat, setMat] = useState<matOptionsProps>([{ width: 0.5, color: "#ffffff", id: new Date().toString() }]);
     const debouncedFrame = useDebounce<emptyFrameProps>(upload, 300);
     const debouncedMat = useDebounce<matOptionsProps>(mat, 1000);
-    const [error,setError] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(null);
+    const router = useRouter();
+    const [addingToCart, setAddingToCart] = useState(false);
+
     useEffect(() => {
         if (frameOptions.framingStyle === "emptyFrame") {
             switch (frameOptions.data.frameType) {
@@ -59,7 +63,7 @@ function Page() {
             }
         }
         setError(null);
-    }, [frameOptions,frames]);
+    }, [frameOptions, frames]);
 
     useEffect(() => {
         if (frameOptions.framingStyle === "emptyFrame") {
@@ -115,7 +119,7 @@ function Page() {
         },
     );
 
-    const addToCart = () => {
+    const addToCart = (qty: number) => {
         let custType: CustomizationType = "EmptyForCanvas";
         switch (frameOptions.data.frameType) {
             case "canvas|panel":
@@ -130,7 +134,7 @@ function Page() {
             width: totalSize.width,
             height: totalSize.height,
             mirror: null,
-            printing:null,
+            printing: null,
             stretching: null,
             backing: null,
             sides: null,
@@ -139,10 +143,25 @@ function Page() {
             mat: mat.map((m) => ({ color: m.color, width: m.width })),
         };
 
-        addCartItemAction(data, { frameId: customizingFrame?.id || "" })
+        if (!data.glazing && customizeOptions === "paper") {
+            setError("Please select a glazing option");
+            return;
+        }
+
+        if (customizingFrame && !customizingFrame.id) {
+            setError("Please select a frame");
+            return;
+        }
+
+        setAddingToCart(true);
+        addCartItemAction(data, {
+            frameId: customizingFrame ? customizingFrame.id : "",
+            qty,
+        })
             .then((data) => {
                 if (data.success) {
                     console.log("Added to cart");
+                    router.push("/cart");
                 } else {
                     setError(data.error);
                 }
@@ -151,7 +170,7 @@ function Page() {
                 console.log(error);
                 setError("Something went wrong");
             });
-    }
+    };
 
     return (
         <div className="grid min-h-[calc(100vh-150px)] gap-5 pb-4 pt-10 md:grid-cols-2">
@@ -377,6 +396,11 @@ function Page() {
                             }
                         />
                     </div>
+                    {error && (
+                        <div className="flex flex-col gap-y-2">
+                            <p className="text-red-500">{error}</p>
+                        </div>
+                    )}
                     <div className="grid items-center gap-4 md:grid-cols-2">
                         <div className="grid justify-between max-md:grid-cols-3 md:flex">
                             <span>
@@ -384,9 +408,9 @@ function Page() {
                             </span>
                             <span className="text-2xl font-bold max-md:col-span-2">$ 2,00.00</span>
                         </div>
-                        <Button size={"lg"} className="h-auto w-full py-4" onClick={addToCart}>
-                            Add to Cart
-                        </Button>
+                        <div>
+                            <AddToCartDialog addToCart={addToCart} addingToCart={addingToCart} />
+                        </div>
                     </div>
                 </div>
             </div>

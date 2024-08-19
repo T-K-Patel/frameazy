@@ -1,12 +1,23 @@
 "use client";
 import { useEffect, useState } from "react";
-import { PaymentStatus, Transaction } from "@prisma/client";
-import { getTransactionsAction } from "@/serverActions/admin/admin.action";
+import { PaymentStatus } from "@prisma/client";
+import { getTransactionsAction, TransactionType } from "@/serverActions/admin/admin.action";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const AdminTransactionPage = () => {
-    const [transactions, setTransactions] = useState<Transaction[]>();
-    const [loading, setLoading] = useState(true);
+    const [transactions, setTransactions] = useState<TransactionType[]>([
+        {
+            // hex id of mongodb
+            id: "60f1b262f9f3b3b3b3b3b3b3",
+            orderId: "6a1b2c3d4e5f6a1b2c3d4e5f",
+            paymentOrderId: "order_IUjvkjIUFu",
+            paymentId: null,
+            amount: 0,
+            updatedAt: new Date(),
+            status: PaymentStatus.Success,
+        },
+    ]);
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     useEffect(() => {
         getTransactionsAction()
@@ -31,12 +42,6 @@ const AdminTransactionPage = () => {
         <div className="mx-auto flex w-11/12 max-w-screen-2xl flex-col gap-y-12 py-12">
             <section className="flex flex-col gap-6 rounded-3xl border border-[#F1F1F1] p-5">
                 <h1 className="leading-12 border-b border-[#F1F1F1] pb-5 text-3xl font-semibold">Transactions</h1>
-                <div className="grid w-full grid-cols-4 items-center justify-between">
-                    <p className="text-center text-xl font-semibold">Order Id</p>
-                    <p className="text-center text-xl font-semibold">Transaction Id</p>
-                    <p className="text-center text-xl font-semibold">Date</p>
-                    <p className="text-center text-xl font-semibold">Status</p>
-                </div>
                 {loading ? (
                     <div className="flex flex-col gap-2">
                         <Skeleton className="md:h-18 h-10 rounded-xl" />
@@ -47,20 +52,55 @@ const AdminTransactionPage = () => {
                 ) : error || transactions?.length == 0 ? (
                     <p className="text-center text-lg font-semibold text-red-500">{error ?? "No transactions yet"}</p>
                 ) : (
-                    transactions?.map((t, ind) => {
-                        return (
-                            <div key={ind} className="grid w-full grid-cols-4 items-center justify-between">
-                                <p className="text-center text-xl font-semibold">{t.orderId}</p>
-                                <p className="text-xl font-semibold">{t.id}</p>
-                                <p className="text-center text-xl font-semibold">{t.createdAt.toDateString()}</p>
-                                <p
-                                    className={`text-center text-xl font-semibold ${t.status === PaymentStatus.Success ? "text-green-500" : t.status === PaymentStatus.Pending ? "text-orange-400" : "text-red-500"}`}
-                                >
-                                    {t.status}/
-                                </p>
-                            </div>
-                        );
-                    })
+                    <div className="w-full overflow-x-auto">
+                        <table className="w-full">
+                            <thead>
+                                <tr className="w-fit items-center gap-x-8 rounded-lg border-b border-[#F1F1F1] *:p-3">
+                                    <th className="text-center font-semibold md:text-xl">Id</th>
+                                    <th className="text-center font-semibold md:text-xl">Order Id</th>
+                                    <th className="text-center font-semibold md:text-xl">PaymentOrder Id</th>
+                                    <th className="text-center font-semibold md:text-xl">Payment Id</th>
+                                    <th className="text-center font-semibold md:text-xl">Amount (₹)</th>
+                                    <th className="text-center font-semibold md:text-xl">Date</th>
+                                    <th className="text-center font-semibold md:text-xl">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody className="w-full">
+                                {transactions?.map((t, ind) => {
+                                    return (
+                                        <tr
+                                            key={ind}
+                                            className="w-fit items-center gap-x-8 rounded-lg border-b border-[#F1F1F1] *:p-3"
+                                        >
+                                            <td className="text-center font-semibold md:text-xl" title={t.id}>
+                                                ...{t.id.substring(16)}
+                                            </td>
+                                            <td className="text-center font-semibold md:text-xl" title={t.orderId}>
+                                                ...{t.orderId.substring(16)}
+                                            </td>
+                                            <td className="text-nowrap text-center font-semibold md:text-xl">
+                                                {t.paymentOrderId}
+                                            </td>
+                                            <td className="text-nowrap text-center font-semibold md:text-xl">
+                                                {t.paymentId || "N/A"}
+                                            </td>
+                                            <td className="text-nowrap text-center font-semibold md:text-xl">
+                                                {t.amount}
+                                            </td>
+                                            <td className="text-nowrap text-center font-semibold md:text-xl">
+                                                {t.updatedAt.toDateString()}
+                                            </td>
+                                            <td
+                                                className={`text-nowrap text-center font-semibold md:text-xl ${t.status === PaymentStatus.Success ? "text-green-500" : t.status === PaymentStatus.Pending ? "text-orange-400" : "text-red-500"}`}
+                                            >
+                                                {t.status}
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
                 )}
             </section>
         </div>

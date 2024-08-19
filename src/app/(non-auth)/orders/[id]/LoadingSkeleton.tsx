@@ -1,24 +1,10 @@
 "use client";
 import React from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/components/ui/button";
 
 export const LoadingSkeleton = () => {
     return (
         <>
-            <section className="flex flex-col gap-y-2 rounded-lg border border-[#F1F1F1] p-3">
-                <p className="border-b border-[#F1F1F1] pb-2 text-2xl font-semibold leading-6">User</p>
-                <p className="text-md font-semibold text-[#A3A1A1]">
-                    <b className="flex gap-5 text-black">
-                        Name: <Skeleton className="h-8 w-20" />{" "}
-                    </b>
-                </p>
-                <p className="text-md font-semibold text-[#A3A1A1]">
-                    <b className="flex gap-5 text-black">
-                        Email: <Skeleton className="h-8 w-20" />
-                    </b>
-                </p>
-            </section>
             <section className="flex flex-col gap-y-2 rounded-lg border border-[#F1F1F1] p-3">
                 <p className="border-b border-[#F1F1F1] pb-2 text-2xl font-semibold leading-6">Order Details</p>
                 <p className="text-md font-semibold text-[#A3A1A1]">
@@ -29,11 +15,6 @@ export const LoadingSkeleton = () => {
                 <p className="text-md font-semibold text-[#A3A1A1]">
                     <b className="flex gap-5 text-black">
                         Order Date: <Skeleton className="h-8 w-20" />
-                    </b>
-                </p>
-                <p className="text-md font-semibold text-[#A3A1A1]">
-                    <b className="flex gap-5 text-black">
-                        Delivery Date: <Skeleton className="h-8 w-20" />
                     </b>
                 </p>
             </section>
@@ -68,18 +49,16 @@ export const LoadingSkeleton = () => {
             </section>
             <section className="grid gap-4 md:grid-cols-3">
                 <div className="flex flex-col gap-2 rounded-lg border border-[#F1F1F1] p-3">
-                    <p className="border-b border-[#F1F1F1] text-2xl font-semibold leading-6">Update Order Status</p>
+                    <p className="border-b border-[#F1F1F1] text-2xl font-semibold leading-6">Order Status</p>
                     <Skeleton className="h-10 w-full" />
-                    <Button disabled={true}>Update</Button>
                 </div>
                 <div className="flex flex-col gap-2 rounded-lg border border-[#F1F1F1] p-3">
                     <p className="border-b border-[#F1F1F1] text-2xl font-semibold leading-6">Payment</p>
                     <Skeleton className="w-15 h-10" />
                 </div>
                 <div className="flex flex-col gap-2 rounded-lg border border-[#F1F1F1] p-3">
-                    <p className="border-b border-[#F1F1F1] text-2xl font-semibold leading-6">Update Delivery Date</p>
-                    <Skeleton className="h-10 w-full" />
-                    <Button disabled={true}>Update</Button>
+                    <p className="border-b border-[#F1F1F1] text-2xl font-semibold leading-6">Delivery Date</p>
+                    <Skeleton className="w-15 h-10" />
                 </div>
             </section>
             <section className="flex flex-col gap-y-2 rounded-lg border border-[#F1F1F1] p-3">

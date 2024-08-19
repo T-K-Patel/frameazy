@@ -1,8 +1,10 @@
 "use server";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
+import { CloudinaryStorage } from "@/lib/Cloudinary.storage";
 import { CustomError } from "@/lib/CustomError";
 import { db } from "@/lib/db";
 import { ServerActionReturnType } from "@/types/serverActionReturnType";
+import { ObjectIdValidation } from "@/utils/validators";
 import {
     Customization,
     CustomizationType,
@@ -53,9 +55,6 @@ export async function addCartItemAction(
 ): Promise<ServerActionReturnType<string>> {
     try {
         const userId = await isAuthenticated();
-        if ((await db.frame.findFirst({ where: { id: frameId } })) === null) {
-            throw new CustomError("Invalid frame id");
-        }
         qty = Number(qty || 1);
         if (!Number.isInteger(qty) || !Number.isSafeInteger(qty) || qty < 1) {
             throw new CustomError("Quantity must be greater than 0");
@@ -183,27 +182,51 @@ export async function addCartItemAction(
             }
             customization.image = data.image;
         }
-        let frame = isframeRequired ? await db.frame.findFirst({ where: { id: frameId } }) : null;
-
-        if (isframeRequired && frame === null) {
-            throw new CustomError("Invalid frame id");
+        console.log("Fetching Frame")
+        if (isframeRequired) {
+            (ObjectIdValidation(frameId, "Invalid frameId"));
+            console.log("Validation Passed:", frameId)
+            const frame = await db.frame.findFirst({ where: { id: frameId } })
+            if (frame === null) {
+                throw new CustomError("Invalid frame id");
+            }
         }
 
         const single_unit_price = 5425; // TODO:calculate price based on customization
+
+        if (customization.image) {
+            try {
+                const imageFileResp = await fetch(customization.image);
+                const imageFile = await imageFileResp.blob();
+                const imageArraybuffer = await imageFile.arrayBuffer();
+                const imageurl = await CloudinaryStorage.upload(imageArraybuffer);
+
+                if (!imageurl) {
+                    throw new CustomError("Failed to upload image");
+                }
+                customization.image = imageurl;
+
+            } catch (error) {
+                console.error("addCartItemAction error", error);
+                throw new CustomError("Failed to upload image");
+            }
+        }
         const custId = await db.customization.create({
             data: {
                 ...customization,
                 mat: {
-                    set: customization.mat,
+                    set: (customization.mat || []),
                 }
             },
         }).then((data) => data.id);
+
+        // Convert image to file and upload it to cloudinary
 
         const cartItem = await db.cartItem.create({
             data: {
                 userId,
                 customizationId: custId,
-                frameId,
+                frameId: frameId || undefined,
                 single_unit_price,
                 quantity: qty,
             },

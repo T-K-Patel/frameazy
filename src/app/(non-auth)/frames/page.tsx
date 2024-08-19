@@ -15,7 +15,7 @@ function Frames() {
         categories: [],
         collections: [],
         colors: [],
-        name:""
+        name: "",
     });
     const [totalFrames, setTotalFrames] = useState(0);
     const [page, setPage] = useState(1);
@@ -24,12 +24,17 @@ function Frames() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    const debouncedFilters = useDebounce(filters, 800);
+    const debouncedFilters = useDebounce(filters, 500);
+    const debouncedPage = useDebounce(page, 500);
     useEffect(() => {
-        getFramesAction(debouncedFilters, page - 1)
+        let fetching = true;
+        getFramesAction(debouncedFilters, debouncedPage - 1)
             .then((data) => {
+                if (!fetching) return;
                 if (data.success) {
-                    // setPage(1);
+                    if (data.data.page != debouncedPage - 1) {
+                        setPage(data.data.page + 1);
+                    }
                     setFrames(data.data.frames);
                     setTotalFrames(data.data.total);
                     setError(null);
@@ -44,7 +49,10 @@ function Frames() {
             .finally(() => {
                 setLoading(false);
             });
-    }, [debouncedFilters, page]);
+        return () => {
+            fetching = false;
+        };
+    }, [debouncedFilters, debouncedPage]);
 
     const [winWidth, setWinWidth] = useState(window.innerWidth);
 
@@ -73,21 +81,26 @@ function Frames() {
                         <div className="flex flex-col gap-y-5 md:col-span-3">
                             <div className="flex flex-col rounded-lg border border-[#F1F1F1] p-3">
                                 <p className="border-b border-[#F1F1F1] pb-3 text-2xl font-semibold">Search Frames</p>
-                                <Input placeholder="Search Frames" className="h-10 w-full" value={filters.name} onChange={(e)=>{
-                                    setFilters((originalFilters) => {
-                                        return {
-                                            ...originalFilters,
-                                            name:e.target.value,
-                                        };
-                                    });
-                                }}/>
+                                <Input
+                                    placeholder="Search Frames"
+                                    className="h-10 w-full"
+                                    value={filters.name}
+                                    onChange={(e) => {
+                                        setFilters((originalFilters) => {
+                                            return {
+                                                ...originalFilters,
+                                                name: e.target.value,
+                                            };
+                                        });
+                                    }}
+                                />
                             </div>
-                            <div className="flex h-auto w-full rounded-lg justify-between border border-[#F1F1F1] p-3">
+                            <div className="flex h-auto w-full justify-between rounded-lg border border-[#F1F1F1] p-3">
                                 <div>
                                     <p className="pb-3 text-2xl font-semibold">Frames</p>
                                     <h4>
-                                        Showing {(page - 1) * 18 + 1} - {Math.min(page * 18, totalFrames)} of{" "}
-                                        {totalFrames} frames
+                                        Showing {totalFrames == 0 ? 0 : (page - 1) * 18 + 1} -{" "}
+                                        {Math.min(page * 18, totalFrames)} of {totalFrames} frames
                                     </h4>
                                 </div>
                                 <div className="relative md:hidden">
