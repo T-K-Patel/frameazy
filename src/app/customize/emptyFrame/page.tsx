@@ -9,9 +9,10 @@ import { BiX } from "react-icons/bi";
 import FrameCanvas from "../FrameCanvas";
 import { IoCloseSharp } from "react-icons/io5";
 import useDebounce from "@/lib/useDebounce";
-import { Glazing } from "@prisma/client";
+import { Customization, CustomizationType, Glazing } from "@prisma/client";
 import Image from "next/image";
 import { FramesForCustomizationType, getFramesForCustomizatinAction } from "@/serverActions/frames/frame.action";
+import { addCartItemAction } from "@/serverActions/cart/addCartItem.action";
 
 type CustomizeOptionsProps = {
     title: string;
@@ -20,7 +21,7 @@ type CustomizeOptionsProps = {
 
 type emptyFrameProps = {
     dimensions: { width: number; height: number };
-    glazing?: string;
+    glazing?: Glazing;
 };
 
 type matOptionsProps = {
@@ -34,12 +35,13 @@ function Page() {
     const { frameOptions, customizingFrame, setCustomizingFrame } = useFrames();
     const [upload, setUpload] = useState<emptyFrameProps>({
         dimensions: { width: 12, height: 9 },
-        glazing: "Regular",
+        glazing: Object.keys(Glazing)[0] as Glazing
     });
     const [frames, setFrames] = useState<FramesForCustomizationType[]>([]);
     const [mat, setMat] = useState<matOptionsProps>([{ width: 0.5, color: "#ffffff", id: new Date().toString() }]);
     const debouncedFrame = useDebounce<emptyFrameProps>(upload, 300);
     const debouncedMat = useDebounce<matOptionsProps>(mat, 1000);
+    const [error,setError] = useState<string | null>(null);
     useEffect(() => {
         if (frameOptions.framingStyle === "emptyFrame") {
             switch (frameOptions.data.frameType) {
@@ -51,12 +53,13 @@ function Page() {
                 case "paper":
                     setUpload({
                         dimensions: { width: 12, height: 9 },
-                        glazing: Object.keys(Glazing)[0],
+                        glazing: Object.keys(Glazing)[0] as Glazing,
                     });
                     break;
             }
         }
-    }, [frameOptions]);
+        setError(null);
+    }, [frameOptions,frames]);
 
     useEffect(() => {
         if (frameOptions.framingStyle === "emptyFrame") {
@@ -111,6 +114,44 @@ function Page() {
             height: debouncedFrame.dimensions.height + 2 * (customizingFrame?.borderWidth || 0),
         },
     );
+
+    const addToCart = () => {
+        let custType: CustomizationType = "EmptyForCanvas";
+        switch (frameOptions.data.frameType) {
+            case "canvas|panel":
+                custType = "EmptyForCanvas";
+                break;
+            case "paper":
+                custType = "EmptyForPaper";
+                break;
+        }
+        const data: Omit<Customization, "id"> = {
+            type: custType,
+            width: totalSize.width,
+            height: totalSize.height,
+            mirror: null,
+            printing:null,
+            stretching: null,
+            backing: null,
+            sides: null,
+            image: null,
+            glazing: upload.glazing || null,
+            mat: mat.map((m) => ({ color: m.color, width: m.width })),
+        };
+
+        addCartItemAction(data, { frameId: customizingFrame?.id || "" })
+            .then((data) => {
+                if (data.success) {
+                    console.log("Added to cart");
+                } else {
+                    setError(data.error);
+                }
+            })
+            .catch((error) => {
+                console.log(error);
+                setError("Something went wrong");
+            });
+    }
 
     return (
         <div className="grid min-h-[calc(100vh-150px)] gap-5 pb-4 pt-10 md:grid-cols-2">
@@ -315,7 +356,7 @@ function Page() {
                                         field={
                                             <DropDown
                                                 value={upload.glazing || ""}
-                                                onChange={(status: string) => {
+                                                onChange={(status: Glazing) => {
                                                     setUpload({ ...upload, glazing: status });
                                                 }}
                                                 items={content.options[0].items}
@@ -343,7 +384,7 @@ function Page() {
                             </span>
                             <span className="text-2xl font-bold max-md:col-span-2">$ 2,00.00</span>
                         </div>
-                        <Button size={"lg"} className="h-auto w-full py-4">
+                        <Button size={"lg"} className="h-auto w-full py-4" onClick={addToCart}>
                             Add to Cart
                         </Button>
                     </div>

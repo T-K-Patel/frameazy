@@ -5,24 +5,26 @@ import { Input } from "@/components/ui/input";
 import React, { useState, useEffect } from "react";
 import InputField from "../InputField";
 import FrameCanvas from "../FrameCanvas";
-import { Mirror } from "@prisma/client";
+import { Customization, CustomizationType, Mirror } from "@prisma/client";
 import { getFramesForCustomizatinAction, FramesForCustomizationType } from "@/serverActions/frames/frame.action";
 import { useFrames } from "@/context/frames-context";
 import Image from "next/image";
+import { addCartItemAction } from "@/serverActions/cart/addCartItem.action";
 
 const MirrorOptions: string[] = Object.keys(Mirror);
 
 type MirrorOptions = {
     dimensions: { width: number; height: number };
-    mirrorType: string;
+    mirrorType: Mirror;
 };
 const Page = () => {
     const [mirror, setMirror] = useState<MirrorOptions>({
         dimensions: { width: 12, height: 9 },
-        mirrorType: MirrorOptions[0],
+        mirrorType: MirrorOptions[0] as Mirror,
     });
     const { frameOptions, customizingFrame, setCustomizingFrame } = useFrames();
     const [frames, setFrames] = useState<FramesForCustomizationType[]>([]);
+    const [error,setError] = useState<string | null>(null);
 
     useEffect(() => {
         if (frameOptions.framingStyle == "mirrorFrame") {
@@ -35,6 +37,36 @@ const Page = () => {
                 });
         }
     }, [frameOptions]);
+
+    const addToCart = () => {
+        const data: Omit<Customization, "id"> = {
+            type: "FramedMirror",
+            width: mirror.dimensions.width,
+            height: mirror.dimensions.height,
+            image: null,
+            mirror: mirror.mirrorType,
+            glazing: null,
+            printing: null,
+            backing: null,
+            stretching:null,
+            sides: null,
+            mat: []
+        };
+
+        addCartItemAction(data, { frameId: customizingFrame?.id || "" })
+            .then((data) => {
+                if (data.success) {
+                    console.log("Added to cart");
+                } else {
+                    setError(data.error);
+                }
+            })
+            .catch((error) => {
+                console.log(error);
+                setError("Something went wrong");
+            });
+    };
+
     return (
         <>
             <div className="grid min-h-[calc(100vh-150px)] gap-5 pb-4 pt-10 md:grid-cols-2">
@@ -158,7 +190,7 @@ const Page = () => {
                                 field={
                                     <DropDown
                                         value={mirror.mirrorType}
-                                        onChange={(status: string) => {
+                                        onChange={(status: Mirror) => {
                                             setMirror({ ...mirror, mirrorType: status });
                                         }}
                                         items={MirrorOptions}
@@ -173,7 +205,7 @@ const Page = () => {
                                 </span>
                                 <span className="text-2xl font-bold max-md:col-span-2">$ 2,00.00</span>
                             </div>
-                            <Button size={"lg"} className="h-auto w-full py-4">
+                            <Button size={"lg"} className="h-auto w-full py-4" onClick={addToCart}>
                                 Add to Cart
                             </Button>
                         </div>

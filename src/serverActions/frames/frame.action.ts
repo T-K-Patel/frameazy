@@ -9,6 +9,7 @@ export type FramesFilterType = {
     categories: Category[];
     collections: Collection[];
     colors: Color[];
+    name:string;
 };
 
 export type PopularFrameDataType = {
@@ -34,6 +35,7 @@ export async function getFramesAction(
                     filters.categories.length > 0 ? { category: { in: filters.categories } } : {},
                     filters.collections.length > 0 ? { collection: { in: filters.collections } } : {},
                     filters.colors.length > 0 ? { color: { in: filters.colors } } : {},
+                    filters.name ? { name: { contains: filters.name, mode: 'insensitive' } } : {},
                 ],
             },
             select: {
@@ -54,6 +56,7 @@ export async function getFramesAction(
                     filters.categories.length > 0 ? { category: { in: filters.categories } } : {},
                     filters.collections.length > 0 ? { collection: { in: filters.collections } } : {},
                     filters.colors.length > 0 ? { color: { in: filters.colors } } : {},
+                    filters.name ? { name: { contains: filters.name, mode: 'insensitive' } } : {},
                 ],
             },
         });
@@ -67,6 +70,7 @@ export async function getFramesAction(
         return { success: false, error: "Something went wrong" };
     }
 }
+
 
 export type FramesForCustomizationType = {
     id: string;

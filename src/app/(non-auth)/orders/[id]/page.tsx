@@ -118,7 +118,7 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                             <ul className="flex flex-col gap-2 border-b border-[#F1F1F1]">
                                 {order?.order_items.map((item) => {
                                     return (
-                                        <div className="flex flex-col gap-1" key={item.id}>
+                                        <div className="flex flex-col gap-1 rounded-lg border border-[#F1F1F1]" key={item.id}>
                                             <div className="flex items-center gap-8 border-b border-[#F1F1F1] p-3 text-center">
                                                 {item.frame && (
                                                     <>
@@ -144,7 +144,7 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                                                     {item.single_unit_price}
                                                 </p>
                                             </div>
-                                            <div className="grid grid-cols-4 items-center gap-2 border-b border-[#F1F1F1] p-2">
+                                            <div className="flex flex-wrap justify-start gap-2 border-b border-[#F1F1F1] p-2">
                                                 {(Object.keys(item.customization) as (keyof Customization)[]).map(
                                                     (key) => {
                                                         if (
@@ -157,7 +157,11 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                                                             item.customization[key]
                                                         ) {
                                                             return (
-                                                                <p key={key}>
+                                                                <p
+                                                                    key={key}
+                                                                    className="flex-shrink-0 flex-grow"
+                                                                    style={{ flexBasis: "200px" }}
+                                                                >
                                                                     <b>{capitalizeFirstLetter(key)}: </b>
                                                                     {item.customization[key]
                                                                         .replace(/_/g, " + ")
@@ -169,10 +173,13 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                                                         return <></>;
                                                     },
                                                 )}
-                                                <p>
+                                                <p className="flex-shrink-0 flex-grow" style={{ flexBasis: "200px" }}>
                                                     <b>Dimensions: </b>
-                                                    {item.customization.width.toFixed(2)}x
-                                                    {item.customization.height.toFixed(2)}
+                                                    {item.customization.width.toFixed(2)}&nbsp;x&nbsp;
+                                                    {item.customization.height.toFixed(2)}{" "}
+                                                    <strong>
+                                                        In<sup>2</sup>
+                                                    </strong>
                                                 </p>
                                             </div>
                                             <div className="flex flex-wrap items-center gap-10 p-3">
@@ -217,41 +224,43 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                                 </div>
                             </div>
                         </section>
-                        <section className="flex flex-col gap-2 rounded-lg border border-[#F1F1F1] p-3">
-                            <p className="border-b border-[#F1F1F1] pb-3 text-2xl font-semibold leading-6">
-                                Order Status
-                            </p>
-                            <p
-                                className={`text-lg font-semibold ${order?.transaction_status === "Success" ? "text-[#008C0E]" : order?.transaction_status === "Pending" ? "text-[#D68D00]" : "text-red-500"}`}
-                            >
-                                {order?.order_status}
-                            </p>
-                        </section>
-                        <section className="flex flex-col gap-2 rounded-lg border border-[#F1F1F1] p-3">
-                            <p className="border-b border-[#F1F1F1] pb-3 text-2xl font-semibold leading-6">Payment</p>
-                            <div className="flex justify-center gap-x-5">
-                                {order?.order_status === "Received" ? (
-                                    <p className={`text-lg font-semibold text-red-500`}>Not Approved yet</p>
-                                ) : order.order_status == "Approved" ? (
-                                    <>
-                                        <Button size={"lg"}>
-                                            Pay Now&nbsp;
-                                            <IoMdOpen size={20} />
-                                        </Button>
-                                    </>
-                                ) : (
-                                    <p
-                                        className={`text-lg font-semibold ${order?.transaction_status === "Pending" ? "text-[#D68D00]" : "text-[#008C0E]"}`}
-                                    >
-                                        {order?.transaction_status}
-                                    </p>
-                                )}
-                            </div>
-                        </section>
-                        <section className="flex flex-col gap-2 rounded-lg border border-[#F1F1F1] p-3">
-                            <p className="border-b border-[#F1F1F1] text-2xl font-semibold leading-6">Delivery by</p>
-                            <p className={`text-lg font-semibold`}>{order?.delivery_date.toDateString()}</p>
-                        </section>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                            <section className="flex flex-col gap-2 rounded-lg border border-[#F1F1F1] p-3">
+                                <p className="border-b border-[#F1F1F1] pb-3 text-2xl font-semibold leading-6">
+                                    Order Status
+                                </p>
+                                <p
+                                    className={`text-lg font-semibold ${order?.transaction_status === "Success" ? "text-[#008C0E]" : order?.transaction_status === "Pending" ? "text-[#D68D00]" : "text-red-500"}`}
+                                >
+                                    {order?.order_status}
+                                </p>
+                            </section>
+                            <section className="flex flex-col gap-2 rounded-lg border border-[#F1F1F1] p-3">
+                                <p className="border-b border-[#F1F1F1] pb-3 text-2xl font-semibold leading-6">Payment</p>
+                                <div className="flex justify-center gap-x-5">
+                                    {order?.order_status === "Received" ? (
+                                        <p className={`text-lg font-semibold text-red-500`}>Not Approved yet</p>
+                                    ) : order.order_status == "Approved" ? (
+                                        <>
+                                            <Button size={"lg"}>
+                                                Pay Now&nbsp;
+                                                <IoMdOpen size={20} />
+                                            </Button>
+                                        </>
+                                    ) : (
+                                        <p
+                                            className={`text-lg font-semibold ${order?.transaction_status === "Pending" ? "text-[#D68D00]" : "text-[#008C0E]"}`}
+                                        >
+                                            {order?.transaction_status}
+                                        </p>
+                                    )}
+                                </div>
+                            </section>
+                            <section className="flex flex-col gap-2 rounded-lg border border-[#F1F1F1] p-3">
+                                <p className="border-b border-[#F1F1F1] text-2xl font-semibold leading-6">Delivery by</p>
+                                <p className={`text-lg font-semibold`}>{order?.delivery_date.toDateString()}</p>
+                            </section>
+                        </div>
                         <section className="flex flex-col rounded-lg border border-[#F1F1F1] p-3">
                             <p className="border-b border-[#F1F1F1] pb-3 text-2xl font-semibold leading-6">
                                 Delivery Address

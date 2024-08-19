@@ -8,12 +8,14 @@ import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
 import useDebounce from "@/lib/useDebounce";
 import FramesPagination from "./FramesPagination";
 import FramesSideBar from "./FramesSideBar";
+import { Input } from "@/components/ui/input";
 
 function Frames() {
     const [filters, setFilters] = useState<FramesFilterType>({
         categories: [],
         collections: [],
         colors: [],
+        name:""
     });
     const [totalFrames, setTotalFrames] = useState(0);
     const [page, setPage] = useState(1);
@@ -68,11 +70,21 @@ function Frames() {
                         <aside className="col-span-1 hidden flex-col gap-y-10 py-5 md:flex">
                             <FramesSideBar filters={filters} setFilters={setFilters} />
                         </aside>
-                        <div className="flex flex-col gap-y-2 md:col-span-3">
-                            <div className="flex h-auto w-full justify-between">
+                        <div className="flex flex-col gap-y-5 md:col-span-3">
+                            <div className="flex flex-col rounded-lg border border-[#F1F1F1] p-3">
+                                <p className="border-b border-[#F1F1F1] pb-3 text-2xl font-semibold">Search Frames</p>
+                                <Input placeholder="Search Frames" className="h-10 w-full" value={filters.name} onChange={(e)=>{
+                                    setFilters((originalFilters) => {
+                                        return {
+                                            ...originalFilters,
+                                            name:e.target.value,
+                                        };
+                                    });
+                                }}/>
+                            </div>
+                            <div className="flex h-auto w-full rounded-lg justify-between border border-[#F1F1F1] p-3">
                                 <div>
-                                    {" "}
-                                    <h2 className="text-2xl font-semibold leading-9">Frames</h2>
+                                    <p className="pb-3 text-2xl font-semibold">Frames</p>
                                     <h4>
                                         Showing {(page - 1) * 18 + 1} - {Math.min(page * 18, totalFrames)} of{" "}
                                         {totalFrames} frames
