@@ -33,11 +33,11 @@ const AdminOrdersPage = () => {
     return (
         <div className="mx-auto flex w-11/12 max-w-screen-2xl flex-col gap-y-12 py-12">
             <section className="mb-12 rounded-md border border-[#F1F1F1] p-3">
-                <header className="pb-3">
+                <div className="pb-3">
                     <h1 className="leading-12 items-center border-b border-[#F1F1F1] pb-3 text-2xl font-semibold">
                         Orders
                     </h1>
-                </header>
+                </div>
                 {loading ? (
                     <div className="flex flex-col gap-4">
                         <Skeleton className="h-60 rounded-xl md:h-28" />

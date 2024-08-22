@@ -4,6 +4,7 @@ import { CloudinaryStorage } from "@/lib/Cloudinary.storage";
 import { CustomError } from "@/lib/CustomError";
 import { db } from "@/lib/db";
 import { ServerActionReturnType } from "@/types/serverActionReturnType";
+import { calculateTotalPrice } from "@/utils/totalPrice";
 import { ObjectIdValidation } from "@/utils/validators";
 import {
     Customization,
@@ -51,7 +52,7 @@ function isvalidMatOptions(options: any): boolean {
 
 export async function addCartItemAction(
     data: Omit<Customization, "id">,
-    { frameId, qty }: { frameId?: string; qty?: number } = {},
+    { frameId, qty, externalImage }: { frameId?: string; qty?: number; externalImage?: boolean } = {},
 ): Promise<ServerActionReturnType<string>> {
     try {
         const userId = await isAuthenticated();
@@ -183,32 +184,57 @@ export async function addCartItemAction(
             customization.image = data.image;
         }
         console.log("Fetching Frame")
+        let frame: { unit_price: number, borderWidth: number } | undefined = undefined;
         if (isframeRequired) {
             (ObjectIdValidation(frameId, "Invalid frameId"));
             console.log("Validation Passed:", frameId)
-            const frame = await db.frame.findFirst({ where: { id: frameId } })
+            frame = await db.frame.findFirst({ where: { id: frameId }, select: { unit_price: true, borderWidth: true } }) || undefined;
             if (frame === null) {
                 throw new CustomError("Invalid frame id");
             }
         }
 
-        const single_unit_price = 5425; // TODO:calculate price based on customization
+
+        const single_unit_price = calculateTotalPrice(customization, frame); // TODO:calculate price based on customization
 
         if (customization.image) {
-            try {
-                const imageFileResp = await fetch(customization.image);
-                const imageFile = await imageFileResp.blob();
-                const imageArraybuffer = await imageFile.arrayBuffer();
-                const imageurl = await CloudinaryStorage.upload(imageArraybuffer);
+            if (externalImage) {
+                try {
+                    const url = new URL(customization.image);
+                    if (!["http:", "https:"].includes(url.protocol)) {
+                        throw new CustomError("Invalid image url");
+                    }
+                    if (url.hostname !== "img.freepik.com") {
+                        throw new CustomError("Invalid image url");
+                    }
+                    const imageFileResp = await fetch(customization.image);
+                    // file should be an image file
+                    if (!imageFileResp.headers.get("content-type")?.startsWith("image/")) {
+                        throw new CustomError("Invalid image url");
+                    }
+                } catch (e) {
+                    throw new CustomError("Invalid image url");
+                }
+            } else {
+                try {
+                    const imageFileResp = await fetch(customization.image);
+                    // file should be an image file
+                    if (!imageFileResp.headers.get("content-type")?.startsWith("image/")) {
+                        throw new CustomError("Invalid image url");
+                    }
+                    const imageFile = await imageFileResp.blob();
+                    const imageArraybuffer = await imageFile.arrayBuffer();
+                    const imageurl = await CloudinaryStorage.upload(imageArraybuffer);
 
-                if (!imageurl) {
+                    if (!imageurl) {
+                        throw new CustomError("Failed to upload image");
+                    }
+                    customization.image = imageurl;
+
+                } catch (error) {
+                    console.error("addCartItemAction error", error);
                     throw new CustomError("Failed to upload image");
                 }
-                customization.image = imageurl;
-
-            } catch (error) {
-                console.error("addCartItemAction error", error);
-                throw new CustomError("Failed to upload image");
             }
         }
         const custId = await db.customization.create({
@@ -219,8 +245,6 @@ export async function addCartItemAction(
                 }
             },
         }).then((data) => data.id);
-
-        // Convert image to file and upload it to cloudinary
 
         const cartItem = await db.cartItem.create({
             data: {

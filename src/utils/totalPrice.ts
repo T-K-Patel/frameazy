@@ -1,9 +1,43 @@
-// const PRINTING_COST=30;
-// const MAT_COST=40;
+import { Customization } from "@prisma/client"
+import { GlazingPrice, BackingPrice, SidesPrice, StretchingPrice, MirrorPrice, PrintingPrice, MAT_PRICE } from "@/contants/pricings"
 
-// export function calculateTotalPrice(, imageD?:{width:number, height:number}, matD:{width:number, height:number}[]){
-//     const printingCost=PRINTING_COST*(imageD?.width||0)*(imageD?.height||0);
-//     const matCost=2*matD.reduce((acc, mat)=>acc+MAT_COST*(mat.width+mat.height),0);
-//     const frameCost=unit_price?unit_price*(2*frameD?.width+2*frameD?.height):0;
+export function calculateTotalPrice(customization: Omit<Customization, "id">, frame?: { unit_price: number, borderWidth: number }) {
 
-// }
+    let height = customization.height;
+    let width = customization.width;
+
+    const backingPrice = customization.backing ? BackingPrice[customization.backing] * height * width : 0;
+    const stretchingPrice = customization.stretching ? StretchingPrice[customization.stretching] * height * width : 0;
+    const sidesPrice = customization.sides ? SidesPrice[customization.sides] * height * width : 0;
+    const mirrorPrice = customization.mirror ? MirrorPrice[customization.mirror] * height * width : 0;
+
+    let totalPrice = 0;
+    if (frame) {
+        totalPrice += 2 * frame.unit_price * (height + width);
+        height -= 2 * frame.borderWidth;
+        width -= 2 * frame.borderWidth
+    };
+
+    const glazingPrice = customization.glazing ? GlazingPrice[customization.glazing] * height * width : 0;
+
+    customization.mat.forEach((m) => {
+        totalPrice += MAT_PRICE * ((height * width) - ((height - 2 * m.width) * (width - 2 * m.width)));
+        height -= 2 * m.width;
+        width -= 2 * m.width;
+    })
+
+    const printingPrice = customization.printing ? PrintingPrice[customization.printing] * height * width : 0;
+
+    totalPrice += glazingPrice + backingPrice + stretchingPrice + sidesPrice + mirrorPrice + printingPrice;
+    return totalPrice;
+}
+
+export function getDeliveryCharge(totalPrice: number) {
+    if (totalPrice < 50000) {
+        return 7000;
+    } else if (totalPrice < 100000) {
+        return 3500;
+    } else {
+        return 0;
+    }
+}

@@ -11,6 +11,7 @@ type FrameOptions =
           data: {
               image?: string;
               croppedImage?: string;
+              usingExternalImage?: boolean;
               width?: number;
               height?: number;
               frameType?: "printOnly" | "canvasPrint" | "framedWithoutMG" | "framedWithMG";
@@ -51,7 +52,6 @@ const FramesContext = createContext<
 
 function FramesProvider({ children }: { children: ReactNode }) {
     const session = useSession();
-    // dialogOpen:isOpen,setDialogOpen:setIsOpen
     const [frameOptions, setFrameOptions] = useState<FrameOptions>({ framingStyle: "none" });
     const [dialogOpen, setDialogOpen] = useState(false);
 

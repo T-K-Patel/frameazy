@@ -97,7 +97,7 @@ export const FrameDropdown = ({
                                 </p>
                                 <p>
                                     <small>
-                                        <>Inch Price</>: {value.unit_price} <strong>&#8377;</strong>
+                                        <>Inch Price</>: {(value.unit_price / 100).toFixed(2)} <strong>&#8377;</strong>
                                     </small>
                                 </p>
                                 <p>

@@ -7,8 +7,10 @@ import { Button } from "@/components/ui/button";
 import { FrameDataType, PopularFrameDataType } from "@/serverActions/frames/frame.action";
 import { getImagePlaceholder } from "@/components/imagePlaceholder";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useFrames } from "@/context/frames-context";
 
 function Item({ item }: { item: FrameDataType | PopularFrameDataType }) {
+    const { setDialogOpen, setCustomizingFrame } = useFrames();
     return (
         <div className="mx-auto grid h-full w-full grid-cols-1 gap-3 rounded-2xl border border-solid px-2 pb-2 max-md:grid-cols-9 sm:w-fit md:p-3">
             <div className="flex items-center justify-center max-md:col-span-3">
@@ -22,7 +24,7 @@ function Item({ item }: { item: FrameDataType | PopularFrameDataType }) {
                     className="h-auto w-full max-w-64 object-contain md:w-full"
                 />
             </div>
-            <div className="align-baseline max-md:col-span-6 max-w-64">
+            <div className="max-w-64 align-baseline max-md:col-span-6">
                 <h2 className="mb-2 mt-3 md:text-2xl">{item.name}</h2>
                 {"color" in item && (
                     <p className="items-center text-xs md:text-sm">
@@ -53,13 +55,24 @@ function Item({ item }: { item: FrameDataType | PopularFrameDataType }) {
                 )}
 
                 <p className="md:text-md mb-2 text-sm md:mb-5">
-                    <b>Price per inch: </b>
-                    {item.unit_price}
+                    <b>Price per inch: </b>₹ {(item.unit_price / 100).toFixed(2)}
                 </p>
                 <form>
                     <Button
                         size={"lg"}
                         variant={"outline"}
+                        onClick={() => {
+                            if ("borderSrc" in item && "borderWidth" in item) {
+                                setCustomizingFrame({
+                                    borderSrc: item.borderSrc,
+                                    borderWidth: item.borderWidth,
+                                    id: item.id,
+                                    name: item.name,
+                                    unit_price: item.unit_price,
+                                });
+                                setDialogOpen(true);
+                            }
+                        }}
                         type="button"
                         className="h-min w-full border border-black bg-transparent px-2 py-2 font-semibold text-black transition-all duration-200 active:scale-90 md:px-4 md:py-3 md:text-lg"
                     >

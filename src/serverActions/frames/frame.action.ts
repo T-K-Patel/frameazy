@@ -19,6 +19,8 @@ export type PopularFrameDataType = {
     image: string;
 };
 export type FrameDataType = PopularFrameDataType & {
+    borderSrc: string;
+    borderWidth: number;
     color: Color;
     collection: Collection;
     category: Category;
@@ -52,6 +54,8 @@ export async function getFramesAction(
                 collection: true,
                 category: true,
                 image: true,
+                borderSrc: true,
+                borderWidth: true,
             },
             skip: page * 18,
             take: 18,

@@ -21,23 +21,23 @@ function CancelOrderDialog({ cancelOrder, cancelingOrder }: { cancelOrder: () =>
                 <div className="grid grid-cols-2 gap-3">
                     <Button
                         size={"lg"}
-                        variant={"destructive"}
                         className="h-auto w-full py-4"
                         onClick={() => {
                             setOpen(false);
                         }}
                     >
-                        Cancel
+                        Return
                     </Button>
                     <Button
                         size={"lg"}
+                        variant={"destructive"}
                         className="h-auto w-full py-4"
                         onClick={() => {
                             setOpen(false);
                             cancelOrder();
                         }}
                     >
-                        Add to Cart
+                        Confirm Cancel
                     </Button>
                 </div>
             </DialogContent>

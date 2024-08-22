@@ -1,6 +1,6 @@
 "use client";
 import { Customization } from "@prisma/client";
-import Image from "next/image";
+import { Img } from "react-image";
 import React, { useState, useEffect } from "react";
 import { cancelOrderAction, getOrderDetailsAction, UserOrderDetails } from "@/serverActions/orders/orders.action";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,8 @@ import { IoMdOpen } from "react-icons/io";
 import { LoadingSkeleton } from "./LoadingSkeleton";
 import { useRouter } from "next/navigation";
 import CancelOrderDialog from "./CancelOrderDialog";
+import Link from "next/link";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const capitalizeFirstLetter = (str: string) => {
     return str.charAt(0).toUpperCase() + str.slice(1);
@@ -42,7 +44,7 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
     }, [params.id]);
 
     const cancelOrder = () => {
-        if(!order?.id){
+        if (!order?.id) {
             setError("Order not found");
             return;
         }
@@ -51,7 +53,7 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
             .then((data) => {
                 if (data.success) {
                     console.log("Order Cancelled");
-                    router.push("/orders");
+                    router.push("/dashboard");
                 } else {
                     setError(data.error);
                 }
@@ -60,7 +62,7 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                 console.log(error);
                 setError("Something went wrong");
             });
-    }
+    };
     return (
         <div className="mx-auto flex w-11/12 max-w-screen-2xl flex-col gap-8 py-5">
             {loading ? (
@@ -71,9 +73,11 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                 order && (
                     <>
                         <section className="flex flex-col rounded-lg border border-[#F1F1F1] p-3">
-                            <div className="flex gap-x-5 justify-between p border-b border-[#F1F1F1] pb-3 text-2xl font-semibold leading-6">
+                            <div className="p flex justify-between gap-x-5 border-b border-[#F1F1F1] pb-3 text-2xl font-semibold leading-6">
                                 Order Details
-                                {(order.order_status==="Received"||order.order_status==="Approved")&&<CancelOrderDialog cancelOrder={cancelOrder} cancelingOrder={cancelingOrder} />}
+                                {(order.order_status === "Received" || order.order_status === "Approved") && (
+                                    <CancelOrderDialog cancelOrder={cancelOrder} cancelingOrder={cancelingOrder} />
+                                )}
                             </div>
                             <p className="text-md py-3 font-semibold text-[#A3A1A1]">
                                 <b className="pr-5 text-black">Order Id: </b>
@@ -102,12 +106,14 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                                             className="flex flex-col gap-1 rounded-lg border border-[#F1F1F1]"
                                             key={item.id}
                                         >
-                                            <div className="flex flex-col md:flex-row items-center gap-x-8 gap-y-5 border-b border-[#F1F1F1] p-3 text-center">
-                                                <div className="w-full flex items-center gap-8">
+                                            <div className="flex flex-col items-center gap-x-8 gap-y-5 border-b border-[#F1F1F1] p-3 text-center md:flex-row">
+                                                <div className="flex w-full items-center gap-8">
                                                     {(item.frame?.image || item.customization.image) && (
                                                         <>
-                                                            <Image
-                                                                src={item.customization.image || item.frame?.image || ""}
+                                                            <Img
+                                                                src={
+                                                                    item.customization.image || item.frame?.image || ""
+                                                                }
                                                                 width={100}
                                                                 height={100}
                                                                 alt={item.frame?.name || ""}
@@ -115,24 +121,32 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                                                             />
                                                         </>
                                                     )}
-                                                    <div className="w-full">
-                                                        <p className="w-full text-start text-xl font-semibold leading-6">
+                                                    <div className="w-full text-start">
+                                                        <p className="w-full text-xl font-semibold leading-6">
                                                             {item.frame?.name || "No Frame"}
                                                         </p>
-                                                        <p className="w-full text-start text-base text-[#A3A1A1]">
+                                                        <p className="w-full pb-2 text-base text-[#A3A1A1]">
                                                             {item.customization.type}
                                                         </p>
+                                                        {item.customization.image && (
+                                                            <Link target="_blank" href={item.customization.image}>
+                                                                <Button className="m-0" size={"sm"}>
+                                                                    Go to Image&nbsp;
+                                                                    <IoMdOpen size={20} />
+                                                                </Button>
+                                                            </Link>
+                                                        )}
                                                     </div>
                                                 </div>
-                                                <div className="flex items-center text-center gap-8">
-                                                    <p className="font-semibold leading-6 md:text-lg">
-                                                        {item.single_unit_price}
+                                                <div className="flex items-center gap-8 text-center">
+                                                    <p className="text-nowrap font-semibold leading-6 md:text-lg">
+                                                        ₹ {(item.single_unit_price / 100).toFixed(2)}
                                                     </p>
                                                     <p className="font-semibold leading-6 text-[#A3A1A1] md:text-lg">
                                                         x{item.quantity}
                                                     </p>
-                                                    <p className="font-semibold leading-6 md:text-lg">
-                                                        {item.single_unit_price * item.quantity}
+                                                    <p className="text-nowrap font-semibold leading-6 md:text-lg">
+                                                        ₹ {((item.single_unit_price * item.quantity) / 100).toFixed(2)}
                                                     </p>
                                                 </div>
                                             </div>
@@ -165,7 +179,10 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                                                         return <></>;
                                                     },
                                                 )}
-                                                <p className="flex-shrink-0 flex-grow" style={{ flexBasis: "200px" }}>
+                                                <p
+                                                    className="flex-shrink-0 flex-grow text-nowrap"
+                                                    style={{ flexBasis: "200px" }}
+                                                >
                                                     <b>Dimensions: </b>
                                                     {item.customization.width.toFixed(2)}&nbsp;x&nbsp;
                                                     {item.customization.height.toFixed(2)}{" "}
@@ -179,17 +196,25 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                                             ) : (
                                                 <div className="flex flex-wrap items-center gap-10 p-3">
                                                     <b className="pb-7">Mat: </b>
-                                                    {item.customization.mat.map((mat: any, ind: number) => {
+                                                    {item.customization.mat.map((mat, ind) => {
                                                         return (
                                                             <div
                                                                 className="flex flex-col items-center gap-2 text-center"
                                                                 key={ind}
                                                             >
-                                                                <div
-                                                                    title={mat.colour}
-                                                                    className="h-5 w-5 overflow-hidden rounded-md border border-black"
-                                                                    style={{ backgroundColor: mat.colour }}
-                                                                ></div>
+                                                                <TooltipProvider>
+                                                                    <Tooltip>
+                                                                        <TooltipTrigger asChild>
+                                                                            <div
+                                                                                className="h-5 w-5 overflow-hidden rounded-md border border-black"
+                                                                                style={{ backgroundColor: mat.color }}
+                                                                            ></div>
+                                                                        </TooltipTrigger>
+                                                                        <TooltipContent>
+                                                                            <p>{mat.color}</p>
+                                                                        </TooltipContent>
+                                                                    </Tooltip>
+                                                                </TooltipProvider>
                                                                 <p className="font-semibold">{mat.width.toFixed(2)}</p>
                                                             </div>
                                                         );
@@ -234,7 +259,7 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                             </section>
                             <section className="flex flex-col gap-2 rounded-lg border border-[#F1F1F1] p-3">
                                 <p className="border-b border-[#F1F1F1] pb-3 text-2xl font-semibold leading-6">
-                                    Payment
+                                    Payment (not refundable)
                                 </p>
                                 <div className="flex gap-x-5">
                                     {order?.order_status === "Received" ? (

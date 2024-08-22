@@ -11,6 +11,7 @@ import { placeOrderAction } from "@/serverActions/orders/orders.action";
 import { useFormState, useFormStatus } from "react-dom";
 import LoadingCart from "./(components)/LoadingCart";
 import { useRouter } from "next/navigation";
+import { getDeliveryCharge } from "@/utils/totalPrice";
 
 const ClearCartButton = ({ disabled }: { disabled: boolean }) => {
     const { pending } = useFormStatus();
@@ -123,10 +124,8 @@ function Cart() {
         return <LoadingCart />;
     }
 
-    const deliveryCharge = cartItems.reduce((acc, item) => acc + item.quantity * 5, 0);
-
-    const orderTotal =
-        Math.round(cartItems.reduce((acc, item) => acc + item.quantity * (item.single_unit_price || 0), 0) * 10) / 10;
+    const orderTotal = cartItems.reduce((acc, item) => acc + item.quantity * (item.single_unit_price / 100 || 0), 0);
+    const deliveryCharge = getDeliveryCharge(orderTotal);
 
     return (
         <section className="mx-auto my-5 max-w-screen-2xl">

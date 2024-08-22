@@ -2,16 +2,20 @@
 import DefaultImage from "../../../../public/Default.svg";
 import { Img } from "react-image";
 import { OrderComponent } from "@/components/Order";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { getOrdersAction, UserOrders } from "@/serverActions/orders/orders.action";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 const Dashboard = () => {
     const session = useSession();
     const [orders, setOrders] = useState<UserOrders[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+
+    const router = useRouter();
 
     useEffect(() => {
         getOrdersAction()
@@ -37,9 +41,18 @@ const Dashboard = () => {
     return (
         <div className="mx-auto w-11/12 max-w-screen-2xl py-12">
             <section className="mb-12 overflow-hidden rounded-lg border border-[#F1F1F1] p-3">
-                <header>
+                <div className="flex justify-between">
                     <h1 className="leading-12 border-b border-[#F1F1F1] pb-3 text-3xl font-semibold">User</h1>
-                </header>
+                    <Button
+                        onClick={() => {
+                            signOut().then(() => {
+                                router.push("/", { scroll: true });
+                            });
+                        }}
+                    >
+                        Sign Out
+                    </Button>
+                </div>
                 <div className="mt-6">
                     <div className="flex flex-col place-items-center md:flex-row md:p-5">
                         <Img
@@ -73,9 +86,9 @@ const Dashboard = () => {
                 </div>
             </section>
             <section className="mb-12 rounded-md border border-[#F1F1F1] p-3">
-                <header>
+                <div>
                     <h1 className="leading-12 mb-6 text-3xl font-semibold">Orders</h1>
-                </header>
+                </div>
                 {loading ? (
                     <div className="flex flex-col gap-4">
                         <Skeleton className="h-14 rounded-xl md:h-24" />

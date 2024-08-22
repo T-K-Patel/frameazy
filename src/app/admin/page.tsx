@@ -139,7 +139,7 @@ const AdminDashboard = () => {
                                 <Input
                                     className="relative h-12"
                                     name="unitPrice"
-                                    placeholder="$1,000,000"
+                                    placeholder="₹1,000,000"
                                     type="number"
                                 />
                             </div>

@@ -88,7 +88,7 @@ export async function addProduct(state: any, formData: FormData) {
         await db.frame.create({
             data: {
                 name: productName,
-                unit_price: unitPrice,
+                unit_price: unitPrice * 100,
                 image: imageUrl,
                 category: productCategory,
                 color: productColor,
@@ -233,6 +233,7 @@ export type AdminOrderDetailsType = {
     transaction_status: PaymentStatus,
     shipping_address: Address,
     order_items: {
+        id: string,
         frame: {
             name: string,
             image: string,
@@ -249,7 +250,6 @@ export type AdminOrderDetailsType = {
 
 export async function getOrderDetailsAction(id: string): Promise<ServerActionReturnType<AdminOrderDetailsType>> {
     try {
-        //66bcac7689557b7850a882cd
         const regex = /^[0-9a-fA-F]{24}$/;
         if (!regex.test(id)) {
             throw new CustomError("Invalid order ID");
@@ -271,6 +271,7 @@ export async function getOrderDetailsAction(id: string): Promise<ServerActionRet
                 shipping_address: true,
                 order_items: {
                     select: {
+                        id: true,
                         frame: {
                             select: {
                                 name: true,

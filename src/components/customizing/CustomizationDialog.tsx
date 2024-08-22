@@ -208,7 +208,10 @@ const CustomizationDialog = ({
                 ],
             };
             onBack = () => {
-                setFrameOptions({ framingStyle: "uploadAndFrame", data: { ...framing.data, croppedImage: undefined } });
+                setFrameOptions({
+                    framingStyle: "uploadAndFrame",
+                    data: { ...framing.data, croppedImage: undefined },
+                });
             };
         }
     }

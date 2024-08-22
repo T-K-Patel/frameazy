@@ -12,6 +12,8 @@ import Image from "next/image";
 import { addCartItemAction } from "@/serverActions/cart/addCartItem.action";
 import { useRouter } from "next/navigation";
 import AddToCartDialog from "../AddToCartDialog";
+import { calculateTotalPrice } from "@/utils/totalPrice";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type CustomizeOptionsProps =
     | {
@@ -40,7 +42,7 @@ type matOptionsProps = {
 
 type ContentType = { title: string; mat: boolean; options: CustomizeOptionsProps[] };
 function Page() {
-    const { frameOptions, customizingFrame, setCustomizingFrame } = useFrames();
+    const { frameOptions, customizingFrame, setCustomizingFrame, setFrameOptions } = useFrames();
     const [upload, setUpload] = useState<uploadOptionsProps>({
         dimensions: { width: 0, height: 0 },
         printing: Object.keys(Printing)[0] as Printing,
@@ -51,6 +53,7 @@ function Page() {
 
     const [error, setError] = useState<string | null>(null);
     const [addingToCart, setAddingToCart] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     const router = useRouter();
 
@@ -96,9 +99,16 @@ function Page() {
         if (frameOptions.framingStyle == "uploadAndFrame") {
             let customizeOptions = frameOptions.data.frameType;
             if (customizeOptions == "framedWithoutMG" || customizeOptions == "framedWithMG") {
-                getFramesForCustomizatinAction().then((data) => {
-                    if (data.success) setFrames(data.data);
-                });
+                getFramesForCustomizatinAction()
+                    .then((data) => {
+                        if (data.success) setFrames(data.data);
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                    })
+                    .finally(() => {
+                        setLoading(false);
+                    });
             }
         }
     }, [frameOptions]);
@@ -195,37 +205,43 @@ function Page() {
             height: frameOptions.data.height! + 2 * (customizingFrame?.borderWidth || 0),
         },
     );
+    let custType: CustomizationType = "ImageCanvasPrint";
+    switch (frameOptions.data.frameType) {
+        case "printOnly":
+            custType = "ImagePrintOnly";
+            break;
+        case "canvasPrint":
+            custType = "ImageCanvasPrint";
+            break;
+        case "framedWithoutMG":
+            custType = "ImageWithoutMatAndGlazing";
+            break;
+        case "framedWithMG":
+            custType = "ImageWithMatAndGlazing";
+            break;
+    }
+
+    const data: Omit<Customization, "id"> = {
+        type: custType,
+        width: totalSize.width,
+        height: totalSize.height,
+        image: frameOptions.data.croppedImage as string,
+        mirror: null,
+        glazing: upload.glazing || null,
+        printing: upload.printing || null,
+        backing: upload.backing || null,
+        stretching: upload.stretching || null,
+        sides: upload.sides || null,
+        mat: mat.map((m) => ({ color: m.color, width: m.width })),
+    };
+
+    const price =
+        calculateTotalPrice(data, {
+            unit_price: customizingFrame?.unit_price || 0,
+            borderWidth: customizingFrame?.borderWidth || 0,
+        }) / 100;
 
     const addToCart = (qty: number) => {
-        let custType: CustomizationType = "ImageCanvasPrint";
-        switch (frameOptions.data.frameType) {
-            case "printOnly":
-                custType = "ImagePrintOnly";
-                break;
-            case "canvasPrint":
-                custType = "ImageCanvasPrint";
-                break;
-            case "framedWithoutMG":
-                custType = "ImageWithoutMatAndGlazing";
-                break;
-            case "framedWithMG":
-                custType = "ImageWithMatAndGlazing";
-                break;
-        }
-        const data: Omit<Customization, "id"> = {
-            type: custType,
-            width: totalSize.width,
-            height: totalSize.height,
-            image: frameOptions.data.croppedImage as string,
-            mirror: null,
-            glazing: upload.glazing || null,
-            printing: upload.printing || null,
-            backing: upload.backing || null,
-            stretching: upload.stretching || null,
-            sides: upload.sides || null,
-            mat: mat.map((m) => ({ color: m.color, width: m.width })),
-        };
-
         if (!data.glazing && customizeOptions === "framedWithMG") {
             setError("Please select a glazing option");
             return;
@@ -256,10 +272,12 @@ function Page() {
         addCartItemAction(data, {
             frameId: customizingFrame && frameOptions.data.frameType?.startsWith("framed") ? customizingFrame.id : "",
             qty,
+            externalImage: frameOptions.data.usingExternalImage,
         })
             .then((data) => {
                 if (data.success) {
                     console.log("Added to cart");
+                    setFrameOptions({ framingStyle: "none" });
                     router.push("/cart");
                 } else {
                     setError(data.error);
@@ -392,60 +410,68 @@ function Page() {
                                         <InputField
                                             label={<strong>Frame</strong>}
                                             field={
-                                                <FrameDropdown
-                                                    items={frames.map((frame) => {
-                                                        return {
-                                                            value: frame.id,
-                                                            label: (
-                                                                <div className="flex gap-3" key={frame.name}>
-                                                                    <Image
-                                                                        src={frame.borderSrc}
-                                                                        width={100}
-                                                                        height={50}
-                                                                        alt="frame"
-                                                                        className="max-w-20 object-cover"
-                                                                    />
-                                                                    <div>
-                                                                        <p>{frame.name}</p>
-                                                                        <p>
-                                                                            <small>
-                                                                                Price per inch: {frame.unit_price}{" "}
-                                                                                <strong>&#8377;</strong>
-                                                                            </small>
-                                                                        </p>
-                                                                        <p>
-                                                                            <small>
-                                                                                Border Thickness: {frame.borderWidth}{" "}
-                                                                                <strong>In</strong>
-                                                                            </small>
-                                                                        </p>
+                                                loading ? (
+                                                    <Skeleton className="h-8 rounded-xl md:h-24" />
+                                                ) : (
+                                                    <FrameDropdown
+                                                        items={frames.map((frame) => {
+                                                            return {
+                                                                value: frame.id,
+                                                                label: (
+                                                                    <div className="flex gap-3" key={frame.name}>
+                                                                        <Image
+                                                                            src={frame.borderSrc}
+                                                                            width={100}
+                                                                            height={50}
+                                                                            alt="frame"
+                                                                            className="max-w-20 object-cover"
+                                                                        />
+                                                                        <div>
+                                                                            <p>{frame.name}</p>
+                                                                            <p>
+                                                                                <small>
+                                                                                    Price per inch:{" "}
+                                                                                    {(frame.unit_price / 100).toFixed(
+                                                                                        2,
+                                                                                    )}{" "}
+                                                                                    <strong>&#8377;</strong>
+                                                                                </small>
+                                                                            </p>
+                                                                            <p>
+                                                                                <small>
+                                                                                    Border Thickness:{" "}
+                                                                                    {frame.borderWidth}{" "}
+                                                                                    <strong>In</strong>
+                                                                                </small>
+                                                                            </p>
+                                                                        </div>
                                                                     </div>
-                                                                </div>
-                                                            ),
-                                                        };
-                                                    })}
-                                                    value={
-                                                        customizingFrame || {
-                                                            id: "",
-                                                            borderSrc: "",
-                                                            name: "",
-                                                            unit_price: 0,
-                                                            borderWidth: 0,
+                                                                ),
+                                                            };
+                                                        })}
+                                                        value={
+                                                            customizingFrame || {
+                                                                id: "",
+                                                                borderSrc: "",
+                                                                name: "",
+                                                                unit_price: 0,
+                                                                borderWidth: 0,
+                                                            }
                                                         }
-                                                    }
-                                                    onChange={(frameId: string) => {
-                                                        const selectedFrame = frames.find(
-                                                            (frame) => frame.id === frameId,
-                                                        );
-                                                        setCustomizingFrame(() => ({
-                                                            id: frameId,
-                                                            borderWidth: selectedFrame?.borderWidth || 0,
-                                                            borderSrc: selectedFrame?.borderSrc || "",
-                                                            name: selectedFrame?.name || "",
-                                                            unit_price: selectedFrame?.unit_price || 0,
-                                                        }));
-                                                    }}
-                                                />
+                                                        onChange={(frameId: string) => {
+                                                            const selectedFrame = frames.find(
+                                                                (frame) => frame.id === frameId,
+                                                            );
+                                                            setCustomizingFrame(() => ({
+                                                                id: frameId,
+                                                                borderWidth: selectedFrame?.borderWidth || 0,
+                                                                borderSrc: selectedFrame?.borderSrc || "",
+                                                                name: selectedFrame?.name || "",
+                                                                unit_price: selectedFrame?.unit_price || 0,
+                                                            }));
+                                                        }}
+                                                    />
+                                                )
                                             }
                                         />
                                     </>
@@ -500,7 +526,7 @@ function Page() {
                                 <span>
                                     <strong>Price</strong>
                                 </span>
-                                <span className="text-2xl font-bold max-md:col-span-2">$ 2,00.00</span>
+                                <span className="text-2xl font-bold max-md:col-span-2">₹ {price.toFixed(2)}</span>
                             </div>
                             <div>
                                 <AddToCartDialog addToCart={addToCart} addingToCart={addingToCart} />

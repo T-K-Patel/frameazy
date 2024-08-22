@@ -16,6 +16,11 @@ const LoginPage = ({ searchParams }: { searchParams: Record<string, any> }) => {
         if (session.data?.user) {
             if (searchParams.callbackUrl) {
                 redirect(searchParams.callbackUrl, RedirectType.replace);
+            } else if (searchParams.next) {
+                if (searchParams.next.startsWith("/admin") && session.data.user.role !== "admin") {
+                    redirect("/", RedirectType.replace);
+                }
+                redirect(searchParams.next, RedirectType.replace);
             } else {
                 redirect("/", RedirectType.replace);
             }

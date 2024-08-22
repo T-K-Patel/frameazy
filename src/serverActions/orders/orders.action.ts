@@ -7,6 +7,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import { z } from "zod";
 import { ObjectIdValidation } from "@/utils/validators";
+import { getDeliveryCharge } from "@/utils/totalPrice";
 async function isAuthenticated() {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
@@ -43,8 +44,8 @@ export async function getOrdersAction(): Promise<ServerActionReturnType<UserOrde
                 packaging: true,
                 discount: true
             },
-            orderBy:{
-                createdAt:"desc"
+            orderBy: {
+                createdAt: "desc"
             }
         });
 
@@ -164,7 +165,7 @@ export async function placeOrderAction(state: any, formData: FormData): Promise<
             throw new CustomError("Address not in proper format");
         }
         const packaging = cart.reduce((acc, item) => acc + item.quantity * item.single_unit_price, 0);
-        const delivery_charge = 30; // NOTE: Hardcoded delivery charge
+        const delivery_charge = getDeliveryCharge(packaging);
         const orderId = await db
             .$transaction(async (transaction) => {
                 const order = await transaction.order.create({

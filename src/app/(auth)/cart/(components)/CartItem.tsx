@@ -1,10 +1,11 @@
 import { IoIosClose } from "react-icons/io";
 import { FaMinus, FaPlus } from "react-icons/fa6";
-import Image from "next/image";
+import { Img } from "react-image";
 import React from "react";
 import { Customization } from "@prisma/client";
 import { CartItemType, deleteCartItem, updateCartItemQty } from "@/serverActions/cart/cart.actions";
 import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 export type CartItemCompType = {
     item: CartItemType;
@@ -49,7 +50,7 @@ export const CartItem = ({ item, updateState, deleteItem, fetchCartItems }: Cart
             <div className="flex items-center gap-8 border-b border-[#F1F1F1] p-3 text-center">
                 {(item.frame?.image || item.customization.image) && (
                     <>
-                        <Image
+                        <Img
                             src={item.customization.image || item.frame?.image || ""}
                             width={100}
                             height={100}
@@ -64,7 +65,9 @@ export const CartItem = ({ item, updateState, deleteItem, fetchCartItems }: Cart
                     </p>
                     <p className="w-full text-start text-base text-[#A3A1A1]">{item.customization.type}</p>
                 </div>
-                <p className="font-semibold leading-6 md:text-lg">{item.single_unit_price}</p>
+                <p className="text-nowrap font-semibold leading-6 md:text-lg">
+                    ₹ {(item.single_unit_price / 100).toFixed(2)}
+                </p>
                 <div className="flex items-center justify-between gap-[1px] rounded-lg bg-blue-1 text-white md:gap-1">
                     <>
                         <button
@@ -86,7 +89,9 @@ export const CartItem = ({ item, updateState, deleteItem, fetchCartItems }: Cart
                         </button>
                     </>
                 </div>
-                <p className="font-semibold leading-6 md:text-lg">{item.single_unit_price * item.quantity}</p>
+                <p className="text-nowrap font-semibold leading-6 md:text-lg">
+                    ₹ {((item.single_unit_price * item.quantity) / 100).toFixed(2)}
+                </p>
                 <>
                     <Button
                         variant={"ghost"}
@@ -130,7 +135,7 @@ export const CartItem = ({ item, updateState, deleteItem, fetchCartItems }: Cart
                     }
                     return <></>;
                 })}
-                <p className="flex-shrink-0 flex-grow" style={{ flexBasis: "200px" }}>
+                <p className="flex-shrink-0 flex-grow text-nowrap" style={{ flexBasis: "200px" }}>
                     <b>Dimensions: </b>
                     {item.customization.width.toFixed(2)}&nbsp;x&nbsp;
                     {item.customization.height.toFixed(2)}{" "}
@@ -144,14 +149,22 @@ export const CartItem = ({ item, updateState, deleteItem, fetchCartItems }: Cart
             ) : (
                 <div className="flex flex-wrap items-center gap-10 p-3">
                     <b className="pb-7">Mat: </b>
-                    {item.customization.mat.map((mat: any, ind: number) => {
+                    {item.customization.mat.map((mat, ind) => {
                         return (
                             <div className="flex flex-col items-center gap-2 text-center" key={ind}>
-                                <div
-                                    title={mat.colour}
-                                    className="h-5 w-5 overflow-hidden rounded-md border border-black"
-                                    style={{ backgroundColor: mat.colour }}
-                                ></div>
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <div
+                                                className="h-5 w-5 overflow-hidden rounded-md border border-black"
+                                                style={{ backgroundColor: mat.color }}
+                                            ></div>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p>{mat.color}</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
                                 <p className="font-semibold">{mat.width.toFixed(2)}</p>
                             </div>
                         );
