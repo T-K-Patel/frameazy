@@ -28,7 +28,7 @@ const OrderComponent = ({ order }: { order: UserOrders | AdminOrdersType }) => {
                         Total
                     </p>
                     <p className="col-span-1 text-sm font-semibold leading-5 md:text-base lg:text-lg">
-                        {Math.ceil((order.delivery_charge + order.packaging - order.discount) * 100) / 100} (₹)
+                        {Math.ceil(order.delivery_charge + order.packaging - order.discount) / 100} (₹)
                     </p>
                 </div>
                 <div className="grid grid-cols-1 gap-y-2 md:col-span-3 md:gap-y-0">
