@@ -2,10 +2,12 @@
 import { Customization } from "@prisma/client";
 import Image from "next/image";
 import React, { useState, useEffect } from "react";
-import { getOrderDetailsAction, UserOrderDetails } from "@/serverActions/orders/orders.action";
+import { cancelOrderAction, getOrderDetailsAction, UserOrderDetails } from "@/serverActions/orders/orders.action";
 import { Button } from "@/components/ui/button";
 import { IoMdOpen } from "react-icons/io";
 import { LoadingSkeleton } from "./LoadingSkeleton";
+import { useRouter } from "next/navigation";
+import CancelOrderDialog from "./CancelOrderDialog";
 
 const capitalizeFirstLetter = (str: string) => {
     return str.charAt(0).toUpperCase() + str.slice(1);
@@ -15,6 +17,8 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
     const [order, setOrder] = useState<UserOrderDetails | null>();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const router = useRouter();
+    const [cancelingOrder, setCancelingOrder] = useState(false);
 
     useEffect(() => {
         getOrderDetailsAction(params.id)
@@ -36,6 +40,27 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                 setLoading(false);
             });
     }, [params.id]);
+
+    const cancelOrder = () => {
+        if(!order?.id){
+            setError("Order not found");
+            return;
+        }
+        setCancelingOrder(true);
+        cancelOrderAction(order.id)
+            .then((data) => {
+                if (data.success) {
+                    console.log("Order Cancelled");
+                    router.push("/orders");
+                } else {
+                    setError(data.error);
+                }
+            })
+            .catch((error) => {
+                console.log(error);
+                setError("Something went wrong");
+            });
+    }
     return (
         <div className="mx-auto flex w-11/12 max-w-screen-2xl flex-col gap-8 py-5">
             {loading ? (
@@ -46,14 +71,15 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                 order && (
                     <>
                         <section className="flex flex-col rounded-lg border border-[#F1F1F1] p-3">
-                            <p className="p border-b border-[#F1F1F1] pb-3 text-2xl font-semibold leading-6">
+                            <div className="flex gap-x-5 justify-between p border-b border-[#F1F1F1] pb-3 text-2xl font-semibold leading-6">
                                 Order Details
-                            </p>
+                                {(order.order_status==="Received"||order.order_status==="Approved")&&<CancelOrderDialog cancelOrder={cancelOrder} cancelingOrder={cancelingOrder} />}
+                            </div>
                             <p className="text-md py-3 font-semibold text-[#A3A1A1]">
                                 <b className="pr-5 text-black">Order Id: </b>
                                 {order.id}
                             </p>
-                            <p className="text-md font-semibold text-[#A3A1A1]">
+                            <p className="text-md pb-3 font-semibold text-[#A3A1A1]">
                                 <b className="pr-5 text-black">Order Date: </b>
                                 {order.createdAt.toLocaleString("en-in", {
                                     weekday: "short",
@@ -76,35 +102,39 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                                             className="flex flex-col gap-1 rounded-lg border border-[#F1F1F1]"
                                             key={item.id}
                                         >
-                                            <div className="flex items-center gap-8 border-b border-[#F1F1F1] p-3 text-center">
-                                                {(item.frame?.image || item.customization.image) && (
-                                                    <>
-                                                        <Image
-                                                            src={item.customization.image || item.frame?.image || ""}
-                                                            width={100}
-                                                            height={100}
-                                                            alt={item.frame?.name || ""}
-                                                            className="h-20 w-20 object-contain"
-                                                        />
-                                                    </>
-                                                )}
-                                                <div className="w-full">
-                                                    <p className="w-full text-start text-xl font-semibold leading-6">
-                                                        {item.frame?.name || "No Frame"}
+                                            <div className="flex flex-col md:flex-row items-center gap-x-8 gap-y-5 border-b border-[#F1F1F1] p-3 text-center">
+                                                <div className="w-full flex items-center gap-8">
+                                                    {(item.frame?.image || item.customization.image) && (
+                                                        <>
+                                                            <Image
+                                                                src={item.customization.image || item.frame?.image || ""}
+                                                                width={100}
+                                                                height={100}
+                                                                alt={item.frame?.name || ""}
+                                                                className="h-20 w-20 object-contain"
+                                                            />
+                                                        </>
+                                                    )}
+                                                    <div className="w-full">
+                                                        <p className="w-full text-start text-xl font-semibold leading-6">
+                                                            {item.frame?.name || "No Frame"}
+                                                        </p>
+                                                        <p className="w-full text-start text-base text-[#A3A1A1]">
+                                                            {item.customization.type}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center text-center gap-8">
+                                                    <p className="font-semibold leading-6 md:text-lg">
+                                                        {item.single_unit_price}
                                                     </p>
-                                                    <p className="w-full text-start text-base text-[#A3A1A1]">
-                                                        {item.customization.type}
+                                                    <p className="font-semibold leading-6 text-[#A3A1A1] md:text-lg">
+                                                        x{item.quantity}
+                                                    </p>
+                                                    <p className="font-semibold leading-6 md:text-lg">
+                                                        {item.single_unit_price * item.quantity}
                                                     </p>
                                                 </div>
-                                                <p className="font-semibold leading-6 md:text-lg">
-                                                    {item.single_unit_price}
-                                                </p>
-                                                <p className="font-semibold leading-6 text-[#A3A1A1] md:text-lg">
-                                                    x{item.quantity}
-                                                </p>
-                                                <p className="font-semibold leading-6 md:text-lg">
-                                                    {item.single_unit_price * item.quantity}
-                                                </p>
                                             </div>
                                             <div className="flex flex-wrap justify-start gap-2 border-b border-[#F1F1F1] p-2">
                                                 {(Object.keys(item.customization) as (keyof Customization)[]).map(

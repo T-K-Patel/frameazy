@@ -120,7 +120,7 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                                 <b className="pr-5 text-black">Order Id: </b>
                                 {order.id}
                             </p>
-                            <p className="text-md font-semibold text-[#A3A1A1]">
+                            <p className="text-md pb-3 font-semibold text-[#A3A1A1]">
                                 <b className="pr-5 text-black">Order Date: </b>
                                 {order.createdAt.toLocaleString("en-in", {
                                     weekday: "short",
@@ -145,35 +145,39 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                                             className="flex flex-col gap-1 rounded-lg border border-[#F1F1F1]"
                                             key={item.id}
                                         >
-                                            <div className="flex items-center gap-8 border-b border-[#F1F1F1] p-3 text-center">
-                                                {(item.frame?.image || item.customization.image) && (
-                                                    <>
-                                                        <Image
-                                                            src={item.customization.image || item.frame?.image || ""}
-                                                            width={100}
-                                                            height={100}
-                                                            alt={item.frame?.name || ""}
-                                                            className="h-20 w-20 object-contain"
-                                                        />
-                                                    </>
-                                                )}
-                                                <div className="w-full">
-                                                    <p className="w-full text-start text-xl font-semibold leading-6">
-                                                        {item.frame?.name || "No Frame"}
+                                            <div className="flex flex-col md:flex-row items-center gap-x-8 gap-y-5 border-b border-[#F1F1F1] p-3 text-center">
+                                                <div className="w-full flex items-center gap-8">
+                                                    {(item.frame?.image || item.customization.image) && (
+                                                        <>
+                                                            <Image
+                                                                src={item.customization.image || item.frame?.image || ""}
+                                                                width={100}
+                                                                height={100}
+                                                                alt={item.frame?.name || ""}
+                                                                className="h-20 w-20 object-contain"
+                                                            />
+                                                        </>
+                                                    )}
+                                                    <div className="w-full">
+                                                        <p className="w-full text-start text-xl font-semibold leading-6">
+                                                            {item.frame?.name || "No Frame"}
+                                                        </p>
+                                                        <p className="w-full text-start text-base text-[#A3A1A1]">
+                                                            {item.customization.type}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center text-center gap-8">
+                                                    <p className="font-semibold leading-6 md:text-lg">
+                                                        {item.single_unit_price}
                                                     </p>
-                                                    <p className="w-full text-start text-base text-[#A3A1A1]">
-                                                        {item.customization.type}
+                                                    <p className="font-semibold leading-6 text-[#A3A1A1] md:text-lg">
+                                                        x{item.quantity}
+                                                    </p>
+                                                    <p className="font-semibold leading-6 md:text-lg">
+                                                        {item.single_unit_price * item.quantity}
                                                     </p>
                                                 </div>
-                                                <p className="font-semibold leading-6 md:text-lg">
-                                                    {item.single_unit_price}
-                                                </p>
-                                                <p className="font-semibold leading-6 text-[#A3A1A1] md:text-lg">
-                                                    x{item.quantity}
-                                                </p>
-                                                <p className="font-semibold leading-6 md:text-lg">
-                                                    {item.single_unit_price * item.quantity}
-                                                </p>
                                             </div>
                                             <div className="flex flex-wrap justify-start gap-2 border-b border-[#F1F1F1] p-2">
                                                 {(Object.keys(item.customization) as (keyof Customization)[]).map(

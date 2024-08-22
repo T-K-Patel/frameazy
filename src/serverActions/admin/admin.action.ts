@@ -207,7 +207,10 @@ export async function getOrdersAction(): Promise<ServerActionReturnType<AdminOrd
                 discount: true,
                 delivery_date: true,
                 transaction_status: true,
-            }
+            },
+            orderBy: {
+                createdAt: "desc",
+            },
         });
         return { success: true, data: orders };
     } catch (error) {

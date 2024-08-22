@@ -43,6 +43,9 @@ export async function getOrdersAction(): Promise<ServerActionReturnType<UserOrde
                 packaging: true,
                 discount: true
             },
+            orderBy:{
+                createdAt:"desc"
+            }
         });
 
         return { success: true, data: orders };
@@ -170,6 +173,7 @@ export async function placeOrderAction(state: any, formData: FormData): Promise<
                         shipping_address: address,
                         delivery_charge,
                         packaging,
+                        delivery_date: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
                     },
                 });
 
@@ -207,12 +211,13 @@ export async function placeOrderAction(state: any, formData: FormData): Promise<
 }
 
 
-export async function cancelOrderAction(orderId: string): Promise<ServerActionReturnType<string>> {
+export async function cancelOrderAction(id: string): Promise<ServerActionReturnType<string>> {
     try {
         const userId = await isAuthenticated();
+        ObjectIdValidation(id, "Invalid Order Id");
         const order = await db.order.findFirst({
             where: {
-                id: orderId,
+                id,
                 userId
             }
         });
@@ -220,7 +225,7 @@ export async function cancelOrderAction(orderId: string): Promise<ServerActionRe
         if (!([OrderStatus.Approved, OrderStatus.Received] as OrderStatus[]).includes(order.order_status)) throw new CustomError("Order cannot be cancelled");
         await db.order.update({
             where: {
-                id: orderId
+                id,
             },
             data: {
                 order_status: "Canceled"
