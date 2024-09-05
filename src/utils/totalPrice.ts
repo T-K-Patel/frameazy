@@ -20,7 +20,7 @@ export function calculateTotalPrice(customization: Omit<Customization, "id">, fr
 
     const glazingPrice = customization.glazing ? GlazingPrice[customization.glazing] * height * width : 0;
 
-    customization.mat.forEach((m) => {
+    customization.mat?.forEach((m) => {
         totalPrice += MAT_PRICE * ((height * width) - ((height - 2 * m.width) * (width - 2 * m.width)));
         height -= 2 * m.width;
         width -= 2 * m.width;

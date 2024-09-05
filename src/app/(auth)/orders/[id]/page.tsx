@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import CancelOrderDialog from "./CancelOrderDialog";
 import Link from "next/link";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import PaymentButton from "./PaymentButton";
 
 const capitalizeFirstLetter = (str: string) => {
     return str.charAt(0).toUpperCase() + str.slice(1);
@@ -266,10 +267,18 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                                         <p className={`text-lg font-semibold text-red-500`}>Not Approved yet</p>
                                     ) : order.order_status == "Approved" ? (
                                         <>
-                                            <Button size={"lg"}>
-                                                Pay with Razorpay&nbsp;
-                                                <IoMdOpen size={20} />
-                                            </Button>
+                                            {order.transaction_status == "Pending" ||
+                                            order.transaction_status == "Processing" ? (
+                                                <>
+                                                    {
+                                                        <p className={`text-lg font-semibold text-[#D68D00]`}>
+                                                            {order.transaction_status}
+                                                        </p>
+                                                    }
+                                                </>
+                                            ) : (
+                                                <PaymentButton orderId={order.id} />
+                                            )}
                                         </>
                                     ) : (
                                         <p

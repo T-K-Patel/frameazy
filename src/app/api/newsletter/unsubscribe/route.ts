@@ -75,19 +75,27 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
     // Unsubscribe the user
-    const token = req.nextUrl.searchParams.get("token");
-    if (!token) {
+    const unsubscribeToken = req.nextUrl.searchParams.get("token");
+    if (!unsubscribeToken) {
         return new NextResponse("Invalid token", { status: 400 });
     }
     // Unsubscribe the user
     try {
-        const dlt = await db.subscription.update({ where: { unsubscribeToken: token }, data: { status: "Unsubscribed" } });
+        const dlt = await db.subscription.update({
+            where: {
+                unsubscribeToken
+            },
+            data: {
+                status: "Unsubscribed"
+            }
+        });
         if (dlt) {
             return new NextResponse("Unsubscribed successfully", { status: 200 });
         } else {
             return new NextResponse("Invalid token", { status: 400 });
         }
     } catch (error) {
+        console.log("Error unsubscribing", error);
         return new NextResponse("Error unsubscribing", { status: 500 });
     }
 }

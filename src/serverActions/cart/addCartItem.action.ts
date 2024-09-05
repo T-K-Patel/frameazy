@@ -61,7 +61,7 @@ export async function addCartItemAction(
             throw new CustomError("Quantity must be greater than 0");
         }
 
-        let customization: Customization = {} as Customization;
+        let customization: Customization = { mat: [] as Customization['mat'] } as Customization;
 
         if (!isValidNumber(data.width)) {
             throw new CustomError("Invalid width");
@@ -103,7 +103,7 @@ export async function addCartItemAction(
                 if (!isvalidMatOptions(data.mat)) {
                     throw new CustomError("Invalid mat options");
                 }
-                customization.mat = data.mat;
+                customization.mat = data.mat.map((mat) => ({ color: mat.color, width: Number(mat.width) }));
                 // customization.glazing
                 if (!data.glazing || !Object.keys(Glazing).includes(data.glazing)) {
                     throw new CustomError("Invalid glazing option");
@@ -154,7 +154,7 @@ export async function addCartItemAction(
                 if (!isvalidMatOptions(data.mat)) {
                     throw new CustomError("Invalid mat options");
                 }
-                customization.mat = data.mat;
+                customization.mat = data.mat.map((mat) => ({ color: mat.color, width: Number(mat.width) }));
                 // customization.glazing
                 if (!data.glazing || !Object.keys(Glazing).includes(data.glazing)) {
                     throw new CustomError("Invalid glazing option");
