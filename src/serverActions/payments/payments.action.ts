@@ -239,6 +239,9 @@ export async function checkPaymentStatus(orderId: string): Promise<ServerActionR
         if (!order.transaction) {
             throw new CustomError("Transaction not found");
         }
+        if(order.transaction.status == "Paid") {
+            return { success: true, data: true };
+        }
         const rzpOrder = await rzpInstance.orders.fetch(order.transaction.paymentOrderId);
         const payments = (await rzpInstance.orders.fetchPayments(order.transaction.paymentOrderId)).items;
         if (rzpOrder.status == "paid") {

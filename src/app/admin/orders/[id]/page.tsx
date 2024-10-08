@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import DropDown from "@/components/DropDown";
-import { OrderStatus, Customization } from "@prisma/client";
+import { OrderStatus, CartCustomization } from "@prisma/client";
 import { Img } from "react-image";
 import {
     getOrderDetailsAction,
@@ -194,7 +194,7 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                                                 </div>
                                             </div>
                                             <div className="flex flex-wrap justify-start gap-2 border-b border-[#F1F1F1] p-2">
-                                                {(Object.keys(item.customization) as (keyof Customization)[]).map(
+                                                {(Object.keys(item.customization) as (keyof CartCustomization)[]).map(
                                                     (key) => {
                                                         if (
                                                             (key === "glazing" ||
@@ -319,9 +319,9 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                                     Payment
                                 </p>
                                 <p
-                                    className={`text-lg font-semibold ${order.transaction_status === "Pending" ? "text-[#D68D00]" : "text-[#008C0E]"}`}
+                                    className={`text-lg font-semibold ${order.transaction?.status === "Attempted"||"Created" ? "text-[#D68D00]" : "text-[#008C0E]"}`}
                                 >
-                                    {order.transaction_status}
+                                    {order.transaction?.status}
                                 </p>
                             </div>
                             <div className="flex flex-col gap-2 rounded-lg border border-[#F1F1F1] p-3 sm:col-span-2 lg:col-span-1">

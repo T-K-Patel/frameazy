@@ -1,5 +1,5 @@
 "use client";
-import { Customization } from "@prisma/client";
+import { CartCustomization } from "@prisma/client";
 import { Img } from "react-image";
 import React, { useState, useEffect } from "react";
 import { cancelOrderAction, getOrderDetailsAction, UserOrderDetails } from "@/serverActions/orders/orders.action";
@@ -11,7 +11,6 @@ import CancelOrderDialog from "./CancelOrderDialog";
 import Link from "next/link";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import PaymentButton from "./PaymentButton";
-import { checkPaymentStatus } from "@/serverActions/payments/payments.action";
 
 const capitalizeFirstLetter = (str: string) => {
     return str.charAt(0).toUpperCase() + str.slice(1);
@@ -66,23 +65,23 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
             });
     };
 
-    const checkStatus = () => {
-        if (!order?.id) {
-            return;
-        }
-        checkPaymentStatus(order.id)
-            .then((data) => {
-                if (data.success) {
-                    console.log(data.data);
-                } else {
-                    alert("Payment not found");
-                }
-            })
-            .catch((error) => {
-                console.log(error);
-                alert("Something went wrong");
-            });
-    };
+    // const checkStatus = () => {
+    //     if (!order?.id) {
+    //         return;
+    //     }
+    //     checkPaymentStatus(order.id)
+    //         .then((data) => {
+    //             if (data.success) {
+    //                 console.log(data.data);
+    //             } else {
+    //                 alert("Payment not found");
+    //             }
+    //         })
+    //         .catch((error) => {
+    //             console.log(error);
+    //             alert("Something went wrong");
+    //         });
+    // };
 
     return (
         <div className="mx-auto flex w-11/12 max-w-screen-2xl flex-col gap-8 py-5">
@@ -172,7 +171,7 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                                                 </div>
                                             </div>
                                             <div className="flex flex-wrap justify-start gap-2 border-b border-[#F1F1F1] p-2">
-                                                {(Object.keys(item.customization) as (keyof Customization)[]).map(
+                                                {(Object.keys(item.customization) as (keyof CartCustomization)[]).map(
                                                     (key) => {
                                                         if (
                                                             (key === "glazing" ||
@@ -273,7 +272,7 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                                     Order Status
                                 </p>
                                 <p
-                                    className={`text-lg font-semibold ${order?.transaction_status === "Success" ? "text-[#008C0E]" : order?.transaction_status === "Pending" ? "text-[#D68D00]" : "text-red-500"}`}
+                                    className={`text-lg font-semibold ${order?.order_status==="Approved" ? "text-[#008C0E]" : order?.order_status === "Received" ? "text-[#D68D00]" : "text-red-500"}`}
                                 >
                                     {order?.order_status}
                                 </p>
@@ -287,24 +286,13 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                                         <p className={`text-lg font-semibold text-red-500`}>Not Approved yet</p>
                                     ) : order.order_status == "Approved" ? (
                                         <>
-                                            {order.transaction_status == "Processing" ? (
-                                                <div>
-                                                    <p className={`text-lg font-semibold text-[#D68D00]`}>
-                                                        {order.transaction_status}
-                                                    </p>
-                                                    <Button size={"lg"} onClick={checkStatus}>
-                                                        Check Status
-                                                    </Button>
-                                                </div>
-                                            ) : (
-                                                <PaymentButton orderId={order.id} />
-                                            )}
+                                            <PaymentButton orderId={order.id} />
                                         </>
                                     ) : (
                                         <p
-                                            className={`text-lg font-semibold ${order?.transaction_status === "Pending" ? "text-[#D68D00]" : "text-[#008C0E]"}`}
+                                            className={`text-lg font-semibold ${order.transaction?.status === "Attempted" ? "text-[#D68D00]" : "text-[#008C0E]"}`}
                                         >
-                                            {order?.transaction_status}
+                                            {order.transaction?.status}
                                         </p>
                                     )}
                                 </div>

@@ -14,7 +14,7 @@ const AdminTransactionPage = () => {
             paymentId: null,
             amount: 0,
             updatedAt: new Date(),
-            status: PaymentStatus.Success,
+            status: PaymentStatus.Paid,
         },
     ]);
     const [loading, setLoading] = useState(false);
@@ -91,7 +91,7 @@ const AdminTransactionPage = () => {
                                                 {t.updatedAt.toDateString()}
                                             </td>
                                             <td
-                                                className={`text-nowrap text-center font-semibold md:text-xl ${t.status === PaymentStatus.Success ? "text-green-500" : t.status === PaymentStatus.Pending ? "text-orange-400" : "text-red-500"}`}
+                                                className={`text-nowrap text-center font-semibold md:text-xl ${t.status === PaymentStatus.Paid ? "text-green-500" : t.status === PaymentStatus.Attempted ? "text-orange-400" : "text-red-500"}`}
                                             >
                                                 {t.status}
                                             </td>

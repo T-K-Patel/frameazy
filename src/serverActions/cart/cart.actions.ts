@@ -4,7 +4,7 @@ import { CustomError } from "@/lib/CustomError";
 import { db } from "@/lib/db";
 import { ServerActionReturnType } from "@/types/serverActionReturnType";
 import { getServerSession } from "next-auth";
-import { Customization } from "@prisma/client";
+import { CartCustomization } from "@prisma/client";
 
 async function isAuthenticated() {
     const session = await getServerSession(authOptions);
@@ -15,7 +15,7 @@ async function isAuthenticated() {
 }
 export type CartItemType = {
     id: string;
-    customization: Customization;
+    customization: CartCustomization;
     quantity: number;
     frame: {
         image: string;

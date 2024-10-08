@@ -5,14 +5,11 @@ import { CustomError } from "@/lib/CustomError";
 import {
     Message,
     Subscription,
-    Category,
-    Color,
-    Collection,
     OrderStatus,
     Role,
     PaymentStatus,
     Address,
-    Customization
+    CartCustomization
 } from "@prisma/client";
 import { CloudinaryStorage } from "@/lib/Cloudinary.storage";
 import { getServerSession } from "next-auth";
@@ -36,9 +33,9 @@ export async function addProduct(state: any, formData: FormData) {
         const unitPrice = Number(formData.get("unitPrice"));
         const productImage = formData.get("productImage") as File;
         const borderImage = formData.get("borderImage") as File;
-        const productCategory = formData.get("productCategory") as Category;
-        const productColor = formData.get("productColor") as Color;
-        const productCollection = formData.get("productCollection") as Collection;
+        const productCategory = formData.get("productCategory")?.toString().trim();
+        const productColor = formData.get("productColor")?.toString().trim();
+        const productCollection = formData.get("productCollection")?.toString().trim();
 
         const borderWidth = Number(formData.get("borderWidth"));
 
@@ -58,16 +55,16 @@ export async function addProduct(state: any, formData: FormData) {
             throw new CustomError("Border Image must be a valid image file (JPEG, PNG, GIF).");
         }
 
-        if (!Object.values(Category).includes(productCategory)) {
-            throw new CustomError("Invalid Product Category.");
+        if (!productCategory || productCategory.length < 3) {
+            throw new CustomError("Product Category must be larger than 3 characters.");
         }
 
-        if (!Object.values(Color).includes(productColor)) {
-            throw new CustomError("Invalid Product Category.");
+        if (!productCollection || productCollection.length < 3) {
+            throw new CustomError("Product Collection must be larger than 3 characters.");
         }
 
-        if (!Object.values(Collection).includes(productCollection)) {
-            throw new CustomError("Invalid Product Category.");
+        if (!productColor || productColor.length < 3) {
+            throw new CustomError("Product Color must be larger than 3 characters.");
         }
 
         if (!isFinite(borderWidth) || isNaN(borderWidth) || borderWidth <= 0) {
@@ -90,9 +87,9 @@ export async function addProduct(state: any, formData: FormData) {
                 name: productName,
                 unit_price: unitPrice * 100,
                 image: imageUrl,
-                category: productCategory,
-                color: productColor,
-                collection: productCollection,
+                category: productCategory.toLowerCase(),
+                color: productColor.toLowerCase(),
+                collection: productCollection.toLowerCase(),
                 borderSrc: borderImageUrl,
                 borderWidth: borderWidth,
             },
@@ -190,7 +187,9 @@ export type AdminOrdersType = {
     packaging: number;
     discount: number;
     delivery_date: Date | null;
-    transaction_status: string;
+    transaction:{
+        status:string
+    }|null
 };
 
 // LATER: Add pagination
@@ -206,7 +205,11 @@ export async function getOrdersAction(): Promise<ServerActionReturnType<AdminOrd
                 packaging: true,
                 discount: true,
                 delivery_date: true,
-                transaction_status: true,
+                transaction:{
+                    select:{
+                        status:true
+                    }
+                }
             },
             orderBy: {
                 createdAt: "desc",
@@ -230,7 +233,6 @@ export type AdminOrderDetailsType = {
     packaging: number,
     discount: number,
     delivery_date: Date | null,
-    transaction_status: PaymentStatus,
     shipping_address: Address,
     order_items: {
         id: string,
@@ -239,13 +241,16 @@ export type AdminOrderDetailsType = {
             image: string,
         } | null,
         quantity: number,
-        customization: Customization,
+        customization: CartCustomization,
         single_unit_price: number,
     }[],
     user: {
         name: string | null,
         email: string | null,
     },
+    transaction:{
+        status:string
+    }|null
 }
 
 export async function getOrderDetailsAction(id: string): Promise<ServerActionReturnType<AdminOrderDetailsType>> {
@@ -267,7 +272,6 @@ export async function getOrderDetailsAction(id: string): Promise<ServerActionRet
                 packaging: true,
                 discount: true,
                 delivery_date: true,
-                transaction_status: true,
                 shipping_address: true,
                 order_items: {
                     select: {
@@ -289,7 +293,11 @@ export async function getOrderDetailsAction(id: string): Promise<ServerActionRet
                         email: true,
                     }
                 },
-
+                transaction:{
+                    select:{
+                        status:true
+                    }
+                }
             },
         });
 

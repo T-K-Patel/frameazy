@@ -6,7 +6,7 @@ import { useFrames } from "@/context/frames-context";
 import InputField from "../InputField";
 import FrameCanvas from "../FrameCanvas";
 import { IoCloseSharp } from "react-icons/io5";
-import { Glazing, Printing, Backing, Stretching, Sides, CustomizationType, Customization } from "@prisma/client";
+import { Glazing, Printing, Backing, Stretching, Sides, CustomizationType, CartCustomization } from "@prisma/client";
 import { getFramesForCustomizatinAction, FramesForCustomizationType } from "@/serverActions/frames/frame.action";
 import Image from "next/image";
 import { addCartItemAction } from "@/serverActions/cart/addCartItem.action";
@@ -42,7 +42,7 @@ type matOptionsProps = {
 
 type ContentType = { title: string; mat: boolean; options: CustomizeOptionsProps[] };
 function Page() {
-    const { frameOptions, customizingFrame, setCustomizingFrame, setFrameOptions } = useFrames();
+    const { frameOptions, customizingFrame, setCustomizingFrame} = useFrames();
     const [upload, setUpload] = useState<uploadOptionsProps>({
         dimensions: { width: 0, height: 0 },
         printing: Object.keys(Printing)[0] as Printing,
@@ -221,7 +221,7 @@ function Page() {
             break;
     }
 
-    const data: Omit<Customization, "id"> = {
+    const data: Omit<CartCustomization, "id"> = {
         type: custType,
         width: totalSize.width,
         height: totalSize.height,
@@ -277,7 +277,6 @@ function Page() {
             .then((data) => {
                 if (data.success) {
                     console.log("Added to cart");
-                    setFrameOptions({ framingStyle: "none" });
                     router.push("/cart");
                 } else {
                     setError(data.error);

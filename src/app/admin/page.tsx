@@ -7,8 +7,6 @@ import Upload from "../../assets/upload.svg";
 import { Button } from "@/components/ui/button";
 import { useFormState, useFormStatus } from "react-dom";
 import { addProduct } from "@/serverActions/admin/admin.action";
-import DropDown from "@/components/DropDown";
-import { Collection, Color, Category } from "@prisma/client";
 
 type UploadImageProps = {
     name: string;
@@ -147,35 +145,41 @@ const AdminDashboard = () => {
                                 <div className="flex flex-col gap-y-1">
                                     <Label className="text-lg font-semibold">Frames Category</Label>
                                     <input type="hidden" name="productCategory" value={dropdownData.category} />
-                                    <DropDown
-                                        items={Object.keys(Category)}
-                                        value={dropdownData.category}
-                                        onChange={(val: string) => {
-                                            setDropdownData((d) => ({ ...d, category: val }));
-                                        }}
-                                    />
+                                    <Input
+                                    className="relative h-12"
+                                    name="Category"
+                                    placeholder="Set Category"
+                                    type="text"
+                                    onChange={(e)=>{
+                                        setDropdownData((d) => ({ ...d, category: e.target.value }));
+                                    }}
+                                />
                                 </div>
                                 <div className="flex flex-col gap-y-1">
                                     <Label className="text-lg font-semibold">Frames Colors</Label>
                                     <input type="hidden" name="productColor" value={dropdownData.color} />
-                                    <DropDown
-                                        items={Object.keys(Color)}
-                                        value={dropdownData.color}
-                                        onChange={(val: string) => {
-                                            setDropdownData((d) => ({ ...d, color: val }));
-                                        }}
-                                    />
+                                    <Input
+                                    className="relative h-12"
+                                    name="Colors"
+                                    placeholder="Set Color"
+                                    type="text"
+                                    onChange={(e)=>{
+                                        setDropdownData((d) => ({ ...d, color: e.target.value }));
+                                    }}
+                                />
                                 </div>
                                 <div className="flex flex-col gap-y-1">
                                     <span className="text-lg font-semibold">Collections</span>
                                     <input type="hidden" name="productCollection" value={dropdownData.collection} />
-                                    <DropDown
-                                        items={Object.keys(Collection)}
-                                        value={dropdownData.collection}
-                                        onChange={(val: string) => {
-                                            setDropdownData((d) => ({ ...d, collection: val }));
-                                        }}
-                                    />
+                                    <Input
+                                    className="relative h-12"
+                                    name="Collections"
+                                    placeholder="Set Collection"
+                                    type="text"
+                                    onChange={(e)=>{
+                                        setDropdownData((d) => ({ ...d, collection: e.target.value }));
+                                    }}
+                                />
                                 </div>
                             </div>
                             <div className="flex justify-between p-3">

@@ -2,7 +2,7 @@
 import { ServerActionReturnType } from "@/types/serverActionReturnType";
 import { db } from "@/lib/db";
 import { CustomError } from "@/lib/CustomError";
-import { OrderStatus, PaymentStatus, Customization, Address } from "@prisma/client";
+import { OrderStatus, CartCustomization, Address } from "@prisma/client";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import { z } from "zod";
@@ -20,11 +20,13 @@ export type UserOrders = {
     id: string;
     order_status: OrderStatus;
     createdAt: Date;
-    transaction_status: PaymentStatus;
     delivery_date: Date | null;
     delivery_charge: number,
     packaging: number,
-    discount: number
+    discount: number,
+    transaction:{
+        status:string
+    }|null
 };
 
 export async function getOrdersAction(): Promise<ServerActionReturnType<UserOrders[]>> {
@@ -38,11 +40,15 @@ export async function getOrdersAction(): Promise<ServerActionReturnType<UserOrde
                 id: true,
                 order_status: true,
                 createdAt: true,
-                transaction_status: true,
                 delivery_date: true,
                 delivery_charge: true,
                 packaging: true,
-                discount: true
+                discount: true,
+                transaction:{
+                    select:{
+                        status:true
+                    }
+                }
             },
             orderBy: {
                 createdAt: "desc"
@@ -63,7 +69,7 @@ export type UserOrderDetails = {
     id: string;
     order_items: {
         id: string;
-        customization: Customization;
+        customization: CartCustomization;
         frame: {
             name: string;
             image: string;
@@ -77,8 +83,10 @@ export type UserOrderDetails = {
     createdAt: Date,
     packaging: number,
     discount: number,
-    transaction_status: PaymentStatus,
     delivery_date: Date | null,
+    transaction:{
+        status:string
+    }|null
 };
 export async function getOrderDetailsAction(id: string): Promise<ServerActionReturnType<UserOrderDetails>> {
     try {
@@ -110,9 +118,13 @@ export async function getOrderDetailsAction(id: string): Promise<ServerActionRet
                 delivery_charge: true,
                 packaging: true,
                 discount: true,
-                transaction_status: true,
                 delivery_date: true,
                 createdAt: true,
+                transaction:{
+                    select:{
+                        status:true
+                    }
+                }
             },
         });
 
@@ -150,7 +162,7 @@ export async function placeOrderAction(state: any, formData: FormData): Promise<
             state: formData.get("state") as string,
             phone: formData.get("phone") as string,
         };
-        const cart = await db.cartItem.findMany({
+        let cart = await db.cartItem.findMany({
             where: {
                 userId,
             },
@@ -177,6 +189,28 @@ export async function placeOrderAction(state: any, formData: FormData): Promise<
                         delivery_date: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
                     },
                 });
+
+                cart.forEach(async(item)=>{
+                    const cutomization = await transaction.cartCustomization.findUnique({
+                        where: {
+                            id: item.customizationId
+                        }
+                    });
+
+                    if (cutomization) {
+                        await transaction.orderCustomization.create({
+                            data: cutomization
+                        });
+                    } else {
+                        throw new CustomError("Customization not found");
+                    }
+
+                    await transaction.cartCustomization.delete({
+                        where: {
+                            id: item.customizationId
+                        }
+                    })
+                })
 
                 const orderItemsArr = cart.map((item) => ({
                     orderId: order.id,

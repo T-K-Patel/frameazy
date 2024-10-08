@@ -3,7 +3,7 @@ import { UserOrders } from "@/serverActions/orders/orders.action";
 import Link from "next/link";
 import { AdminOrdersType } from "@/serverActions/admin/admin.action";
 
-const OrderComponent = ({ order }: { order: UserOrders | AdminOrdersType }) => {
+const OrderComponent = ({ order}: { order: UserOrders | AdminOrdersType}) => {
     return (
         <div className="flex flex-col justify-between gap-3 rounded-lg border border-[#F1F1F1] px-3 py-4 md:flex-row">
             <div className="grid flex-grow grid-cols-1 gap-2 border-[#F1F1F1] md:grid-cols-3 md:border-r">
@@ -55,9 +55,9 @@ const OrderComponent = ({ order }: { order: UserOrders | AdminOrdersType }) => {
                             Payment Status
                         </p>
                         <p
-                            className={`font-semibold leading-6 ${order.transaction_status === "Pending" ? "text-[#D68D00]" : "text-[#008C0E]"}`}
+                            className={`font-semibold leading-6 ${ order.transaction?.status=== "Attempted"||order.transaction?.status==="Created" ? "text-[#D68D00]" : "text-[#008C0E]"}`}
                         >
-                            {order.transaction_status}
+                            {order.transaction?.status}
                         </p>
                     </div>
                 </div>

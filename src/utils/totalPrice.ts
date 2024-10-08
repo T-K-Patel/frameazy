@@ -1,7 +1,7 @@
-import { Customization } from "@prisma/client"
+import { CartCustomization } from "@prisma/client"
 import { GlazingPrice, BackingPrice, SidesPrice, StretchingPrice, MirrorPrice, PrintingPrice, MAT_PRICE } from "@/contants/pricings"
 
-export function calculateTotalPrice(customization: Omit<Customization, "id">, frame?: { unit_price: number, borderWidth: number }) {
+export function calculateTotalPrice(customization: Omit<CartCustomization, "id">, frame?: { unit_price: number, borderWidth: number }) {
 
     let height = customization.height;
     let width = customization.width;

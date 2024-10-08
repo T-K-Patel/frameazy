@@ -1,14 +1,13 @@
 "use server";
-
-import { Category, Collection, Color, OrderStatus } from "@prisma/client";
 import { db } from "@/lib/db";
 import { ServerActionReturnType } from "@/types/serverActionReturnType";
 import { CustomError } from "@/lib/CustomError";
+import { OrderStatus } from "@prisma/client";
 
 export type FramesFilterType = {
-    categories: Category[];
-    collections: Collection[];
-    colors: Color[];
+    categories: string[];
+    collections: string[];
+    colors: string[];
     name: string;
 };
 
@@ -21,20 +20,75 @@ export type PopularFrameDataType = {
 export type FrameDataType = PopularFrameDataType & {
     borderSrc: string;
     borderWidth: number;
-    color: Color;
-    collection: Collection;
-    category: Category;
+    color: string;
+    collection: string;
+    category: string;
 };
+
+export async function getUniqueColors() {
+    const frames = await db.frame.findMany({
+      select: {
+        color: true,
+      },
+    });
+  
+    const uniqueColors = new Set<string>();
+  
+    frames.forEach((frame:any) => {
+      if (frame.color) {
+        uniqueColors.add(frame.color);
+      }
+    });
+  
+    return Array.from(uniqueColors);
+  }
+export async function getUniqueCollections() {
+    const frames = await db.frame.findMany({
+      select: {
+        collection: true,
+      },
+    });
+  
+    const uniqueColors = new Set<string>();
+  
+    frames.forEach((frame:any) => {
+      if (frame.collection) {
+        uniqueColors.add(frame.collection);
+      }
+    });
+  
+    return Array.from(uniqueColors);
+  }
+export async function getUniqueCategory() {
+    const frames = await db.frame.findMany({
+      select: {
+        category: true,
+      },
+    });
+  
+    const uniqueColors = new Set<string>();
+  
+    frames.forEach((frame:any) => {
+      if (frame.category) {
+        uniqueColors.add(frame.category);
+      }
+    });
+  
+    return Array.from(uniqueColors);
+  }
 
 export async function getFramesAction(
     filters: FramesFilterType,
     page: number,
 ): Promise<ServerActionReturnType<{ total: number; page: number; frames: FrameDataType[] }>> {
     try {
+        const Color:string[]=await getUniqueColors();
+        const Category:string[]=await getUniqueCategory();
+        const Collection:string[]=await getUniqueCollections();
         const validatedFilters = {
-            categories: filters.categories.filter((cat) => { return Category[cat] }).sort(),
-            collections: filters.collections.filter((col) => { return Collection[col] }).sort(),
-            colors: filters.colors.filter((col) => { return Color[col] }).sort(),
+            categories: filters.categories.filter((cat) => Category.includes(cat)).sort(),
+            collections: filters.collections.filter((col) => { Collection.includes(col) }).sort(),
+            colors: filters.colors.filter((col) => { Color.includes(col) }).sort(),
             name: filters.name
         }
         const frames = await db.frame.findMany({

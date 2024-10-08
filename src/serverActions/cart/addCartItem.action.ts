@@ -7,7 +7,7 @@ import { ServerActionReturnType } from "@/types/serverActionReturnType";
 import { calculateTotalPrice } from "@/utils/totalPrice";
 import { ObjectIdValidation } from "@/utils/validators";
 import {
-    Customization,
+    CartCustomization,
     CustomizationType,
     Printing,
     Stretching,
@@ -51,7 +51,7 @@ function isvalidMatOptions(options: any): boolean {
 }
 
 export async function addCartItemAction(
-    data: Omit<Customization, "id">,
+    data: Omit<CartCustomization, "id">,
     { frameId, qty, externalImage }: { frameId?: string; qty?: number; externalImage?: boolean } = {},
 ): Promise<ServerActionReturnType<string>> {
     try {
@@ -61,7 +61,7 @@ export async function addCartItemAction(
             throw new CustomError("Quantity must be greater than 0");
         }
 
-        let customization: Customization = { mat: [] as Customization['mat'] } as Customization;
+        let customization: CartCustomization = { mat: [] as CartCustomization['mat'] } as CartCustomization;
 
         if (!isValidNumber(data.width)) {
             throw new CustomError("Invalid width");
@@ -237,7 +237,7 @@ export async function addCartItemAction(
                 }
             }
         }
-        const custId = await db.customization.create({
+        const custId = await db.cartCustomization.create({
             data: {
                 ...customization,
                 mat: {

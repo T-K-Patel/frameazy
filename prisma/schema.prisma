@@ -85,9 +85,9 @@ model Frame {
   borderSrc   String
   borderWidth Float
   unit_price  Float
-  category    Category
-  color       Color
-  collection  Collection
+  category    String
+  color       String
+  collection  String
   CartItem    CartItem[]
   OrderItem   OrderItem[]
   createdAt   DateTime    @default(now())

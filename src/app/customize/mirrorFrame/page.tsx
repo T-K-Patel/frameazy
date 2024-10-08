@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import React, { useState, useEffect } from "react";
 import InputField from "../InputField";
 import FrameCanvas from "../FrameCanvas";
-import { Customization, Mirror } from "@prisma/client";
+import { CartCustomization, Mirror } from "@prisma/client";
 import { getFramesForCustomizatinAction, FramesForCustomizationType } from "@/serverActions/frames/frame.action";
 import { useFrames } from "@/context/frames-context";
 import Image from "next/image";
@@ -25,7 +25,7 @@ const Page = () => {
         dimensions: { width: 12, height: 9 },
         mirrorType: MirrorOptions[0] as Mirror,
     });
-    const { frameOptions, customizingFrame, setCustomizingFrame, setFrameOptions } = useFrames();
+    const { frameOptions, customizingFrame, setCustomizingFrame} = useFrames();
     const [frames, setFrames] = useState<FramesForCustomizationType[]>([]);
     const [error, setError] = useState<string | null>(null);
     const router = useRouter();
@@ -48,7 +48,7 @@ const Page = () => {
     }, [frameOptions]);
 
     if (frameOptions.framingStyle != "mirrorFrame") return <></>;
-    const data: Omit<Customization, "id"> = {
+    const data: Omit<CartCustomization, "id"> = {
         type: "FramedMirror",
         width: mirror.dimensions.width,
         height: mirror.dimensions.height,
@@ -80,7 +80,6 @@ const Page = () => {
             .then((data) => {
                 if (data.success) {
                     console.log("Added to cart");
-                    setFrameOptions({ framingStyle: "none" });
                     router.push("/cart");
                 } else {
                     setError(data.error);
