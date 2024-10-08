@@ -36,8 +36,16 @@ export function validatePassword(password: string) {
     return error;
 }
 
+/**
+ * 
+ * @param id 
+ * @param message 
+ * @returns {true}
+ * 
+ * @throws {CustomError} if id is not a valid ObjectId
+ */
 
-export function ObjectIdValidation(id: string | undefined, message: string = "Invalid Id") {
+export function ObjectIdValidation(id: string | undefined, message: string = "Invalid Id"): true {
     try {
         if (!id || !/^[0-9a-f]{24}$/.test(id)) {
             throw new CustomError(message);

@@ -7,16 +7,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  user
-  admin
-}
-
 model User {
   id            String          @id @default(auto()) @map("_id") @db.ObjectId
   name          String?
   email         String?         @unique
-  emailVerified DateTime?       @map("email_verified")
+  emailVerified DateTime?       @default(now()) @map("email_verified")
   role          Role            @default(user)
   image         String?
   accounts      Account[]
@@ -65,16 +60,6 @@ model Session {
   @@map("sessions")
 }
 
-model VerificationToken {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  identifier String
-  token      String
-  expires    DateTime
-
-  @@unique([identifier, token])
-  @@map("verification_tokens")
-}
-
 // Optional for WebAuthn support
 model Authenticator {
   credentialID         String  @id @map("_id")
@@ -91,6 +76,8 @@ model Authenticator {
   @@unique([userId, credentialID])
 }
 
+// Custom Models
+
 model Frame {
   id          String      @id @default(auto()) @map("_id") @db.ObjectId
   name        String      @unique
@@ -105,6 +92,148 @@ model Frame {
   OrderItem   OrderItem[]
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
+}
+
+model Message {
+  id        String        @id @default(auto()) @map("_id") @db.ObjectId
+  message   String
+  name      String
+  email     String
+  userId    String?       @db.ObjectId
+  status    MessageStatus @default(UnResolved)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
+
+model CartCustomization {
+  id         String            @id @default(auto()) @map("_id") @db.ObjectId
+  type       CustomizationType
+  glazing    Glazing?
+  width      Float
+  height     Float
+  mat        MatOptions[]
+  mirror     Mirror?
+  image      String?
+  printing   Printing?
+  backing    Backing?
+  stretching Stretching?
+  sides      Sides?
+  // Relationship
+  CartItem   CartItem?         @relation()
+}
+
+model CartItem {
+  id                String            @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String            @db.ObjectId
+  user              User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  frameId           String?           @db.ObjectId
+  frame             Frame?            @relation(fields: [frameId], references: [id], onDelete: Restrict)
+  customizationId   String            @unique @db.ObjectId
+  customization     CartCustomization @relation(fields: [customizationId], references: [id], onDelete: Cascade)
+  single_unit_price Int
+  quantity          Int               @default(1)
+  // Time stamps
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  @@index([userId, frameId])
+  @@map("cart_items")
+}
+
+model Order {
+  id               String       @id @default(auto()) @map("_id") @db.ObjectId
+  userId           String       @db.ObjectId
+  user             User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // Cost breakup
+  packaging        Int
+  delivery_charge  Int
+  discount         Int          @default(0)
+  // Items and Status
+  order_items      OrderItem[]
+  order_status     OrderStatus  @default(Received)
+  // Payment and shipping
+  shipping_address Address
+  delivery_date    DateTime?
+  transaction      Transaction? @relation()
+  // Time stamps
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  @@index([userId])
+  @@map("orders")
+}
+
+model OrderCustomization {
+  id         String            @id @default(auto()) @map("_id") @db.ObjectId
+  type       CustomizationType
+  glazing    Glazing?
+  width      Float
+  height     Float
+  mat        MatOptions[]
+  mirror     Mirror?
+  image      String?
+  printing   Printing?
+  backing    Backing?
+  stretching Stretching?
+  sides      Sides?
+  // Relationship
+  OrderItem  OrderItem?        @relation()
+}
+
+model OrderItem {
+  id                String             @id @default(auto()) @map("_id") @db.ObjectId
+  frameId           String?            @db.ObjectId
+  frame             Frame?             @relation(fields: [frameId], references: [id], onDelete: Restrict)
+  quantity          Int
+  single_unit_price Int
+  orderId           String             @db.ObjectId
+  order             Order              @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  customizationId   String             @unique @db.ObjectId
+  customization     OrderCustomization @relation(fields: [customizationId], references: [id], onDelete: Cascade)
+  // Time stamps
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  @@index([frameId])
+  @@index([orderId])
+  @@map("order_items")
+}
+
+model Transaction {
+  id             String        @id @default(auto()) @map("_id") @db.ObjectId
+  // Payment Gateway fields
+  paymentOrderId String
+  status         PaymentStatus @default(Created)
+  paymentId      String?
+  // Order and Amount
+  orderId        String        @unique @db.ObjectId
+  order          Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  amount         Int
+  currency       String
+  description    String?
+  // Time stamps
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([paymentOrderId])
+  @@map("transactions")
+}
+
+model Subscription {
+  id               String             @id @default(auto()) @map("_id") @db.ObjectId
+  email            String             @unique
+  status           SubscriptionStatus @default(Subscribed)
+  unsubscribeToken String             @unique
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  @@index([status])
+  @@map("subscriptions")
+}
+
+enum Role {
+  user
+  admin
 }
 
 enum Category {
@@ -149,17 +278,6 @@ enum Mirror {
 enum MessageStatus {
   UnResolved
   Resolved
-}
-
-model Message {
-  id        String        @id @default(auto()) @map("_id") @db.ObjectId
-  message   String
-  name      String
-  email     String
-  userId    String?       @db.ObjectId
-  status    MessageStatus @default(UnResolved)
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
 }
 
 enum Glazing {
@@ -221,70 +339,6 @@ enum CustomizationType {
   FramedMirror
 }
 
-model Customization {
-  id         String            @id @default(auto()) @map("_id") @db.ObjectId
-  type       CustomizationType
-  glazing    Glazing?
-  width      Float
-  height     Float
-  mat        MatOptions[]
-  mirror     Mirror?
-  image      String?
-  printing   Printing?
-  backing    Backing?
-  stretching Stretching?
-  sides      Sides?
-
-  OrderItem OrderItem[]
-  CartItem  CartItem[]
-}
-
-model CartItem {
-  id                String        @id @default(auto()) @map("_id") @db.ObjectId
-  userId            String        @db.ObjectId
-  user              User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  frameId           String?       @db.ObjectId
-  frame             Frame?        @relation(fields: [frameId], references: [id], onDelete: Restrict)
-  customizationId   String        @db.ObjectId
-  customization     Customization @relation(fields: [customizationId], references: [id])
-  single_unit_price Int
-
-  quantity  Int      @default(1)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([userId, frameId])
-  @@map("cart_items")
-}
-
-model Order {
-  id     String @id @default(auto()) @map("_id") @db.ObjectId
-  userId String @db.ObjectId
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  // Cost breakup
-  packaging       Int
-  delivery_charge Int
-  discount        Int @default(0)
-
-  // Items and Status
-  order_items  OrderItem[]
-  order_status OrderStatus @default(Received)
-
-  // Payment and shipping
-  transaction_status PaymentStatus @default(UnInitiated)
-  paymentOrderId     String?
-  shipping_address   Address
-  delivery_date      DateTime?
-  transactions       Transaction[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([userId])
-  @@map("orders")
-}
-
 enum OrderStatus {
   Received
   Approved
@@ -296,65 +350,9 @@ enum OrderStatus {
 }
 
 enum PaymentStatus {
-  UnInitiated
-  Pending
-  Processing
-  Success
-  Failed
-}
-
-model OrderItem {
-  id                String        @id @default(auto()) @map("_id") @db.ObjectId
-  frameId           String?       @db.ObjectId
-  frame             Frame?        @relation(fields: [frameId], references: [id], onDelete: Restrict)
-  customizationId   String        @db.ObjectId
-  customization     Customization @relation(fields: [customizationId], references: [id])
-  quantity          Int
-  single_unit_price Int
-  orderId           String        @db.ObjectId
-  order             Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([frameId])
-  @@index([orderId])
-  @@map("order_items")
-}
-
-model Transaction {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-
-  // Payment Gateway fields
-  paymentOrderId String
-  status         PaymentStatus @default(Pending)
-  paymentId      String?
-
-  // Order and Amount
-  orderId  String @db.ObjectId
-  order    Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  amount   Int
-  currency String
-
-  description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  @@index([orderId])
-  @@index([paymentOrderId])
-  @@map("transactions")
-}
-
-model Subscription {
-  id               String             @id @default(auto()) @map("_id") @db.ObjectId
-  email            String             @unique
-  status           SubscriptionStatus @default(Subscribed)
-  unsubscribeToken String             @unique
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime           @updatedAt
-
-  @@index([status])
-  @@map("subscriptions")
+  Created
+  Attempted
+  Paid
 }
 
 enum SubscriptionStatus {

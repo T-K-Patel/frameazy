@@ -11,6 +11,7 @@ import CancelOrderDialog from "./CancelOrderDialog";
 import Link from "next/link";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import PaymentButton from "./PaymentButton";
+import { checkPaymentStatus } from "@/serverActions/payments/payments.action";
 
 const capitalizeFirstLetter = (str: string) => {
     return str.charAt(0).toUpperCase() + str.slice(1);
@@ -64,6 +65,25 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                 setError("Something went wrong");
             });
     };
+
+    const checkStatus = () => {
+        if (!order?.id) {
+            return;
+        }
+        checkPaymentStatus(order.id)
+            .then((data) => {
+                if (data.success) {
+                    console.log(data.data);
+                } else {
+                    alert("Payment not found");
+                }
+            })
+            .catch((error) => {
+                console.log(error);
+                alert("Something went wrong");
+            });
+    };
+
     return (
         <div className="mx-auto flex w-11/12 max-w-screen-2xl flex-col gap-8 py-5">
             {loading ? (
@@ -267,15 +287,15 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                                         <p className={`text-lg font-semibold text-red-500`}>Not Approved yet</p>
                                     ) : order.order_status == "Approved" ? (
                                         <>
-                                            {order.transaction_status == "Pending" ||
-                                            order.transaction_status == "Processing" ? (
-                                                <>
-                                                    {
-                                                        <p className={`text-lg font-semibold text-[#D68D00]`}>
-                                                            {order.transaction_status}
-                                                        </p>
-                                                    }
-                                                </>
+                                            {order.transaction_status == "Processing" ? (
+                                                <div>
+                                                    <p className={`text-lg font-semibold text-[#D68D00]`}>
+                                                        {order.transaction_status}
+                                                    </p>
+                                                    <Button size={"lg"} onClick={checkStatus}>
+                                                        Check Status
+                                                    </Button>
+                                                </div>
                                             ) : (
                                                 <PaymentButton orderId={order.id} />
                                             )}
