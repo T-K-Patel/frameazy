@@ -319,10 +319,10 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                                     Payment
                                 </p>
                                 <p
-                                    className={`text-lg font-semibold ${order.transaction?.status === "Attempted"||"Created" ? "text-[#D68D00]" : "text-[#008C0E]"}`}
+                                    className={`text-lg font-semibold ${order.transaction==null?"text-red-400":order.transaction?.status === "Attempted"||"Created" ? "text-[#D68D00]" : "text-[#008C0E]"}`}
                                 >
-                                    {order.transaction?.status}
-                                </p>
+                            {order.transaction==null?"Uninitiated":order.transaction?.status}
+                            </p>
                             </div>
                             <div className="flex flex-col gap-2 rounded-lg border border-[#F1F1F1] p-3 sm:col-span-2 lg:col-span-1">
                                 <p className="border-b border-[#F1F1F1] pb-3 text-2xl font-semibold">

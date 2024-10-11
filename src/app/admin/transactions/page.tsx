@@ -6,16 +6,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 const AdminTransactionPage = () => {
     const [transactions, setTransactions] = useState<TransactionType[]>([
-        {
-            // hex id of mongodb
-            id: "60f1b262f9f3b3b3b3b3b3b3",
-            orderId: "6a1b2c3d4e5f6a1b2c3d4e5f",
-            paymentOrderId: "order_IUjvkjIUFu",
-            paymentId: null,
-            amount: 0,
-            updatedAt: new Date(),
-            status: PaymentStatus.Paid,
-        },
     ]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -85,7 +75,7 @@ const AdminTransactionPage = () => {
                                                 {t.paymentId || "N/A"}
                                             </td>
                                             <td className="text-nowrap text-center font-semibold md:text-xl">
-                                                {t.amount}
+                                                {(t.amount/100).toFixed(2)}
                                             </td>
                                             <td className="text-nowrap text-center font-semibold md:text-xl">
                                                 {t.updatedAt.toDateString()}

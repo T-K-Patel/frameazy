@@ -55,9 +55,9 @@ const OrderComponent = ({ order}: { order: UserOrders | AdminOrdersType}) => {
                             Payment Status
                         </p>
                         <p
-                            className={`font-semibold leading-6 ${ order.transaction?.status=== "Attempted"||order.transaction?.status==="Created" ? "text-[#D68D00]" : "text-[#008C0E]"}`}
+                            className={`font-semibold leading-6 ${ order.transaction==null?"text-red-400":order.transaction?.status=== "Attempted"||order.transaction?.status==="Created" ? "text-[#D68D00]" : "text-[#008C0E]"}`}
                         >
-                            {order.transaction?.status}
+                            {order.transaction==null?"Uninitiated":order.transaction?.status}
                         </p>
                     </div>
                 </div>

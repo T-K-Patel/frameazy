@@ -277,15 +277,15 @@ function Cart() {
                                 </div>
                                 <div className="flex justify-between">
                                     <p className="text-gray-600">Delivery</p>
-                                    <span>&#8377; {deliveryCharge.toLocaleString("en-in")}</span>
+                                    <span>&#8377; {(deliveryCharge/100).toFixed(2)}</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <p className="text-gray-600">Package</p>
-                                    <span>&#8377; {orderTotal.toLocaleString("en-in")}</span>
+                                    <span>&#8377; {(orderTotal/100).toFixed(2)}</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <p className="text-gray-600">Total</p>
-                                    <span>&#8377; {(orderTotal + deliveryCharge).toLocaleString("en-in")}</span>
+                                    <span>&#8377; {((orderTotal + deliveryCharge)/100).toFixed(2)}</span>
                                 </div>
                             </div>
                         </div>

@@ -24,7 +24,7 @@ function FramesSideBar({ filters, setFilters }: SidebarProps) {
             setCollections(filters.collections);
             setCategories(filters.categories);
         });
-    })
+    },[]);
     return (
         <div className="gap-8 max-md:flex max-md:flex-wrap max-md:p-4">
             <>
