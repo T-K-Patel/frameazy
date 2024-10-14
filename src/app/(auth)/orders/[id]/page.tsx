@@ -11,6 +11,7 @@ import CancelOrderDialog from "./CancelOrderDialog";
 import Link from "next/link";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import PaymentButton from "./PaymentButton";
+import { checkPaymentStatus } from "@/serverActions/payments/payments.action";
 
 const capitalizeFirstLetter = (str: string) => {
     return str.charAt(0).toUpperCase() + str.slice(1);
@@ -39,10 +40,26 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                 setError("Something went wrong");
                 setOrder(null);
             })
-            .finally(() => {
-                setLoading(false);
-            });
     }, [params.id]);
+
+    useEffect(()=>{
+        if(order?.transaction?.status==="Created" || order?.transaction?.status==="Attempted"){
+            checkPaymentStatus(order.id).then((data)=>{
+                if(data.success){
+                    if(data.data){
+                        setOrder((prev) => prev ? ({ ...prev, transaction: { ...prev.transaction, status: "Paid" } }) : prev)
+                    }
+                }else{
+                    setError(data.error)
+                }
+            }).catch((error)=>{
+                console.log(error);
+                setError("Something went wrong");
+            }).finally(()=>{
+                setLoading(false);
+            })
+        }
+    },[order])
 
     const cancelOrder = () => {
         if (!order?.id) {
