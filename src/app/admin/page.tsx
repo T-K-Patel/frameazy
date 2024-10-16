@@ -2,11 +2,11 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import React, { ChangeEvent, DragEventHandler, forwardRef, useEffect, useState } from "react";
-import NextImage from "next/image";
 import Upload from "../../assets/upload.svg";
 import { Button } from "@/components/ui/button";
 import { useFormState, useFormStatus } from "react-dom";
 import { addProduct } from "@/serverActions/admin/admin.action";
+import { Img } from "react-image";
 
 type UploadImageProps = {
     name: string;
@@ -65,7 +65,7 @@ const UploadImage = forwardRef<HTMLInputElement, { name: string }>(function Uplo
         <div onDragOver={handleDragOver} onDrop={handleDrop}>
             <>
                 <Label className="relative cursor-pointer">
-                    <NextImage
+                    <Img
                         src={dataUrl ?? Upload}
                         width={dataUrl ? dataUrl.width : Upload.width}
                         height={dataUrl ? dataUrl.height : Upload.height}

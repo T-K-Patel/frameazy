@@ -1,5 +1,5 @@
-import Image from "next/image";
 import React from "react";
+import { Img } from "react-image";
 import Select, { StylesConfig } from "react-select";
 
 const DropDown = ({ items, value, onChange }: { items: string[]; value: string; onChange: any }) => {
@@ -84,7 +84,7 @@ export const FrameDropdown = ({
                 label: value.borderSrc ? (
                     <>
                         <div className="flex gap-3 p-1">
-                            <Image
+                            <Img
                                 src={value.borderSrc}
                                 width={100}
                                 height={50}

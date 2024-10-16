@@ -1,12 +1,12 @@
 "use client";
 import { signIn, useSession } from "next-auth/react";
-import Image from "next/image";
 import { RedirectType, redirect } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import Logo from "../../../assets/Logo.svg";
 import { Button } from "@/components/ui/button";
 import Google from "../../../assets/google.svg";
 import Link from "next/link";
+import { Img } from "react-image";
 
 const LoginPage = ({ searchParams }: { searchParams: Record<string, any> }) => {
     const session = useSession();
@@ -31,7 +31,7 @@ const LoginPage = ({ searchParams }: { searchParams: Record<string, any> }) => {
     return (
         <div className="no-scrollbar flex h-full flex-col gap-y-5 overflow-y-auto px-5 py-4">
             <Link href={"/"}>
-                <Image src={Logo} alt="logo" className="md:h-31 md:w-32" />
+                <Img src={Logo} alt="logo" className="md:h-31 md:w-32" />
             </Link>
             <div className="mx-auto flex h-full w-full max-w-[25rem] flex-col gap-y-5 px-2">
                 <div className="flex w-full flex-col gap-y-5">
@@ -50,7 +50,7 @@ const LoginPage = ({ searchParams }: { searchParams: Record<string, any> }) => {
                             await signIn("google", { redirect: false });
                         }}
                     >
-                        <Image src={Google} alt="google" />
+                        <Img src={Google} alt="google" />
                         <div className="w-auto text-xl font-semibold leading-[30px] text-black">
                             Sign in with Google
                         </div>

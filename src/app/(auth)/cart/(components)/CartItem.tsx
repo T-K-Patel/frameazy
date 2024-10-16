@@ -1,11 +1,11 @@
 import { IoIosClose } from "react-icons/io";
 import { FaMinus, FaPlus } from "react-icons/fa6";
-import Image from "next/image";
 import React from "react";
 import { CartCustomization } from "@prisma/client";
 import { CartItemType, deleteCartItem, updateCartItemQty } from "@/serverActions/cart/cart.actions";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Img } from "react-image";
 
 export type CartItemCompType = {
     item: CartItemType;
@@ -50,7 +50,7 @@ export const CartItem = ({ item, updateState, deleteItem, fetchCartItems }: Cart
             <div className="flex items-center gap-8 border-b border-[#F1F1F1] p-3 text-center">
                 {(item.frame?.image || item.customization.image) && (
                     <>
-                        <Image
+                        <Img
                             src={item.customization.image || item.frame?.image || ""}
                             width={100}
                             height={100}

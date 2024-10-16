@@ -2,7 +2,7 @@
 import React, { ReactNode, useEffect, useRef } from "react";
 import { Button } from "../ui/button";
 import { DialogContent, Dialog, DialogHeader } from "../ui/dialog";
-import Image, { StaticImageData } from "next/image";
+import { StaticImageData } from "next/image";
 import Upload from "@/assets/uploadImage.svg";
 import Empty from "@/assets/empty.svg";
 import Mirror from "@/assets/mirror.svg";
@@ -15,6 +15,7 @@ import UploadImage from "./UploadImage";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import CropImage from "./CropImage";
+import { Img } from "react-image";
 
 type FrameOptionProps = {
     title: string;
@@ -26,7 +27,7 @@ const FrameOption = ({ title, image, ...props }: FrameOptionProps) => {
     return (
         <button className="h-full gap-4 rounded-2xl border-2 border-[#d0d0d0] p-4 md:p-6" {...props}>
             <p className="w-full pb-3 text-left font-bold">{title}</p>
-            <Image src={image} alt="canvas" />
+            <Img src={image.src} alt="canvas" />
         </button>
     );
 };
