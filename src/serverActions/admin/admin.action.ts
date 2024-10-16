@@ -2,15 +2,7 @@
 import { ServerActionReturnType } from "@/types/serverActionReturnType";
 import { db } from "@/lib/db";
 import { CustomError } from "@/lib/CustomError";
-import {
-    Message,
-    Subscription,
-    OrderStatus,
-    Role,
-    PaymentStatus,
-    Address,
-    CartCustomization
-} from "@prisma/client";
+import { Message, Subscription, OrderStatus, Role, PaymentStatus, Address, CartCustomization } from "@prisma/client";
 import { CloudinaryStorage } from "@/lib/Cloudinary.storage";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
@@ -143,7 +135,7 @@ export async function getTransactionsAction(): Promise<ServerActionReturnType<Tr
                 paymentOrderId: true,
                 paymentId: true,
                 updatedAt: true,
-            }
+            },
         });
 
         return { success: true, data: transactions };
@@ -157,7 +149,9 @@ export async function getTransactionsAction(): Promise<ServerActionReturnType<Tr
 }
 
 // LATER: Add pagination
-export async function getSubscriptionsAction(): Promise<ServerActionReturnType<(Omit<Subscription, "unsubscribeToken">)[]>> {
+export async function getSubscriptionsAction(): Promise<
+    ServerActionReturnType<Omit<Subscription, "unsubscribeToken">[]>
+> {
     try {
         await isAdmin();
         const subscriptions = await db.subscription.findMany({
@@ -187,9 +181,9 @@ export type AdminOrdersType = {
     packaging: number;
     discount: number;
     delivery_date: Date | null;
-    transaction:{
-        status:string
-    }|null
+    transaction: {
+        status: string;
+    } | null;
 };
 
 // LATER: Add pagination
@@ -205,11 +199,11 @@ export async function getOrdersAction(): Promise<ServerActionReturnType<AdminOrd
                 packaging: true,
                 discount: true,
                 delivery_date: true,
-                transaction:{
-                    select:{
-                        status:true
-                    }
-                }
+                transaction: {
+                    select: {
+                        status: true,
+                    },
+                },
             },
             orderBy: {
                 createdAt: "desc",
@@ -226,32 +220,32 @@ export async function getOrdersAction(): Promise<ServerActionReturnType<AdminOrd
 }
 
 export type AdminOrderDetailsType = {
-    id: string,
-    order_status: OrderStatus,
-    createdAt: Date,
-    delivery_charge: number,
-    packaging: number,
-    discount: number,
-    delivery_date: Date | null,
-    shipping_address: Address,
+    id: string;
+    order_status: OrderStatus;
+    createdAt: Date;
+    delivery_charge: number;
+    packaging: number;
+    discount: number;
+    delivery_date: Date | null;
+    shipping_address: Address;
     order_items: {
-        id: string,
+        id: string;
         frame: {
-            name: string,
-            image: string,
-        } | null,
-        quantity: number,
-        customization: CartCustomization,
-        single_unit_price: number,
-    }[],
+            name: string;
+            image: string;
+        } | null;
+        quantity: number;
+        customization: CartCustomization;
+        single_unit_price: number;
+    }[];
     user: {
-        name: string | null,
-        email: string | null,
-    },
-    transaction:{
-        status:string
-    }|null
-}
+        name: string | null;
+        email: string | null;
+    };
+    transaction: {
+        status: string;
+    } | null;
+};
 
 export async function getOrderDetailsAction(id: string): Promise<ServerActionReturnType<AdminOrderDetailsType>> {
     try {
@@ -291,13 +285,13 @@ export async function getOrderDetailsAction(id: string): Promise<ServerActionRet
                     select: {
                         name: true,
                         email: true,
-                    }
+                    },
                 },
-                transaction:{
-                    select:{
-                        status:true
-                    }
-                }
+                transaction: {
+                    select: {
+                        status: true,
+                    },
+                },
             },
         });
 
@@ -361,12 +355,8 @@ export async function updateOrderStatusAction(
     }
 }
 
-
-export async function updateDeliveryDateAction(state: any,
-    formData: FormData,
-): Promise<ServerActionReturnType<Date>> {
+export async function updateDeliveryDateAction(state: any, formData: FormData): Promise<ServerActionReturnType<Date>> {
     try {
-
         await isAdmin();
         const orderId = formData.get("orderId") as string;
         const deliveryDate = formData.get("deliveryDate") as string;
@@ -382,7 +372,6 @@ export async function updateDeliveryDateAction(state: any,
             if (parsedDeliveryDate.getTime() < new Date().getTime()) {
                 throw new CustomError("Invalid delivery date");
             }
-
         } catch (error) {
             throw new CustomError("Invalid delivery date");
         }
@@ -406,7 +395,6 @@ export async function updateDeliveryDateAction(state: any,
         }
 
         return { success: true, data: order.delivery_date };
-
     } catch (error) {
         if (error instanceof CustomError) {
             return { success: false, error: error.message };

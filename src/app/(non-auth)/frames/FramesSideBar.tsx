@@ -1,6 +1,11 @@
-"use client"
+"use client";
 import Checkbox from "@/components/Checkbox";
-import { FramesFilterType, getUniqueCategory, getUniqueCollections, getUniqueColors } from "@/serverActions/frames/frame.action";
+import {
+    FramesFilterType,
+    getUniqueCategory,
+    getUniqueCollections,
+    getUniqueColors,
+} from "@/serverActions/frames/frame.action";
 import { useEffect, useState } from "react";
 
 interface SidebarProps {
@@ -8,23 +13,23 @@ interface SidebarProps {
     setFilters: React.Dispatch<React.SetStateAction<FramesFilterType>>;
 }
 
-async function getFilters(){
+async function getFilters() {
     const colors = await getUniqueColors();
     const collections = await getUniqueCollections();
     const categories = await getUniqueCategory();
-    return {colors,collections,categories};
+    return { colors, collections, categories };
 }
 function FramesSideBar({ filters, setFilters }: SidebarProps) {
-    const [Colors,setColors] = useState<string[]>([]);
-    const [Collections,setCollections] = useState<string[]>([]);
-    const [Categories,setCategories] = useState<string[]>([]);
-    useEffect(()=>{
-        getFilters().then((filters)=>{
+    const [Colors, setColors] = useState<string[]>([]);
+    const [Collections, setCollections] = useState<string[]>([]);
+    const [Categories, setCategories] = useState<string[]>([]);
+    useEffect(() => {
+        getFilters().then((filters) => {
             setColors(filters.colors);
             setCollections(filters.collections);
             setCategories(filters.categories);
         });
-    },[]);
+    }, []);
     return (
         <div className="gap-8 max-md:flex max-md:flex-wrap max-md:p-4">
             <>

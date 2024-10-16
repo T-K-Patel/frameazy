@@ -124,7 +124,7 @@ function Cart() {
         return <LoadingCart />;
     }
 
-    const orderTotal = cartItems.reduce((acc, item) => acc + item.quantity * (item.single_unit_price / 100 || 0), 0);
+    const orderTotal = cartItems.reduce((acc, item) => acc + item.quantity * (item.single_unit_price || 0), 0);
     const deliveryCharge = getDeliveryCharge(orderTotal);
 
     return (
@@ -270,24 +270,45 @@ function Cart() {
                         <div className="rounded-xl border border-solid border-[#D2D1D1] p-3">
                             <h3 className="pb-3 text-2xl font-semibold">Order Summary</h3>
                             <hr />
-                            <div className="flex flex-col gap-3 py-3 font-semibold">
-                                <div className="flex justify-between">
-                                    <p className="text-gray-600">Discount</p>
-                                    <span>&#8377; 00.0</span>
+                            {cartItems.length == 0 ? (
+                                <div className="flex flex-col gap-3 py-3 font-semibold">
+                                    <div className="flex justify-between">
+                                        <p className="text-gray-600">Discount</p>
+                                        <span>--</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <p className="text-gray-600">Delivery</p>
+                                        <span>--</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <p className="text-gray-600">Package</p>
+                                        <span>--</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <p className="text-gray-600">Total</p>
+                                        <span>--</span>
+                                    </div>
                                 </div>
-                                <div className="flex justify-between">
-                                    <p className="text-gray-600">Delivery</p>
-                                    <span>&#8377; {(deliveryCharge/100).toFixed(2)}</span>
+                            ) : (
+                                <div className="flex flex-col gap-3 py-3 font-semibold">
+                                    <div className="flex justify-between">
+                                        <p className="text-gray-600">Discount</p>
+                                        <span>&#8377; 00.0</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <p className="text-gray-600">Delivery</p>
+                                        <span>&#8377; {(deliveryCharge / 100).toFixed(2)}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <p className="text-gray-600">Package</p>
+                                        <span>&#8377; {(orderTotal / 100).toFixed(2)}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <p className="text-gray-600">Total</p>
+                                        <span>&#8377; {((orderTotal + deliveryCharge) / 100).toFixed(2)}</span>
+                                    </div>
                                 </div>
-                                <div className="flex justify-between">
-                                    <p className="text-gray-600">Package</p>
-                                    <span>&#8377; {(orderTotal/100).toFixed(2)}</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <p className="text-gray-600">Total</p>
-                                    <span>&#8377; {((orderTotal + deliveryCharge)/100).toFixed(2)}</span>
-                                </div>
-                            </div>
+                            )}
                         </div>
                         <PlaceOrderButton disabled={cartItems.length == 0} />
                     </form>

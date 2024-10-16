@@ -1,6 +1,6 @@
 "use client";
 import { CartCustomization } from "@prisma/client";
-import { Img } from "react-image";
+import Image from "next/image";
 import React, { useState, useEffect } from "react";
 import { cancelOrderAction, getOrderDetailsAction, UserOrderDetails } from "@/serverActions/orders/orders.action";
 import { Button } from "@/components/ui/button";
@@ -30,6 +30,26 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                 if (data.success) {
                     setOrder(data.data);
                     setError(null);
+                    if (order?.transaction?.status === "Created" || order?.transaction?.status === "Attempted") {
+                        checkPaymentStatus(order.id)
+                            .then((data) => {
+                                if (data.success) {
+                                    if (data.data) {
+                                        setOrder((prev) =>
+                                            prev
+                                                ? { ...prev, transaction: { ...prev.transaction, status: "Paid" } }
+                                                : prev,
+                                        );
+                                    }
+                                } else {
+                                    setError(data.error);
+                                }
+                            })
+                            .catch((error) => {
+                                console.log(error);
+                                setError("Something went wrong");
+                            });
+                    }
                 } else {
                     setError(data.error);
                     setOrder(null);
@@ -40,26 +60,34 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                 setError("Something went wrong");
                 setOrder(null);
             })
+            .finally(() => {
+                setLoading(false);
+            });
     }, [params.id]);
 
-    useEffect(()=>{
-        if(order?.transaction?.status==="Created" || order?.transaction?.status==="Attempted"){
-            checkPaymentStatus(order.id).then((data)=>{
-                if(data.success){
-                    if(data.data){
-                        setOrder((prev) => prev ? ({ ...prev, transaction: { ...prev.transaction, status: "Paid" } }) : prev)
+    useEffect(() => {
+        if (order?.transaction?.status === "Created" || order?.transaction?.status === "Attempted") {
+            checkPaymentStatus(order.id)
+                .then((data) => {
+                    if (data.success) {
+                        if (data.data) {
+                            setOrder((prev) =>
+                                prev ? { ...prev, transaction: { ...prev.transaction, status: "Paid" } } : prev,
+                            );
+                        }
+                    } else {
+                        setError(data.error);
                     }
-                }else{
-                    setError(data.error)
-                }
-            }).catch((error)=>{
-                console.log(error);
-                setError("Something went wrong");
-            }).finally(()=>{
-                setLoading(false);
-            })
+                })
+                .catch((error) => {
+                    console.log(error);
+                    setError("Something went wrong");
+                })
+                .finally(() => {
+                    setLoading(false);
+                });
         }
-    },[order])
+    }, [order]);
 
     const cancelOrder = () => {
         if (!order?.id) {
@@ -147,7 +175,7 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                                                 <div className="flex w-full items-center gap-8">
                                                     {(item.frame?.image || item.customization.image) && (
                                                         <>
-                                                            <Img
+                                                            <Image
                                                                 src={
                                                                     item.customization.image || item.frame?.image || ""
                                                                 }
@@ -289,7 +317,7 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                                     Order Status
                                 </p>
                                 <p
-                                    className={`text-lg font-semibold ${order?.order_status==="Approved" ? "text-[#008C0E]" : order?.order_status === "Received" ? "text-[#D68D00]" : "text-red-500"}`}
+                                    className={`text-lg font-semibold ${order?.order_status === "Approved" ? "text-[#008C0E]" : order?.order_status === "Received" ? "text-[#D68D00]" : "text-red-500"}`}
                                 >
                                     {order?.order_status}
                                 </p>

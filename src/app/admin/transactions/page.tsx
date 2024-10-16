@@ -5,8 +5,7 @@ import { getTransactionsAction, TransactionType } from "@/serverActions/admin/ad
 import { Skeleton } from "@/components/ui/skeleton";
 
 const AdminTransactionPage = () => {
-    const [transactions, setTransactions] = useState<TransactionType[]>([
-    ]);
+    const [transactions, setTransactions] = useState<TransactionType[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     useEffect(() => {
@@ -75,7 +74,7 @@ const AdminTransactionPage = () => {
                                                 {t.paymentId || "N/A"}
                                             </td>
                                             <td className="text-nowrap text-center font-semibold md:text-xl">
-                                                {(t.amount/100).toFixed(2)}
+                                                {(t.amount / 100).toFixed(2)}
                                             </td>
                                             <td className="text-nowrap text-center font-semibold md:text-xl">
                                                 {t.updatedAt.toDateString()}

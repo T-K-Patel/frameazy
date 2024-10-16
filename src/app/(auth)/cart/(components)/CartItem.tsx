@@ -1,6 +1,6 @@
 import { IoIosClose } from "react-icons/io";
 import { FaMinus, FaPlus } from "react-icons/fa6";
-import { Img } from "react-image";
+import Image from "next/image";
 import React from "react";
 import { CartCustomization } from "@prisma/client";
 import { CartItemType, deleteCartItem, updateCartItemQty } from "@/serverActions/cart/cart.actions";
@@ -50,7 +50,7 @@ export const CartItem = ({ item, updateState, deleteItem, fetchCartItems }: Cart
             <div className="flex items-center gap-8 border-b border-[#F1F1F1] p-3 text-center">
                 {(item.frame?.image || item.customization.image) && (
                     <>
-                        <Img
+                        <Image
                             src={item.customization.image || item.frame?.image || ""}
                             width={100}
                             height={100}
@@ -149,7 +149,7 @@ export const CartItem = ({ item, updateState, deleteItem, fetchCartItems }: Cart
             ) : (
                 <div className="flex flex-wrap items-center gap-10 p-3">
                     <b className="pb-7">Mat: </b>
-                    {item.customization.mat.map((mat:any, ind:number) => {
+                    {item.customization.mat.map((mat: any, ind: number) => {
                         return (
                             <div className="flex flex-col items-center gap-2 text-center" key={ind}>
                                 <TooltipProvider>

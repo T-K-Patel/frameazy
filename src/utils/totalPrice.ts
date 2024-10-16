@@ -1,8 +1,18 @@
-import { CartCustomization } from "@prisma/client"
-import { GlazingPrice, BackingPrice, SidesPrice, StretchingPrice, MirrorPrice, PrintingPrice, MAT_PRICE } from "@/contants/pricings"
+import { CartCustomization } from "@prisma/client";
+import {
+    GlazingPrice,
+    BackingPrice,
+    SidesPrice,
+    StretchingPrice,
+    MirrorPrice,
+    PrintingPrice,
+    MAT_PRICE,
+} from "@/contants/pricings";
 
-export function calculateTotalPrice(customization: Omit<CartCustomization, "id">, frame?: { unit_price: number, borderWidth: number }) {
-
+export function calculateTotalPrice(
+    customization: Omit<CartCustomization, "id">,
+    frame?: { unit_price: number; borderWidth: number },
+) {
     let height = customization.height;
     let width = customization.width;
 
@@ -15,16 +25,16 @@ export function calculateTotalPrice(customization: Omit<CartCustomization, "id">
     if (frame) {
         totalPrice += 2 * frame.unit_price * (height + width);
         height -= 2 * frame.borderWidth;
-        width -= 2 * frame.borderWidth
-    };
+        width -= 2 * frame.borderWidth;
+    }
 
     const glazingPrice = customization.glazing ? GlazingPrice[customization.glazing] * height * width : 0;
 
     customization.mat?.forEach((m) => {
-        totalPrice += MAT_PRICE * ((height * width) - ((height - 2 * m.width) * (width - 2 * m.width)));
+        totalPrice += MAT_PRICE * (height * width - (height - 2 * m.width) * (width - 2 * m.width));
         height -= 2 * m.width;
         width -= 2 * m.width;
-    })
+    });
 
     const printingPrice = customization.printing ? PrintingPrice[customization.printing] * height * width : 0;
 

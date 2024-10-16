@@ -21,12 +21,12 @@ export type UserOrders = {
     order_status: OrderStatus;
     createdAt: Date;
     delivery_date: Date | null;
-    delivery_charge: number,
-    packaging: number,
-    discount: number,
-    transaction:{
-        status:string
-    }|null
+    delivery_charge: number;
+    packaging: number;
+    discount: number;
+    transaction: {
+        status: string;
+    } | null;
 };
 
 export async function getOrdersAction(): Promise<ServerActionReturnType<UserOrders[]>> {
@@ -44,15 +44,15 @@ export async function getOrdersAction(): Promise<ServerActionReturnType<UserOrde
                 delivery_charge: true,
                 packaging: true,
                 discount: true,
-                transaction:{
-                    select:{
-                        status:true
-                    }
-                }
+                transaction: {
+                    select: {
+                        status: true,
+                    },
+                },
             },
             orderBy: {
-                createdAt: "desc"
-            }
+                createdAt: "desc",
+            },
         });
 
         return { success: true, data: orders };
@@ -77,16 +77,16 @@ export type UserOrderDetails = {
         quantity: number;
         single_unit_price: number;
     }[];
-    shipping_address: Address,
-    order_status: OrderStatus,
-    delivery_charge: number,
-    createdAt: Date,
-    packaging: number,
-    discount: number,
-    delivery_date: Date | null,
-    transaction:{
-        status:string
-    }|null
+    shipping_address: Address;
+    order_status: OrderStatus;
+    delivery_charge: number;
+    createdAt: Date;
+    packaging: number;
+    discount: number;
+    delivery_date: Date | null;
+    transaction: {
+        status: string;
+    } | null;
 };
 export async function getOrderDetailsAction(id: string): Promise<ServerActionReturnType<UserOrderDetails>> {
     try {
@@ -120,11 +120,11 @@ export async function getOrderDetailsAction(id: string): Promise<ServerActionRet
                 discount: true,
                 delivery_date: true,
                 createdAt: true,
-                transaction:{
-                    select:{
-                        status:true
-                    }
-                }
+                transaction: {
+                    select: {
+                        status: true,
+                    },
+                },
             },
         });
 
@@ -190,27 +190,26 @@ export async function placeOrderAction(state: any, formData: FormData): Promise<
                     },
                 });
 
-                cart.forEach(async(item)=>{
+                cart.forEach(async (item) => {
                     const cutomization = await transaction.cartCustomization.findUnique({
                         where: {
-                            id: item.customizationId
-                        }
+                            id: item.customizationId,
+                        },
                     });
 
                     if (cutomization) {
                         await transaction.orderCustomization.create({
-                            data: cutomization
+                            data: cutomization,
                         });
                     } else {
                         throw new CustomError("Customization not found");
                     }
-
                     await transaction.cartCustomization.delete({
                         where: {
-                            id: item.customizationId
-                        }
-                    })
-                })
+                            id: cutomization?.id,
+                        },
+                    });
+                });
 
                 const orderItemsArr = cart.map((item) => ({
                     orderId: order.id,
@@ -245,7 +244,6 @@ export async function placeOrderAction(state: any, formData: FormData): Promise<
     }
 }
 
-
 export async function cancelOrderAction(id: string): Promise<ServerActionReturnType<string>> {
     try {
         const userId = await isAuthenticated();
@@ -253,18 +251,19 @@ export async function cancelOrderAction(id: string): Promise<ServerActionReturnT
         const order = await db.order.findFirst({
             where: {
                 id,
-                userId
-            }
+                userId,
+            },
         });
         if (!order) throw new CustomError("Order not found");
-        if (!([OrderStatus.Approved, OrderStatus.Received] as OrderStatus[]).includes(order.order_status)) throw new CustomError("Order cannot be cancelled");
+        if (!([OrderStatus.Approved, OrderStatus.Received] as OrderStatus[]).includes(order.order_status))
+            throw new CustomError("Order cannot be cancelled");
         await db.order.update({
             where: {
                 id,
             },
             data: {
-                order_status: "Canceled"
-            }
+                order_status: "Canceled",
+            },
         });
         return { success: true, data: "Order cancelled successfully" };
     } catch (error) {
