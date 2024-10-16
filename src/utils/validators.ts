@@ -37,11 +37,11 @@ export function validatePassword(password: string) {
 }
 
 /**
- * 
- * @param id 
- * @param message 
+ *
+ * @param id
+ * @param message
  * @returns {true}
- * 
+ *
  * @throws {CustomError} if id is not a valid ObjectId
  */
 

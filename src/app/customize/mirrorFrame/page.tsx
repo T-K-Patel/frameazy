@@ -25,7 +25,7 @@ const Page = () => {
         dimensions: { width: 12, height: 9 },
         mirrorType: MirrorOptions[0] as Mirror,
     });
-    const { frameOptions, customizingFrame, setCustomizingFrame} = useFrames();
+    const { frameOptions, customizingFrame, setCustomizingFrame } = useFrames();
     const [frames, setFrames] = useState<FramesForCustomizationType[]>([]);
     const [error, setError] = useState<string | null>(null);
     const router = useRouter();

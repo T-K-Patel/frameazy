@@ -84,7 +84,6 @@ export async function deleteCartItem(itemId: string): Promise<ServerActionReturn
     try {
         const userId = await isAuthenticated();
 
-
         // TODO: delete customization also
         const deletedItem = await db.cartItem.delete({ where: { id: itemId, userId } });
 

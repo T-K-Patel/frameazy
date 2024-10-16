@@ -3,7 +3,7 @@ import { UserOrders } from "@/serverActions/orders/orders.action";
 import Link from "next/link";
 import { AdminOrdersType } from "@/serverActions/admin/admin.action";
 
-const OrderComponent = ({ order}: { order: UserOrders | AdminOrdersType}) => {
+const OrderComponent = ({ order }: { order: UserOrders | AdminOrdersType }) => {
     return (
         <div className="flex flex-col justify-between gap-3 rounded-lg border border-[#F1F1F1] px-3 py-4 md:flex-row">
             <div className="grid flex-grow grid-cols-1 gap-2 border-[#F1F1F1] md:grid-cols-3 md:border-r">
@@ -28,7 +28,7 @@ const OrderComponent = ({ order}: { order: UserOrders | AdminOrdersType}) => {
                         Total
                     </p>
                     <p className="col-span-1 text-sm font-semibold leading-5 md:text-base lg:text-lg">
-                        {Math.ceil(order.delivery_charge + order.packaging - order.discount) / 100} (₹)
+                        {((order.delivery_charge + order.packaging - order.discount) / 100).toFixed(2)} (₹)
                     </p>
                 </div>
                 <div className="grid grid-cols-1 gap-y-2 md:col-span-3 md:gap-y-0">
@@ -55,9 +55,9 @@ const OrderComponent = ({ order}: { order: UserOrders | AdminOrdersType}) => {
                             Payment Status
                         </p>
                         <p
-                            className={`font-semibold leading-6 ${ order.transaction==null?"text-red-400":order.transaction?.status=== "Attempted"||order.transaction?.status==="Created" ? "text-[#D68D00]" : "text-[#008C0E]"}`}
+                            className={`font-semibold leading-6 ${order.transaction == null ? "text-red-400" : order.transaction?.status === "Attempted" || order.transaction?.status === "Created" ? "text-[#D68D00]" : "text-[#008C0E]"}`}
                         >
-                            {order.transaction==null?"Uninitiated":order.transaction?.status}
+                            {order.transaction == null ? "Uninitiated" : order.transaction?.status}
                         </p>
                     </div>
                 </div>
@@ -71,12 +71,6 @@ const OrderComponent = ({ order}: { order: UserOrders | AdminOrdersType}) => {
                         Order details +
                     </Button>
                 </Link>
-                <Button
-                    className="w-fill overflow-hidden whitespace-normal break-words text-xs lg:text-base"
-                    size={"lg"}
-                >
-                    Download Invoice
-                </Button>
             </div>
         </div>
     );

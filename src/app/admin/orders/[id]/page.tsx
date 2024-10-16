@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import DropDown from "@/components/DropDown";
 import { OrderStatus, CartCustomization } from "@prisma/client";
-import { Img } from "react-image";
+import Image from "next/image";
 import {
     getOrderDetailsAction,
     updateOrderStatusAction,
@@ -81,6 +81,27 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                     setStatus(data.data.order_status);
                     setDeliveryDate(data.data.delivery_date);
                     setError(null);
+
+                    if (order?.transaction?.status === "Created" || order?.transaction?.status === "Attempted") {
+                        checkPaymentStatus(order.id)
+                            .then((data) => {
+                                if (data.success) {
+                                    if (data.data) {
+                                        setOrder((prev) =>
+                                            prev
+                                                ? { ...prev, transaction: { ...prev.transaction, status: "Paid" } }
+                                                : prev,
+                                        );
+                                    }
+                                } else {
+                                    setError(data.error);
+                                }
+                            })
+                            .catch((error) => {
+                                console.log(error);
+                                setError("Something went wrong");
+                            });
+                    }
                 } else {
                     setError(data.error);
                     setOrder(null);
@@ -91,26 +112,10 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                 setError("Something went wrong");
                 setOrder(null);
             })
-    }, [params.id]);
-
-    useEffect(()=>{
-        if(order?.transaction?.status==="Created" || order?.transaction?.status==="Attempted"){
-            checkPaymentStatus(order.id).then((data)=>{
-                if(data.success){
-                    if(data.data){
-                        setOrder((prev) => prev ? ({ ...prev, transaction: { ...prev.transaction, status: "Paid" } }) : prev)
-                    }
-                }else{
-                    setError(data.error)
-                }
-            }).catch((error)=>{
-                console.log(error);
-                setError("Something went wrong");
-            }).finally(()=>{
+            .finally(() => {
                 setLoading(false);
-            })
-        }
-    },[order])
+            });
+    }, [params.id]);
 
     return (
         <div className="mx-auto flex w-11/12 max-w-screen-2xl flex-col gap-8 py-5">
@@ -170,7 +175,7 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                                                 <div className="flex w-full gap-8">
                                                     {(item.frame?.image || item.customization.image) && (
                                                         <>
-                                                            <Img
+                                                            <Image
                                                                 src={
                                                                     item.customization.image || item.frame?.image || ""
                                                                 }
@@ -336,10 +341,10 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                                     Payment
                                 </p>
                                 <p
-                                    className={`text-lg font-semibold ${order.transaction==null?"text-red-400":order.transaction?.status === "Attempted"||"Created" ? "text-[#D68D00]" : "text-[#008C0E]"}`}
+                                    className={`text-lg font-semibold ${order.transaction == null ? "text-red-400" : order.transaction?.status === "Attempted" || "Created" ? "text-[#D68D00]" : "text-[#008C0E]"}`}
                                 >
-                            {order.transaction==null?"Uninitiated":order.transaction?.status}
-                            </p>
+                                    {order.transaction == null ? "Uninitiated" : order.transaction?.status}
+                                </p>
                             </div>
                             <div className="flex flex-col gap-2 rounded-lg border border-[#F1F1F1] p-3 sm:col-span-2 lg:col-span-1">
                                 <p className="border-b border-[#F1F1F1] pb-3 text-2xl font-semibold">

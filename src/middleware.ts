@@ -55,13 +55,16 @@ export default async function middleware(req: NextRequest) {
         return NextResponse.next();
     } catch (error) {
         console.error("authorized error", error);
-        return new NextResponse(`
+        return new NextResponse(
+            `
             <html>
                 <body>
                     <h1>Something went wrong</h1>
                 </body>
             </html>
-            `, { status: 500, headers: { "Content-Type": "text/html" } });
+            `,
+            { status: 500, headers: { "Content-Type": "text/html" } },
+        );
     }
 }
 

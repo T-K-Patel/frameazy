@@ -1,4 +1,4 @@
-"use server"
+"use server";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import { CustomError } from "@/lib/CustomError";
 import { db } from "@/lib/db";
@@ -30,9 +30,8 @@ async function updateOrderStatus(orderId: string, status: OrderStatus) {
     });
 }
 
-
 async function updateTransactionStatus(transactionId: string, status: PaymentStatus, payId?: string) {
-    const data: { status: PaymentStatus, paymentId?: string } = { status };
+    const data: { status: PaymentStatus; paymentId?: string } = { status };
     if (payId) {
         data.paymentId = payId;
     }
@@ -40,13 +39,13 @@ async function updateTransactionStatus(transactionId: string, status: PaymentSta
         where: {
             id: transactionId,
         },
-        data
+        data,
     });
 }
 
 const rzpInstance = new Razorpay({
     key_id: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-    key_secret: process.env.RAZORPAY_KEY_SECRET
+    key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
 type InitiatePaymentForOrderReturnType = {
@@ -57,7 +56,9 @@ type InitiatePaymentForOrderReturnType = {
     currency: string;
 };
 
-export async function initiatePaymentForOrder(orderId: string): Promise<ServerActionReturnType<InitiatePaymentForOrderReturnType>> {
+export async function initiatePaymentForOrder(
+    orderId: string,
+): Promise<ServerActionReturnType<InitiatePaymentForOrderReturnType>> {
     try {
         const userId = await isAuthenticated();
         const order = await db.order.findFirst({
@@ -81,7 +82,7 @@ export async function initiatePaymentForOrder(orderId: string): Promise<ServerAc
         if (!order) {
             throw new CustomError("Order not found");
         }
-        console.log("Order found")
+        console.log("Order found");
         if (order.order_status == "Received") {
             throw new CustomError("Order is not approved yet");
         }
@@ -89,34 +90,34 @@ export async function initiatePaymentForOrder(orderId: string): Promise<ServerAc
             throw new CustomError("Payment can't be initiated for this order");
         }
 
-        console.log("Order approved")
+        console.log("Order approved");
         if (order.transaction) {
-            console.log("Transaction found")
+            console.log("Transaction found");
             if (order.transaction.status == "Paid") {
                 throw new CustomError("Already paid for an order");
             }
-            console.log("Transaction not paid")
+            console.log("Transaction not paid");
             const rzpOrderId = order.transaction.paymentOrderId;
             const rzpOrderStatus = await rzpInstance.orders.fetch(rzpOrderId);
             const payments = (await rzpInstance.orders.fetchPayments(rzpOrderId)).items;
             if (rzpOrderStatus.status == "paid") {
-                console.log("Payment Order paid")
+                console.log("Payment Order paid");
                 // TODO: Update order status to Processing
                 await updateOrderStatus(orderId, "Processing");
                 const paymentId = payments.find((payment) => payment.status == "captured")?.id;
                 await updateTransactionStatus(order.transaction.id, "Paid", paymentId);
                 throw new CustomError("Already paid for an order");
             } else if (rzpOrderStatus.status == "attempted") {
-                console.log("Payment Order attempted")
+                console.log("Payment Order attempted");
                 if (order.transaction.status != "Attempted") {
                     await updateTransactionStatus(order.transaction.id, "Attempted");
                 }
                 if (payments.some((p) => p.status == "authorized")) {
-                    console.log("Payment Order authorized")
+                    console.log("Payment Order authorized");
                     throw new CustomError("Payment is being processed");
                 }
             }
-            console.log("Payment Order not authorized")
+            console.log("Payment Order not authorized");
             return {
                 success: true,
                 data: {
@@ -128,8 +129,8 @@ export async function initiatePaymentForOrder(orderId: string): Promise<ServerAc
                 },
             };
         }
-        console.log("No Transaction found")
-        const orderAmount = (order.delivery_charge + order.packaging - order.discount); // Amount in paise
+        console.log("No Transaction found");
+        const orderAmount = order.delivery_charge + order.packaging - order.discount; // Amount in paise
 
         // Create an new order on payment gateway.
 
@@ -140,7 +141,7 @@ export async function initiatePaymentForOrder(orderId: string): Promise<ServerAc
         });
         const paymentOrderId = rzpOrder.id;
 
-        console.log("Order created on Razorpay")
+        console.log("Order created on Razorpay");
 
         // Create a new transaction
         const transaction = await db.transaction.create({
@@ -152,7 +153,7 @@ export async function initiatePaymentForOrder(orderId: string): Promise<ServerAc
             },
         });
 
-        console.log("Transaction created")
+        console.log("Transaction created");
 
         // Update order
         await db.order.update({
@@ -163,12 +164,12 @@ export async function initiatePaymentForOrder(orderId: string): Promise<ServerAc
                 transaction: {
                     connect: {
                         id: transaction.id,
-                    }
-                }
+                    },
+                },
             },
         });
 
-        console.log("Order updated")
+        console.log("Order updated");
 
         return {
             success: true,
@@ -202,7 +203,6 @@ export async function verifyPayment(
     paymentId: string,
 ): Promise<ServerActionReturnType<VerifyPaymentReturnType>> {
     try {
-
         // TODO: Verify payment from Razorpay and update tables accordingly
         return { success: true, data: { orderId, transactionId: "", paymentId, paymentOrderId } };
     } catch (error) {
@@ -228,7 +228,7 @@ export async function checkPaymentStatus(orderId: string): Promise<ServerActionR
                     select: {
                         id: true,
                         status: true,
-                        paymentOrderId: true
+                        paymentOrderId: true,
                     },
                 },
             },
@@ -239,7 +239,7 @@ export async function checkPaymentStatus(orderId: string): Promise<ServerActionR
         if (!order.transaction) {
             throw new CustomError("Transaction not found");
         }
-        if(order.transaction.status == "Paid") {
+        if (order.transaction.status == "Paid") {
             return { success: true, data: true };
         }
         const rzpOrder = await rzpInstance.orders.fetch(order.transaction.paymentOrderId);

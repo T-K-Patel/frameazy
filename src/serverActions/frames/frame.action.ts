@@ -27,77 +27,85 @@ export type FrameDataType = PopularFrameDataType & {
 
 export async function getUniqueColors() {
     const frames = await db.frame.findMany({
-      select: {
-        color: true,
-      },
+        select: {
+            color: true,
+        },
     });
-  
+
     const uniqueColors = new Set<string>();
-  
-    frames.forEach((frame:any) => {
-      if (frame.color) {
-        uniqueColors.add(frame.color);
-      }
+
+    frames.forEach((frame: any) => {
+        if (frame.color) {
+            uniqueColors.add(frame.color);
+        }
     });
-  
+
     return Array.from(uniqueColors);
-  }
+}
 export async function getUniqueCollections() {
     const frames = await db.frame.findMany({
-      select: {
-        collection: true,
-      },
+        select: {
+            collection: true,
+        },
     });
-  
+
     const uniqueColors = new Set<string>();
-  
-    frames.forEach((frame:any) => {
-      if (frame.collection) {
-        uniqueColors.add(frame.collection);
-      }
+
+    frames.forEach((frame: any) => {
+        if (frame.collection) {
+            uniqueColors.add(frame.collection);
+        }
     });
-  
+
     return Array.from(uniqueColors);
-  }
+}
 export async function getUniqueCategory() {
     const frames = await db.frame.findMany({
-      select: {
-        category: true,
-      },
+        select: {
+            category: true,
+        },
     });
-  
+
     const uniqueColors = new Set<string>();
-  
-    frames.forEach((frame:any) => {
-      if (frame.category) {
-        uniqueColors.add(frame.category);
-      }
+
+    frames.forEach((frame: any) => {
+        if (frame.category) {
+            uniqueColors.add(frame.category);
+        }
     });
-  
+
     return Array.from(uniqueColors);
-  }
+}
 
 export async function getFramesAction(
     filters: FramesFilterType,
     page: number,
 ): Promise<ServerActionReturnType<{ total: number; page: number; frames: FrameDataType[] }>> {
     try {
-        const Color:string[]=await getUniqueColors();
-        const Category:string[]=await getUniqueCategory();
-        const Collection:string[]=await getUniqueCollections();
+        const Color: string[] = await getUniqueColors();
+        const Category: string[] = await getUniqueCategory();
+        const Collection: string[] = await getUniqueCollections();
         const validatedFilters = {
             categories: filters.categories.filter((cat) => Category.includes(cat)).sort(),
-            collections: filters.collections.filter((col) => { Collection.includes(col) }).sort(),
-            colors: filters.colors.filter((col) => { Color.includes(col) }).sort(),
-            name: filters.name
-        }
+            collections: filters.collections
+                .filter((col) => {
+                    Collection.includes(col);
+                })
+                .sort(),
+            colors: filters.colors
+                .filter((col) => {
+                    Color.includes(col);
+                })
+                .sort(),
+            name: filters.name,
+        };
         const frames = await db.frame.findMany({
             where: {
                 AND: [
                     validatedFilters.categories.length > 0 ? { category: { in: validatedFilters.categories } } : {},
                     validatedFilters.collections.length > 0 ? { collection: { in: validatedFilters.collections } } : {},
                     validatedFilters.colors.length > 0 ? { color: { in: validatedFilters.colors } } : {},
-                    validatedFilters.name ? { name: { contains: validatedFilters.name, mode: 'insensitive' } } : {},
+                    validatedFilters.name ? { name: { contains: validatedFilters.name, mode: "insensitive" } } : {},
                 ],
             },
             select: {
@@ -120,7 +128,7 @@ export async function getFramesAction(
                     validatedFilters.categories.length > 0 ? { category: { in: validatedFilters.categories } } : {},
                     validatedFilters.collections.length > 0 ? { collection: { in: validatedFilters.collections } } : {},
                     validatedFilters.colors.length > 0 ? { color: { in: validatedFilters.colors } } : {},
-                    validatedFilters.name ? { name: { contains: validatedFilters.name, mode: 'insensitive' } } : {},
+                    validatedFilters.name ? { name: { contains: validatedFilters.name, mode: "insensitive" } } : {},
                 ],
             },
         });
@@ -135,18 +143,16 @@ export async function getFramesAction(
     }
 }
 
-
 export type FramesForCustomizationType = {
     id: string;
     name: string;
     borderSrc: string;
     borderWidth: number;
     unit_price: number;
-}
+};
 
 export async function getFramesForCustomizatinAction(): Promise<ServerActionReturnType<FramesForCustomizationType[]>> {
     try {
-
         // LATER: Caching needed
         const frames = await db.frame.findMany({
             select: {
@@ -187,7 +193,6 @@ export async function getPopularFramesAction(): Promise<ServerActionReturnType<P
                             },
                         },
                     },
-
                 },
             },
             orderBy: {
@@ -203,7 +208,6 @@ export async function getPopularFramesAction(): Promise<ServerActionReturnType<P
                 image: true,
             },
         });
-
 
         return { success: true, data: frames };
     } catch (error) {

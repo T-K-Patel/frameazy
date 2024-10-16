@@ -61,7 +61,7 @@ export async function addCartItemAction(
             throw new CustomError("Quantity must be greater than 0");
         }
 
-        let customization: CartCustomization = { mat: [] as CartCustomization['mat'] } as CartCustomization;
+        let customization: CartCustomization = { mat: [] as CartCustomization["mat"] } as CartCustomization;
 
         if (!isValidNumber(data.width)) {
             throw new CustomError("Invalid width");
@@ -183,17 +183,20 @@ export async function addCartItemAction(
             }
             customization.image = data.image;
         }
-        console.log("Fetching Frame")
-        let frame: { unit_price: number, borderWidth: number } | undefined = undefined;
+        console.log("Fetching Frame");
+        let frame: { unit_price: number; borderWidth: number } | undefined = undefined;
         if (isframeRequired) {
-            (ObjectIdValidation(frameId, "Invalid frameId"));
-            console.log("Validation Passed:", frameId)
-            frame = await db.frame.findFirst({ where: { id: frameId }, select: { unit_price: true, borderWidth: true } }) || undefined;
+            ObjectIdValidation(frameId, "Invalid frameId");
+            console.log("Validation Passed:", frameId);
+            frame =
+                (await db.frame.findFirst({
+                    where: { id: frameId },
+                    select: { unit_price: true, borderWidth: true },
+                })) || undefined;
             if (frame === null) {
                 throw new CustomError("Invalid frame id");
             }
         }
-
 
         const single_unit_price = calculateTotalPrice(customization, frame); // TODO:calculate price based on customization
 
@@ -230,21 +233,22 @@ export async function addCartItemAction(
                         throw new CustomError("Failed to upload image");
                     }
                     customization.image = imageurl;
-
                 } catch (error) {
                     console.error("addCartItemAction error", error);
                     throw new CustomError("Failed to upload image");
                 }
             }
         }
-        const custId = await db.cartCustomization.create({
-            data: {
-                ...customization,
-                mat: {
-                    set: (customization.mat || []),
-                }
-            },
-        }).then((data) => data.id);
+        const custId = await db.cartCustomization
+            .create({
+                data: {
+                    ...customization,
+                    mat: {
+                        set: customization.mat || [],
+                    },
+                },
+            })
+            .then((data) => data.id);
 
         const cartItem = await db.cartItem.create({
             data: {

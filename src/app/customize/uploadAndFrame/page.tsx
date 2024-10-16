@@ -42,7 +42,7 @@ type matOptionsProps = {
 
 type ContentType = { title: string; mat: boolean; options: CustomizeOptionsProps[] };
 function Page() {
-    const { frameOptions, customizingFrame, setCustomizingFrame} = useFrames();
+    const { frameOptions, customizingFrame, setCustomizingFrame } = useFrames();
     const [upload, setUpload] = useState<uploadOptionsProps>({
         dimensions: { width: 0, height: 0 },
         printing: Object.keys(Printing)[0] as Printing,

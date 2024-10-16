@@ -7,7 +7,8 @@ export async function GET(req: NextRequest) {
     if (!token) {
         return new NextResponse("Invalid token", { status: 400 });
     }
-    return new NextResponse(`
+    return new NextResponse(
+        `
     <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -70,7 +71,9 @@ export async function GET(req: NextRequest) {
         </form>
     </body>
     </html>
-`, { headers: { "Content-Type": "text/html" } });
+`,
+        { headers: { "Content-Type": "text/html" } },
+    );
 }
 
 export async function POST(req: NextRequest) {
@@ -83,11 +86,11 @@ export async function POST(req: NextRequest) {
     try {
         const dlt = await db.subscription.update({
             where: {
-                unsubscribeToken
+                unsubscribeToken,
             },
             data: {
-                status: "Unsubscribed"
-            }
+                status: "Unsubscribed",
+            },
         });
         if (dlt) {
             return new NextResponse("Unsubscribed successfully", { status: 200 });

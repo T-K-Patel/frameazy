@@ -146,40 +146,40 @@ const AdminDashboard = () => {
                                     <Label className="text-lg font-semibold">Frames Category</Label>
                                     <input type="hidden" name="productCategory" value={dropdownData.category} />
                                     <Input
-                                    className="relative h-12"
-                                    name="Category"
-                                    placeholder="Set Category"
-                                    type="text"
-                                    onChange={(e)=>{
-                                        setDropdownData((d) => ({ ...d, category: e.target.value }));
-                                    }}
-                                />
+                                        className="relative h-12"
+                                        name="Category"
+                                        placeholder="Set Category"
+                                        type="text"
+                                        onChange={(e) => {
+                                            setDropdownData((d) => ({ ...d, category: e.target.value }));
+                                        }}
+                                    />
                                 </div>
                                 <div className="flex flex-col gap-y-1">
                                     <Label className="text-lg font-semibold">Frames Colors</Label>
                                     <input type="hidden" name="productColor" value={dropdownData.color} />
                                     <Input
-                                    className="relative h-12"
-                                    name="Colors"
-                                    placeholder="Set Color"
-                                    type="text"
-                                    onChange={(e)=>{
-                                        setDropdownData((d) => ({ ...d, color: e.target.value }));
-                                    }}
-                                />
+                                        className="relative h-12"
+                                        name="Colors"
+                                        placeholder="Set Color"
+                                        type="text"
+                                        onChange={(e) => {
+                                            setDropdownData((d) => ({ ...d, color: e.target.value }));
+                                        }}
+                                    />
                                 </div>
                                 <div className="flex flex-col gap-y-1">
                                     <span className="text-lg font-semibold">Collections</span>
                                     <input type="hidden" name="productCollection" value={dropdownData.collection} />
                                     <Input
-                                    className="relative h-12"
-                                    name="Collections"
-                                    placeholder="Set Collection"
-                                    type="text"
-                                    onChange={(e)=>{
-                                        setDropdownData((d) => ({ ...d, collection: e.target.value }));
-                                    }}
-                                />
+                                        className="relative h-12"
+                                        name="Collections"
+                                        placeholder="Set Collection"
+                                        type="text"
+                                        onChange={(e) => {
+                                            setDropdownData((d) => ({ ...d, collection: e.target.value }));
+                                        }}
+                                    />
                                 </div>
                             </div>
                             <div className="flex justify-between p-3">
