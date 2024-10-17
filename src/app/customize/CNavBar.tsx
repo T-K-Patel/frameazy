@@ -1,8 +1,7 @@
 import { ArrowLeft } from "lucide-react";
-import Image from "next/image";
-import Logo from "@/assets/frameasy-logo.png";
 import Link from "next/link";
 import { BsCart3 } from "react-icons/bs";
+import { Img } from "react-image";
 
 function CNavBar() {
     return (
@@ -12,7 +11,7 @@ function CNavBar() {
                     <ArrowLeft size={30} />
                     <p className="text-xl font-semibold">Back</p>
                 </Link>
-                <Image src={Logo} alt="Frameazy" />
+                <Img src={"@/assets/frameasy-logo.png"} alt="Frameazy" />
                 <Link href="/cart" className="text-dark-blue flex items-center gap-3">
                     <BsCart3 size={30} />
                     <p className="text-xl font-semibold">Cart</p>

@@ -1,10 +1,10 @@
-import NextImage from "next/image";
 import React, { ChangeEvent, DragEvent, useState } from "react";
 import UploadIcon from "@/assets/upload.svg";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { useFrames } from "@/context/frames-context";
 import { Button } from "../ui/button";
+import { Img } from "react-image";
 
 function UploadImage() {
     const [error, setError] = useState(null as string | null);
@@ -62,7 +62,7 @@ function UploadImage() {
         <div>
             <div onDragOver={handleDragOver} className="mb-3" onDrop={handleDrop}>
                 <Label className="cursor-pointer">
-                    <NextImage src={UploadIcon} alt="Auth Image" className="w-[28rem]" />
+                    <Img src={UploadIcon} alt="Auth Image" className="w-[28rem]" />
                     <Input type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
                 </Label>
             </div>

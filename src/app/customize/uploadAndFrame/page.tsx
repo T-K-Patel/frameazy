@@ -8,12 +8,12 @@ import FrameCanvas from "../FrameCanvas";
 import { IoCloseSharp } from "react-icons/io5";
 import { Glazing, Printing, Backing, Stretching, Sides, CustomizationType, CartCustomization } from "@prisma/client";
 import { getFramesForCustomizatinAction, FramesForCustomizationType } from "@/serverActions/frames/frame.action";
-import Image from "next/image";
 import { addCartItemAction } from "@/serverActions/cart/addCartItem.action";
 import { useRouter } from "next/navigation";
 import AddToCartDialog from "../AddToCartDialog";
 import { calculateTotalPrice } from "@/utils/totalPrice";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Img } from "react-image";
 
 type CustomizeOptionsProps =
     | {
@@ -418,7 +418,7 @@ function Page() {
                                                                 value: frame.id,
                                                                 label: (
                                                                     <div className="flex gap-3" key={frame.name}>
-                                                                        <Image
+                                                                        <Img
                                                                             src={frame.borderSrc}
                                                                             width={100}
                                                                             height={50}

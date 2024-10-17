@@ -1,6 +1,5 @@
 "use client";
 import DefaultImage from "../../../../public/Default.svg";
-import Image from "next/image";
 import { OrderComponent } from "@/components/Order";
 import { signOut, useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
@@ -8,6 +7,7 @@ import { getOrdersAction, UserOrders } from "@/serverActions/orders/orders.actio
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { Img } from "react-image";
 
 const Dashboard = () => {
     const session = useSession();
@@ -55,7 +55,7 @@ const Dashboard = () => {
                 </div>
                 <div className="mt-6">
                     <div className="flex flex-col place-items-center md:flex-row md:p-5">
-                        <Image
+                        <Img
                             src={session.data?.user?.image || DefaultImage}
                             alt={session.data?.user?.name || "Profile"}
                             width={300}

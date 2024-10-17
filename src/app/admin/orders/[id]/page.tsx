@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from "react";
 import DropDown from "@/components/DropDown";
 import { OrderStatus, CartCustomization } from "@prisma/client";
-import Image from "next/image";
 import {
     getOrderDetailsAction,
     updateOrderStatusAction,
@@ -19,6 +18,7 @@ import Link from "next/link";
 import { IoMdOpen } from "react-icons/io";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { checkPaymentStatus } from "@/serverActions/payments/payments.action";
+import { Img } from "react-image";
 
 const capitalizeFirstLetter = (str: string) => {
     return str.charAt(0).toUpperCase() + str.slice(1);
@@ -175,7 +175,7 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                                                 <div className="flex w-full gap-8">
                                                     {(item.frame?.image || item.customization.image) && (
                                                         <>
-                                                            <Image
+                                                            <Img
                                                                 src={
                                                                     item.customization.image || item.frame?.image || ""
                                                                 }
