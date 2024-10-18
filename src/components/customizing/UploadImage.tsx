@@ -62,7 +62,7 @@ function UploadImage() {
         <div>
             <div onDragOver={handleDragOver} className="mb-3" onDrop={handleDrop}>
                 <Label className="cursor-pointer">
-                    <Img src={UploadIcon} alt="Auth Image" className="w-[28rem]" />
+                    <Img src={UploadIcon.src} alt="Auth Image" className="w-[28rem]" />
                     <Input type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
                 </Label>
             </div>

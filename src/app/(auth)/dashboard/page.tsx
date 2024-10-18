@@ -56,7 +56,7 @@ const Dashboard = () => {
                 <div className="mt-6">
                     <div className="flex flex-col place-items-center md:flex-row md:p-5">
                         <Img
-                            src={session.data?.user?.image || DefaultImage}
+                            src={session.data?.user?.image || DefaultImage.src}
                             alt={session.data?.user?.name || "Profile"}
                             width={300}
                             height={300}

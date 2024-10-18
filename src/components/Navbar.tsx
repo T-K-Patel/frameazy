@@ -1,5 +1,4 @@
 "use client";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { useCallback, useEffect, useState } from "react";
@@ -9,6 +8,7 @@ import Logo from "@/assets/frameasy-logo.png";
 import Sidebar from "@/components/SideBar";
 import { Button } from "@/components/ui/button";
 import { useSession } from "next-auth/react";
+import { Img } from "react-image";
 
 const Navbar = () => {
     const [showSideBar, setShowSideBar] = useState(false);
@@ -104,7 +104,7 @@ const Navbar = () => {
         <header className="mx-auto max-w-screen-2xl">
             <nav className="mx-auto flex h-[100px] w-11/12 items-center justify-between">
                 <a href="/">
-                    <Image src={Logo} alt="logo" priority />
+                    <Img src={Logo.src} alt="logo" loading="eager"/>
                 </a>
                 <ul className="hidden gap-5 md:flex">
                     {links.map((link, ind) => (

@@ -1,9 +1,9 @@
-import Image from "next/image";
 import ArtImg from "@/assets/art_1.png";
 import { getImagePlaceholder } from "@/components/imagePlaceholder";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { BsArrowRight } from "react-icons/bs";
+import { Img } from "react-image";
 
 const FrameArt = () => {
     return (
@@ -27,11 +27,10 @@ const FrameArt = () => {
                 </Link>
             </div>
             <div className="flex flex-1 justify-end">
-                <Image
-                    src={ArtImg}
+                <Img
+                    src={ArtImg.src}
                     alt="frame"
-                    placeholder="blur"
-                    blurDataURL={getImagePlaceholder(ArtImg.width, ArtImg.height)}
+                    loader={<Img src={getImagePlaceholder(ArtImg.width, ArtImg.height)} />}
                     loading="lazy"
                     className="rounded-xl object-cover"
                 />

@@ -6,6 +6,7 @@ import { useFormState, useFormStatus } from "react-dom";
 import { subscribeNewsLetterAction } from "@/serverActions/subscribe-news-letter";
 import { useEffect, useRef } from "react";
 import Link from "next/link";
+import Logo from "@/assets/frameasy-logo.png"
 import { Img } from "react-image";
 
 const SubscribeButton = () => {
@@ -102,7 +103,7 @@ const Footer = () => {
             <div className="mx-auto w-11/12 border-t-2 border-solid border-[#f1f1f1]">
                 <div className="mx-auto flex flex-col justify-start gap-5 py-9 font-semibold md:flex-row md:justify-between">
                     <p>&copy;{new Date().getFullYear()} Copyright by Frameazy</p>
-                    <Img src={"@/assets/frameasy-logo.png"} alt="logo" loading="lazy" className="w-36" />
+                    <Img src={Logo.src} alt="logo" loading="lazy" className="w-36" />
                     <p>Terms, Privacy policy</p>
                 </div>
             </div>
