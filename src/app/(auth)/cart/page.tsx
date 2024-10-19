@@ -2,7 +2,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { CartItem } from "./(components)/CartItem";
 import { Button } from "@/components/ui/button";
-import Image from "next/image";
 import RazorpayLogo from "@/assets/Razorpay_logo.svg";
 import { useSession } from "next-auth/react";
 import { getImagePlaceholder } from "@/components/imagePlaceholder";
@@ -12,6 +11,7 @@ import { useFormState, useFormStatus } from "react-dom";
 import LoadingCart from "./(components)/LoadingCart";
 import { useRouter } from "next/navigation";
 import { getDeliveryCharge } from "@/utils/totalPrice";
+import { Img } from "react-image";
 
 const ClearCartButton = ({ disabled }: { disabled: boolean }) => {
     const { pending } = useFormStatus();
@@ -257,11 +257,10 @@ function Cart() {
                                 className={`remove-arrow rounded-xl border border-solid border-[#D2D1D1] px-5 py-4 focus:outline-none`}
                             /> */}
                                 <span className="lg:text-xl">
-                                    <Image
-                                        src={RazorpayLogo}
+                                    <Img
+                                        src={RazorpayLogo.src}
                                         alt="Razorpay"
-                                        placeholder="blur"
-                                        blurDataURL={getImagePlaceholder(RazorpayLogo.width, RazorpayLogo.height)}
+                                        loader={<Img src={getImagePlaceholder(RazorpayLogo.width,RazorpayLogo.height)}/>}
                                         className="h-8 w-min"
                                     />
                                 </span>

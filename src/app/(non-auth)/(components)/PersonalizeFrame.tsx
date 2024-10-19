@@ -2,11 +2,12 @@ import React from "react";
 import Personal1 from "@/assets/personal1.png";
 import Personal2 from "@/assets/personal2.png";
 import Personal3 from "@/assets/personal3.png";
-import Image, { StaticImageData } from "next/image";
+import { StaticImageData } from "next/image";
 import { getImagePlaceholder } from "@/components/imagePlaceholder";
 import { Button } from "@/components/ui/button";
 import { useFrames } from "@/context/frames-context";
 import { BsArrowRight } from "react-icons/bs";
+import { Img } from "react-image";
 
 type PersonalArtItemProps = {
     img: StaticImageData;
@@ -17,12 +18,11 @@ type PersonalArtItemProps = {
 const PersonalArtItem = ({ img, title, desc }: PersonalArtItemProps) => {
     return (
         <div className="h-full w-full max-w-[350px] text-black">
-            <Image
-                src={img}
+            <Img
+                src={img.src}
                 alt=""
                 className="w-full rounded-t-xl"
-                placeholder="blur"
-                blurDataURL={getImagePlaceholder(img.width, img.height)}
+                loader={<Img src={getImagePlaceholder(img.width,img.height)}/>}
             />
             <div className="rounded-b-xl bg-white px-5 py-5">
                 <h2 className="pb-3 text-2xl font-semibold">{title}</h2>

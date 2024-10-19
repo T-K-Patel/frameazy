@@ -2,25 +2,24 @@
 import React from "react";
 import Frame from "@/assets/frame-1.png";
 import { AiFillEdit } from "react-icons/ai";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { FrameDataType, PopularFrameDataType } from "@/serverActions/frames/frame.action";
 import { getImagePlaceholder } from "@/components/imagePlaceholder";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useFrames } from "@/context/frames-context";
+import { Img } from "react-image";
 
 function Item({ item }: { item: FrameDataType | PopularFrameDataType }) {
     const { setDialogOpen, setCustomizingFrame } = useFrames();
     return (
         <div className="mx-auto grid h-full w-full grid-cols-1 gap-3 rounded-2xl border border-solid px-2 pb-2 max-md:grid-cols-9 sm:w-fit md:p-3">
             <div className="flex items-center justify-center max-md:col-span-3">
-                <Image
+                <Img
                     src={item.image}
                     width={300}
                     height={400}
                     alt="frame"
-                    placeholder="blur"
-                    blurDataURL={getImagePlaceholder()}
+                    loader={<Img src={getImagePlaceholder()}/>}
                     className="h-auto w-full max-w-64 object-contain md:w-full"
                 />
             </div>
@@ -91,12 +90,11 @@ export function FrameLoading() {
     return (
         <div className="mx-auto w-fit rounded-2xl border border-solid p-3 blur-[1px]">
             <div className="flex items-center justify-center">
-                <Image
+                <Img
                     src={getImagePlaceholder()}
                     width={Frame.blurWidth! * 2}
                     height={Frame.blurHeight! * 2}
-                    placeholder="blur"
-                    blurDataURL={getImagePlaceholder()}
+                    loader={<Img src={getImagePlaceholder()}/>}
                     alt="frame"
                     className="aspect-[3/4] w-full max-w-64"
                 />
