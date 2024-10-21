@@ -27,7 +27,7 @@ const FrameOption = ({ title, image, ...props }: FrameOptionProps) => {
     return (
         <button className="h-full gap-4 rounded-2xl border-2 border-[#d0d0d0] p-4 md:p-6" {...props}>
             <p className="w-full pb-3 text-left font-bold">{title}</p>
-            <Img src={image.src} alt="canvas" />
+            <Img src={image.src} alt="canvas object-contain" />
         </button>
     );
 };

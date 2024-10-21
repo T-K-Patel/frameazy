@@ -19,7 +19,7 @@ function Item({ item }: { item: FrameDataType | PopularFrameDataType }) {
                     width={300}
                     height={400}
                     alt="frame"
-                    loader={<Img src={getImagePlaceholder()}/>}
+                    loader={<Img src={getImagePlaceholder()} />}
                     className="h-auto w-full max-w-64 object-contain md:w-full"
                 />
             </div>
@@ -94,7 +94,7 @@ export function FrameLoading() {
                     src={getImagePlaceholder()}
                     width={Frame.blurWidth! * 2}
                     height={Frame.blurHeight! * 2}
-                    loader={<Img src={getImagePlaceholder()}/>}
+                    loader={<Img src={getImagePlaceholder()} />}
                     alt="frame"
                     className="aspect-[3/4] w-full max-w-64"
                 />

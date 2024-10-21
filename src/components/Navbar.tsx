@@ -104,7 +104,7 @@ const Navbar = () => {
         <header className="mx-auto max-w-screen-2xl">
             <nav className="mx-auto flex h-[100px] w-11/12 items-center justify-between">
                 <a href="/">
-                    <Img src={Logo.src} alt="logo" loading="eager"/>
+                    <Img src={Logo.src} alt="logo" loading="eager" />
                 </a>
                 <ul className="hidden gap-5 md:flex">
                     {links.map((link, ind) => (

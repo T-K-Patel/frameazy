@@ -1,3 +1,4 @@
+"use client";
 import ArtImg from "@/assets/art_2.png";
 import Link from "next/link";
 import { BsArrowRight } from "react-icons/bs";
@@ -20,11 +21,16 @@ const EnhanceArt = () => {
             <div className="mb-5 flex flex-1 flex-col items-start justify-center md:mb-0">
                 <h2 className="mb-6 text-4xl font-semibold lg:w-[450px]">Why Choose us </h2>
                 <p>
-                <b>Quality</b>: We use only the finest materials to ensure that every frame is both stylish and durable.</p><p>
-
-                <b>Customization</b>: Enjoy a personalized framing experience with a wide range of options to suit your taste.</p><p>
-
-                <b>Convenience</b>: From selection to delivery, we handle every step with care to make your experience seamless.
+                    <b>Quality</b>: We use only the finest materials to ensure that every frame is both stylish and
+                    durable.
+                </p>
+                <p>
+                    <b>Customization</b>: Enjoy a personalized framing experience with a wide range of options to suit
+                    your taste.
+                </p>
+                <p>
+                    <b>Convenience</b>: From selection to delivery, we handle every step with care to make your
+                    experience seamless.
                 </p>
                 {/* <Button title="Get Framing" /> */}
                 <Link href="/frames">

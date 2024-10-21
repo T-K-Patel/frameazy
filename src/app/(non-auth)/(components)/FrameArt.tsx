@@ -1,3 +1,4 @@
+"use client";
 import ArtImg from "@/assets/art_1.png";
 import { getImagePlaceholder } from "@/components/imagePlaceholder";
 import Link from "next/link";

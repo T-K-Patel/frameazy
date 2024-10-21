@@ -1,3 +1,4 @@
+"use client";
 import { IoIosClose } from "react-icons/io";
 import { FaMinus, FaPlus } from "react-icons/fa6";
 import React from "react";

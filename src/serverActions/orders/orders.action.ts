@@ -167,9 +167,9 @@ export async function placeOrderAction(state: any, formData: FormData): Promise<
                 userId,
             },
         });
-        console.log("h1")
+        console.log("h1");
         if (cart.length == 0) {
-            console.log("h2")
+            console.log("h2");
             throw new CustomError("Cart is empty");
         }
 

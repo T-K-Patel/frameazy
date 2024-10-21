@@ -10,7 +10,7 @@ import { Img } from "react-image";
 
 const LoginPage = ({ searchParams }: { searchParams: Record<string, any> }) => {
     const session = useSession();
-    const [error, setError] = useState(null as string | null);
+    const [error, setError] = useState<string | null>(null as string | null);
 
     useEffect(() => {
         if (session.data?.user) {

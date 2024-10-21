@@ -260,7 +260,9 @@ function Cart() {
                                     <Img
                                         src={RazorpayLogo.src}
                                         alt="Razorpay"
-                                        loader={<Img src={getImagePlaceholder(RazorpayLogo.width,RazorpayLogo.height)}/>}
+                                        loader={
+                                            <Img src={getImagePlaceholder(RazorpayLogo.width, RazorpayLogo.height)} />
+                                        }
                                         className="h-8 w-min"
                                     />
                                 </span>

@@ -6,7 +6,7 @@ import { useFormState, useFormStatus } from "react-dom";
 import { subscribeNewsLetterAction } from "@/serverActions/subscribe-news-letter";
 import { useEffect, useRef } from "react";
 import Link from "next/link";
-import Logo from "@/assets/frameasy-logo.png"
+import Logo from "@/assets/frameasy-logo.png";
 import { Img } from "react-image";
 
 const SubscribeButton = () => {
