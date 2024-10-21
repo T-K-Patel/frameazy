@@ -20,7 +20,7 @@ function Item({ item }: { item: FrameDataType | PopularFrameDataType }) {
                     height={400}
                     alt="frame"
                     loader={<Img src={getImagePlaceholder()} />}
-                    className="h-auto w-full max-w-64 object-contain md:w-full"
+                    className="h-auto w-full max-w-64 object-cover md:w-full"
                 />
             </div>
             <div className="max-w-64 align-baseline max-md:col-span-6">

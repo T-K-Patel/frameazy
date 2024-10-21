@@ -10,7 +10,7 @@ export default function Home() {
     return (
         <>
             <Hero />
-            <FrameArt />
+            {/* <FrameArt /> */}
             <PopularItems />
             <EnhanceArt />
             <PersonalizeFrame />

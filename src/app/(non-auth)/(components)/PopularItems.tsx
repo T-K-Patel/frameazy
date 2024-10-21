@@ -39,7 +39,7 @@ const PopularItems = () => {
     if (error) return null;
 
     return (
-        <div className="mx-auto w-11/12 max-w-screen-2xl items-center" id="explore">
+        <div className="mx-auto mt-5 w-11/12 max-w-screen-2xl items-center" id="explore">
             <div className="flex items-center justify-between font-semibold">
                 <h2 className="text-2xl md:text-4xl">Popular Items</h2>
                 <Link href="/frames" className="text-dark-blue hover:underline md:text-xl">

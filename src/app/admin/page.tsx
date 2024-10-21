@@ -66,7 +66,7 @@ const UploadImage = forwardRef<HTMLInputElement, { name: string }>(function Uplo
             <>
                 <Label className="relative cursor-pointer">
                     <Img
-                        src={dataUrl ?? Upload.src}
+                        src={dataUrl?.src ?? Upload.src}
                         width={dataUrl ? dataUrl.width : Upload.width}
                         height={dataUrl ? dataUrl.height : Upload.height}
                         alt="Auth Image"
