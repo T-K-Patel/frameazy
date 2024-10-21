@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import AuthImage from "@/assets/frame-sign.png";
 import { getImagePlaceholder } from "@/components/imagePlaceholder";
@@ -12,7 +13,7 @@ const layout = async ({ children }: { children: React.ReactNode }) => {
                 <Img
                     src={AuthImage.src}
                     alt="Auth Image"
-                    loader={<img src={getImagePlaceholder()}/>}
+                    loader={<img src={getImagePlaceholder()} />}
                     className="h-screen w-full object-cover"
                 />
             </div>

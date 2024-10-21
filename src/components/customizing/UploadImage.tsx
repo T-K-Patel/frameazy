@@ -1,3 +1,4 @@
+"use client";
 import React, { ChangeEvent, DragEvent, useState } from "react";
 import UploadIcon from "@/assets/upload.svg";
 import { Label } from "../ui/label";

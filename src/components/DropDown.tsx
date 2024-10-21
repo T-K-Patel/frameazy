@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import { Img } from "react-image";
 import Select, { StylesConfig } from "react-select";
