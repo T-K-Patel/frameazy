@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { IoMdOpen } from "react-icons/io";
-import { initiatePaymentForOrder, verifyPayment } from "@/serverActions/payments/payments.action";
+import { checkPaymentStatus, initiatePaymentForOrder } from "@/serverActions/payments/payments.action";
 import { useSession } from "next-auth/react";
 
 function PaymentButton({ orderId }: { orderId: string }) {
@@ -31,15 +31,14 @@ function PaymentButton({ orderId }: { orderId: string }) {
                         name: "Frameazy",
                         description: "Payment for your order with order id " + orderId,
                         order_id: paymentOrderId,
-                        handler: function (response: any) {
-                            verifyPayment(orderId, response.razorpay_order_id, response.razorpay_payment_id)
+                        handler: function () {
+                            checkPaymentStatus(orderId)
                                 .then((res) => {
                                     if (res.success) {
-                                        alert(JSON.stringify(res.data, null, 4));
-                                        window.location.reload();
-                                    } else {
-                                        console.log(res.error);
-                                        alert(res.error);
+                                        if (res.data) {
+                                            alert("Payment successful");
+                                            window.location.reload();
+                                        }
                                     }
                                 })
                                 .catch((err) => {

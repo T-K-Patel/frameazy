@@ -82,14 +82,21 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                     setDeliveryDate(data.data.delivery_date);
                     setError(null);
 
-                    if (order?.transaction?.status === "Created" || order?.transaction?.status === "Attempted") {
-                        checkPaymentStatus(order.id)
+                    if (
+                        data.data?.transaction?.status === "Created" ||
+                        data.data?.transaction?.status === "Attempted"
+                    ) {
+                        checkPaymentStatus(data.data.id)
                             .then((data) => {
                                 if (data.success) {
                                     if (data.data) {
                                         setOrder((prev) =>
                                             prev
-                                                ? { ...prev, transaction: { ...prev.transaction, status: "Paid" } }
+                                                ? {
+                                                      ...prev,
+                                                      order_status: "Processing",
+                                                      transaction: { ...prev.transaction, status: "Paid" },
+                                                  }
                                                 : prev,
                                         );
                                     }

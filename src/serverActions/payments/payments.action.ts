@@ -19,6 +19,14 @@ async function isAuthenticated() {
     return session.user.id;
 }
 
+async function isAuthUserAdmin() {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+        throw new CustomError("Unauthorized");
+    }
+    return session.user.role == "admin";
+}
+
 async function updateOrderStatus(orderId: string, status: OrderStatus) {
     await db.order.update({
         where: {
@@ -190,39 +198,14 @@ export async function initiatePaymentForOrder(
     }
 }
 
-type VerifyPaymentReturnType = {
-    orderId: string;
-    transactionId: string;
-    paymentId: string;
-    paymentOrderId: string;
-};
-
-export async function verifyPayment(
-    orderId: string,
-    paymentOrderId: string,
-    paymentId: string,
-): Promise<ServerActionReturnType<VerifyPaymentReturnType>> {
-    try {
-        // TODO: Verify payment from Razorpay and update tables accordingly
-        return { success: true, data: { orderId, transactionId: "", paymentId, paymentOrderId } };
-    } catch (error) {
-        if (error instanceof CustomError) {
-            return { success: false, error: error.message };
-        }
-        console.error("verifyPayment error", error);
-        return { success: false, error: "Something went wrong" };
-    }
-}
-
 export async function checkPaymentStatus(orderId: string): Promise<ServerActionReturnType<Boolean>> {
     try {
         const userId = await isAuthenticated();
         ObjectIdValidation(orderId);
+        const isAdmin = await isAuthUserAdmin();
+        const query = isAdmin ? { id: orderId } : { id: orderId, userId };
         const order = await db.order.findFirst({
-            where: {
-                id: orderId,
-                userId,
-            },
+            where: query,
             include: {
                 transaction: {
                     select: {

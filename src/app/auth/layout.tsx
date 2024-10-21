@@ -13,7 +13,7 @@ const layout = async ({ children }: { children: React.ReactNode }) => {
                 <Img
                     src={AuthImage.src}
                     alt="Auth Image"
-                    loader={<img src={getImagePlaceholder()} />}
+                    loader={<Img src={getImagePlaceholder()} className="h-screen w-full object-cover" />}
                     className="h-screen w-full object-cover"
                 />
             </div>

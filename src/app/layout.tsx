@@ -2,6 +2,8 @@ import { Poppins } from "next/font/google";
 import "./globals.css";
 import ContextProviders from "@/context/ContextProviders";
 import { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const poppins = Poppins({
     weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
@@ -38,6 +40,8 @@ export default function RootLayout({
                 <div className="_next">
                     <ContextProviders>{children}</ContextProviders>
                 </div>
+                <Analytics />
+                <SpeedInsights />
             </body>
         </html>
     );

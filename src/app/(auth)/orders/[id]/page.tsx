@@ -30,14 +30,21 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                 if (data.success) {
                     setOrder(data.data);
                     setError(null);
-                    if (order?.transaction?.status === "Created" || order?.transaction?.status === "Attempted") {
-                        checkPaymentStatus(order.id)
+                    if (
+                        data.data?.transaction?.status === "Created" ||
+                        data.data?.transaction?.status === "Attempted"
+                    ) {
+                        checkPaymentStatus(data.data.id)
                             .then((data) => {
                                 if (data.success) {
                                     if (data.data) {
                                         setOrder((prev) =>
                                             prev
-                                                ? { ...prev, transaction: { ...prev.transaction, status: "Paid" } }
+                                                ? {
+                                                      ...prev,
+                                                      order_status: "Processing",
+                                                      transaction: { ...prev.transaction, status: "Paid" },
+                                                  }
                                                 : prev,
                                         );
                                     }
@@ -65,30 +72,6 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
             });
     }, [params.id]);
 
-    useEffect(() => {
-        if (order?.transaction?.status === "Created" || order?.transaction?.status === "Attempted") {
-            checkPaymentStatus(order.id)
-                .then((data) => {
-                    if (data.success) {
-                        if (data.data) {
-                            setOrder((prev) =>
-                                prev ? { ...prev, transaction: { ...prev.transaction, status: "Paid" } } : prev,
-                            );
-                        }
-                    } else {
-                        setError(data.error);
-                    }
-                })
-                .catch((error) => {
-                    console.log(error);
-                    setError("Something went wrong");
-                })
-                .finally(() => {
-                    setLoading(false);
-                });
-        }
-    }, [order]);
-
     const cancelOrder = () => {
         if (!order?.id) {
             setError("Order not found");
@@ -109,24 +92,6 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                 setError("Something went wrong");
             });
     };
-
-    // const checkStatus = () => {
-    //     if (!order?.id) {
-    //         return;
-    //     }
-    //     checkPaymentStatus(order.id)
-    //         .then((data) => {
-    //             if (data.success) {
-    //                 console.log(data.data);
-    //             } else {
-    //                 alert("Payment not found");
-    //             }
-    //         })
-    //         .catch((error) => {
-    //             console.log(error);
-    //             alert("Something went wrong");
-    //         });
-    // };
 
     return (
         <div className="mx-auto flex w-11/12 max-w-screen-2xl flex-col gap-8 py-5">
