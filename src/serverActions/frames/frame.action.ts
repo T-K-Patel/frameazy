@@ -25,77 +25,51 @@ export type FrameDataType = PopularFrameDataType & {
     category: string;
 };
 
-export async function getUniqueColors() {
-    const frames = await db.frame.findMany({
-        select: {
-            color: true,
-        },
-    });
+export async function getFiltersOptionsAction(): Promise<ServerActionReturnType<{ colors: string[]; collections: string[]; categories: string[] }>> {
+    try {
+        const colors = (await db.frame.findMany({
+            select: {
+                color: true,
+            },
+            distinct: ["color"],
+        })).map((frame) => frame.color);
 
-    const uniqueColors = new Set<string>();
+        const categories = (await db.frame.findMany({
+            select: {
+                category: true,
+            },
+            distinct: ["category"],
+        })).map((frame) => frame.category);
 
-    frames.forEach((frame: any) => {
-        if (frame.color) {
-            uniqueColors.add(frame.color);
+        const collections = (await db.frame.findMany({
+            select: {
+                collection: true,
+            },
+            distinct: ["collection"],
+        })).map((frame) => frame.collection);
+
+        return { success: true, data: { colors, collections, categories } };
+    } catch (error) {
+        if (error instanceof CustomError) {
+            return { success: false, error: error.message };
         }
-    });
-
-    return Array.from(uniqueColors);
-}
-export async function getUniqueCollections() {
-    const frames = await db.frame.findMany({
-        select: {
-            collection: true,
-        },
-    });
-
-    const uniqueColors = new Set<string>();
-
-    frames.forEach((frame: any) => {
-        if (frame.collection) {
-            uniqueColors.add(frame.collection);
-        }
-    });
-
-    return Array.from(uniqueColors);
-}
-export async function getUniqueCategory() {
-    const frames = await db.frame.findMany({
-        select: {
-            category: true,
-        },
-    });
-
-    const uniqueColors = new Set<string>();
-
-    frames.forEach((frame: any) => {
-        if (frame.category) {
-            uniqueColors.add(frame.category);
-        }
-    });
-
-    return Array.from(uniqueColors);
+        console.error("getFiltersOptionsAction error", error);
+        return { success: false, error: "Something went wrong" };
+    }
 }
 
 export async function getFramesAction(
     filters: FramesFilterType,
-    page: number,
+    page: number = 0,
 ): Promise<ServerActionReturnType<{ total: number; page: number; frames: FrameDataType[] }>> {
     try {
-        const Color: string[] = await getUniqueColors();
-        const Category: string[] = await getUniqueCategory();
-        const Collection: string[] = await getUniqueCollections();
         const validatedFilters = {
-            categories: filters.categories.filter((cat) => Category.includes(cat)).sort(),
+            categories: filters.categories.filter((cat) => typeof cat === 'string').sort(),
             collections: filters.collections
-                .filter((col) => {
-                    Collection.includes(col);
-                })
+                .filter((col) => typeof col === 'string')
                 .sort(),
             colors: filters.colors
-                .filter((col) => {
-                    Color.includes(col);
-                })
+                .filter((col) => typeof col === 'string')
                 .sort(),
             name: filters.name,
         };

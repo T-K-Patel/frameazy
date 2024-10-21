@@ -11,7 +11,6 @@ const db = new PrismaClient();
 
 export const authOptions: NextAuthOptions = {
     adapter: PrismaAdapter(db),
-    debug: process.env.NODE_ENV === "development",
     providers: [
         Google({
             clientId: process.env.GOOGLE_CLIENT_ID || "",
@@ -22,7 +21,7 @@ export const authOptions: NextAuthOptions = {
         strategy: "database",
         maxAge: 24 * 60 * 60, // 1 day
         generateSessionToken() {
-            return crypto.randomBytes(64).toString("hex");
+            return crypto.randomBytes(32).toString("hex");
         },
     },
     callbacks: {

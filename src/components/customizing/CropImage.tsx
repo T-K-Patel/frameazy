@@ -136,13 +136,12 @@ function CropImage() {
                         <>
                             <ReactImage
                                 src={frameOptions.data.image}
-                                className="h-full w-full object-cover"
+                                className="h-full w-full object-contain"
                                 alt="image"
                             />
                         </>
                     ) : (
                         <Cropper
-                            //@ts-ignore
                             image={frameOptions.data.image}
                             crop={crop}
                             zoom={zoom}
