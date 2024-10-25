@@ -1,7 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import React, { useEffect, useRef } from "react";
-import Contact from "@/assets/contact.png";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
