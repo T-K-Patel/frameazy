@@ -67,15 +67,15 @@ const Footer = () => {
                     <div className="flex flex-1 flex-col gap-5">
                         <div className="flex gap-3">
                             <FaLocationDot size={24} />
-                            <p className="md:text-xl">3517 W. Gray St. Utica</p>
+                            <p className="md:text-xl">601, Makhija arcad, 35th road Bandra west Mumbai 400050 Maha.</p>
                         </div>
                         <div className="flex gap-3">
                             <FaEnvelope size={24} />
-                            <p className="md:text-xl">Frameazy@mail.co</p>
+                            <p className="md:text-xl">Info@frameazy.in</p>
                         </div>
                         <div className="flex gap-3">
                             <BsTelephoneFill size={24} />
-                            <p className="md:text-xl">(+33)7 65 55 72 67</p>
+                            <p className="md:text-xl">(+91)9079038014</p>
                         </div>
                     </div>
                     <div className="flex flex-1 flex-col md:items-end">

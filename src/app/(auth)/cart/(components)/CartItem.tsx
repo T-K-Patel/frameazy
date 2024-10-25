@@ -48,51 +48,57 @@ export const CartItem = ({ item, updateState, deleteItem, fetchCartItems }: Cart
 
     return (
         <div className="flex flex-col gap-1 rounded-lg border border-[#F1F1F1]" key={item.id}>
-            <div className="flex items-center gap-8 border-b border-[#F1F1F1] p-3 text-center">
-                {(item.frame?.image || item.customization.image) && (
-                    <>
-                        <Img
-                            src={item.customization.image || item.frame?.image || ""}
-                            width={100}
-                            height={100}
-                            alt={item.frame?.name || ""}
-                            className="h-20 w-20 object-contain"
-                        />
-                    </>
-                )}
-                <div className="w-full">
-                    <p className="w-full text-start text-xl font-semibold leading-6">
-                        {item.frame?.name || "No Frame"}
-                    </p>
-                    <p className="w-full text-start text-base text-[#A3A1A1]">{item.customization.type}</p>
+            <div className="flex items-center justify-between border-b border-[#F1F1F1] p-3 text-center">
+                <div className="flex flex-col items-center gap-5 border-b border-[#F1F1F1] p-3 text-center sm:flex-row sm:gap-8">
+                    <div className="flex items-center gap-8">
+                        {(item.frame?.image || item.customization.image) && (
+                            <>
+                                <Img
+                                    src={item.customization.image || item.frame?.image || ""}
+                                    width={100}
+                                    height={100}
+                                    alt={item.frame?.name || ""}
+                                    className="h-20 w-20 object-contain"
+                                />
+                            </>
+                        )}
+                        <div className="w-full">
+                            <p className="w-full text-start text-xl font-semibold leading-6">
+                                {item.frame?.name || "No Frame"}
+                            </p>
+                            <p className="w-full text-start text-base text-[#A3A1A1]">{item.customization.type}</p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-8">
+                        <p className="text-nowrap font-semibold leading-6 md:text-lg">
+                            ₹ {(item.single_unit_price / 100).toFixed(2)}
+                        </p>
+                        <div className="flex items-center justify-between gap-[1px] rounded-lg bg-blue-1 text-white md:gap-1">
+                            <>
+                                <button
+                                    className="flex w-full items-center p-1 disabled:bg-white disabled:bg-opacity-20 md:p-2"
+                                    disabled={updating}
+                                    onClick={updateQtyState.bind(null, -1)}
+                                >
+                                    <FaMinus size={16} />
+                                </button>
+                            </>
+                            <p className="w-auto px-[2px] text-center text-sm md:px-2 md:text-base">{qty}</p>
+                            <>
+                                <button
+                                    className="flex w-full items-center p-1 disabled:bg-white disabled:bg-opacity-20 md:p-2"
+                                    disabled={updating}
+                                    onClick={updateQtyState.bind(null, 1)}
+                                >
+                                    <FaPlus size={16} />
+                                </button>
+                            </>
+                        </div>
+                        <p className="text-nowrap font-semibold leading-6 md:text-lg">
+                            ₹ {((item.single_unit_price * item.quantity) / 100).toFixed(2)}
+                        </p>
+                    </div>
                 </div>
-                <p className="text-nowrap font-semibold leading-6 md:text-lg">
-                    ₹ {(item.single_unit_price / 100).toFixed(2)}
-                </p>
-                <div className="flex items-center justify-between gap-[1px] rounded-lg bg-blue-1 text-white md:gap-1">
-                    <>
-                        <button
-                            className="flex w-full items-center p-1 disabled:bg-white disabled:bg-opacity-20 md:p-2"
-                            disabled={updating}
-                            onClick={updateQtyState.bind(null, -1)}
-                        >
-                            <FaMinus size={16} />
-                        </button>
-                    </>
-                    <p className="w-auto px-[2px] text-center text-sm md:px-2 md:text-base">{qty}</p>
-                    <>
-                        <button
-                            className="flex w-full items-center p-1 disabled:bg-white disabled:bg-opacity-20 md:p-2"
-                            disabled={updating}
-                            onClick={updateQtyState.bind(null, 1)}
-                        >
-                            <FaPlus size={16} />
-                        </button>
-                    </>
-                </div>
-                <p className="text-nowrap font-semibold leading-6 md:text-lg">
-                    ₹ {((item.single_unit_price * item.quantity) / 100).toFixed(2)}
-                </p>
                 <>
                     <Button
                         variant={"ghost"}

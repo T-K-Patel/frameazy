@@ -30,16 +30,28 @@ const ContactPage = () => {
 
     return (
         <section className="mx-auto flex h-auto max-w-screen-2xl flex-col gap-y-4 px-0">
-            <div
-                className="py-24 md:py-32"
-                style={{
-                    backgroundImage: `url(${Contact.src})`,
-                    backgroundPosition: "center",
-                    backgroundRepeat: "no-repeat",
-                    backgroundSize: "cover",
-                }}
-            >
-                <h1 className="text-center text-4xl font-bold text-white md:text-6xl">Contact Us</h1>
+            <div className="mx-auto flex h-auto w-11/12 flex-col gap-y-2">
+                <div className="mx-auto flex h-auto w-11/12 flex-col gap-y-2">
+                    <h1 className="w-90 h-auto pb-3 text-2xl font-semibold leading-[36px] md:text-3xl/8 md:leading-[48px]">
+                        Our Story
+                    </h1>
+                    <p className="text-left">
+                        At Frameazy, our journey began with a simple frustration. Joy Sharma, founder of Frameazy,
+                        inspired by a love for preserving memories and enhancing home décor, struggled to find quality
+                        frames that didn’t break the bank. After countless trips to stores that offered either
+                        overpriced options or lackluster quality, he realized there had to be a better way.
+                    </p>
+                    <p>
+                        Determined to change the framing experience, he set out to create a business that would
+                        prioritize both craftsmanship and affordability. With a vision to help others showcase their
+                        most cherished moments, Frameazy was born. We believe every photo deserves a beautiful frame
+                        that reflects its significance. Our mission is to provide high-quality, custom framing solutions
+                        that make it easy for you to display what matters most. With a commitment to exceptional
+                        craftsmanship and customer satisfaction, we’re here to help you create frames that you’ll
+                        cherish for years to come. Join us on this journey, and let’s turn your memories into art
+                        together!
+                    </p>
+                </div>
             </div>
             <div className="mx-auto grid w-11/12 py-6 md:grid-cols-2">
                 <div className="mx-auto flex h-auto w-11/12 flex-col gap-y-10">
