@@ -25,28 +25,36 @@ export type FrameDataType = PopularFrameDataType & {
     category: string;
 };
 
-export async function getFiltersOptionsAction(): Promise<ServerActionReturnType<{ colors: string[]; collections: string[]; categories: string[] }>> {
+export async function getFiltersOptionsAction(): Promise<
+    ServerActionReturnType<{ colors: string[]; collections: string[]; categories: string[] }>
+> {
     try {
-        const colors = (await db.frame.findMany({
-            select: {
-                color: true,
-            },
-            distinct: ["color"],
-        })).map((frame) => frame.color);
+        const colors = (
+            await db.frame.findMany({
+                select: {
+                    color: true,
+                },
+                distinct: ["color"],
+            })
+        ).map((frame) => frame.color);
 
-        const categories = (await db.frame.findMany({
-            select: {
-                category: true,
-            },
-            distinct: ["category"],
-        })).map((frame) => frame.category);
+        const categories = (
+            await db.frame.findMany({
+                select: {
+                    category: true,
+                },
+                distinct: ["category"],
+            })
+        ).map((frame) => frame.category);
 
-        const collections = (await db.frame.findMany({
-            select: {
-                collection: true,
-            },
-            distinct: ["collection"],
-        })).map((frame) => frame.collection);
+        const collections = (
+            await db.frame.findMany({
+                select: {
+                    collection: true,
+                },
+                distinct: ["collection"],
+            })
+        ).map((frame) => frame.collection);
 
         return { success: true, data: { colors, collections, categories } };
     } catch (error) {
@@ -64,13 +72,9 @@ export async function getFramesAction(
 ): Promise<ServerActionReturnType<{ total: number; page: number; frames: FrameDataType[] }>> {
     try {
         const validatedFilters = {
-            categories: filters.categories.filter((cat) => typeof cat === 'string').sort(),
-            collections: filters.collections
-                .filter((col) => typeof col === 'string')
-                .sort(),
-            colors: filters.colors
-                .filter((col) => typeof col === 'string')
-                .sort(),
+            categories: filters.categories.filter((cat) => typeof cat === "string").sort(),
+            collections: filters.collections.filter((col) => typeof col === "string").sort(),
+            colors: filters.colors.filter((col) => typeof col === "string").sort(),
             name: filters.name,
         };
         const frames = await db.frame.findMany({

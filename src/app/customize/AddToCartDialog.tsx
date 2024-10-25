@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import React from "react";
-import InputField from "./InputField";
 import { Label } from "@radix-ui/react-label";
 
 function AddToCartDialog({ addToCart, addingToCart }: { addToCart: (qty: number) => void; addingToCart: boolean }) {
