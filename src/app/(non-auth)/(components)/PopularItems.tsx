@@ -85,8 +85,8 @@ const PopularItems = () => {
                     : popularFrames.map((item, ind) => {
                           return (
                               <React.Fragment key={ind}>
-                                  <SwiperSlide>
-                                      <Item item={item} />
+                                  <SwiperSlide className="">
+                                      <Item item={item} isPopularItem={true} />
                                   </SwiperSlide>
                               </React.Fragment>
                           );

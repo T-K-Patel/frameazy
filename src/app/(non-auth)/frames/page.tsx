@@ -3,7 +3,12 @@ import React, { useEffect, useState } from "react";
 import Item, { FrameLoading } from "../(components)/Item";
 import { Button } from "@/components/ui/button";
 import { RiArrowDropDownLine } from "react-icons/ri";
-import { getFramesAction, FrameDataType, FramesFilterType } from "@/serverActions/frames/frame.action";
+import {
+    getFramesAction,
+    FrameDataType,
+    FramesFilterType,
+    getFiltersOptionsAction,
+} from "@/serverActions/frames/frame.action";
 import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
 import useDebounce from "@/lib/useDebounce";
 import FramesPagination from "./FramesPagination";
@@ -21,6 +26,9 @@ function Frames() {
     const [page, setPage] = useState(1);
     const [sidebarHidden, setSidebarHidden] = useState(true);
     const [frames, setFrames] = useState<FrameDataType[]>();
+    const [colors, setColors] = useState<string[]>([]);
+    const [collections, setCollections] = useState<string[]>([]);
+    const [categories, setCategories] = useState<string[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -67,6 +75,20 @@ function Frames() {
         };
     }, []);
 
+    useEffect(() => {
+        getFiltersOptionsAction()
+            .then((data) => {
+                if (data.success) {
+                    setColors(data.data.colors);
+                    setCollections(data.data.collections);
+                    setCategories(data.data.categories);
+                }
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    }, []);
+
     const totalPages = Math.ceil(totalFrames / 18);
 
     return (
@@ -76,7 +98,13 @@ function Frames() {
             ) : (
                 <div className="grid w-full gap-4 md:grid-cols-4 md:p-4">
                     <aside className="col-span-1 hidden flex-col gap-y-10 py-5 md:flex">
-                        <FramesSideBar filters={filters} setFilters={setFilters} />
+                        <FramesSideBar
+                            filters={filters}
+                            setFilters={setFilters}
+                            colors={colors}
+                            collections={collections}
+                            categories={categories}
+                        />
                     </aside>
                     <div className="flex flex-col gap-y-5 md:col-span-3">
                         <div className="flex flex-col rounded-lg border border-[#F1F1F1] p-3">
@@ -116,7 +144,13 @@ function Frames() {
                                     </DialogTrigger>
                                     <DialogContent className="max-w-11/12 max-h-[90%] overflow-auto rounded-lg">
                                         <div className="flex h-fit w-auto flex-col items-center justify-start gap-y-5 overflow-y-auto md:gap-y-6">
-                                            <FramesSideBar filters={filters} setFilters={setFilters} />
+                                            <FramesSideBar
+                                                filters={filters}
+                                                setFilters={setFilters}
+                                                colors={colors}
+                                                collections={collections}
+                                                categories={categories}
+                                            />
                                         </div>
                                     </DialogContent>
                                 </Dialog>

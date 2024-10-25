@@ -30,17 +30,17 @@ const ContactPage = () => {
     return (
         <section className="mx-auto flex h-auto max-w-screen-2xl flex-col gap-y-4 px-0">
             <div className="mx-auto flex h-auto w-11/12 flex-col gap-y-2">
-                <div className="mx-auto flex h-auto w-11/12 flex-col gap-y-2">
-                    <h1 className="w-90 h-auto pb-3 text-2xl font-semibold leading-[36px] md:text-3xl/8 md:leading-[48px]">
+                <div className="mx-auto flex h-auto flex-col gap-y-2 p-5">
+                    <h1 className="h-auto pb-3 text-2xl font-semibold leading-[36px] md:text-3xl/8 md:leading-[48px]">
                         Our Story
                     </h1>
-                    <p className="text-left">
+                    <p className="text-justify">
                         At Frameazy, our journey began with a simple frustration. Joy Sharma, founder of Frameazy,
                         inspired by a love for preserving memories and enhancing home décor, struggled to find quality
                         frames that didn’t break the bank. After countless trips to stores that offered either
                         overpriced options or lackluster quality, he realized there had to be a better way.
                     </p>
-                    <p>
+                    <p className="text-justify">
                         Determined to change the framing experience, he set out to create a business that would
                         prioritize both craftsmanship and affordability. With a vision to help others showcase their
                         most cherished moments, Frameazy was born. We believe every photo deserves a beautiful frame
@@ -112,7 +112,7 @@ const ContactPage = () => {
                 </div>
                 <div className="flex items-center justify-end p-5">
                     <iframe
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d7310705.282272247!2d68.5844335014852!3d26.530404211858755!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x396a3efaf7e30e37%3A0xb52b9b4506c088e5!2sRajasthan!5e0!3m2!1sen!2sin!4v1720096416411!5m2!1sen!2sin"
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1641.4091381059002!2d72.83321327460479!3d19.065154768106584!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7c91140262913%3A0xc53b6407e4d39f76!2sMakhija%20Arcade%2C%2035th%20Rd%2C%20Khar%2C%20Khar%20West%2C%20Mumbai%2C%20Maharashtra%20400052!5e0!3m2!1sen!2sin!4v1729875578501!5m2!1sen!2sin"
                         className="aspect-square w-full"
                         allowFullScreen={true}
                         loading="lazy"
