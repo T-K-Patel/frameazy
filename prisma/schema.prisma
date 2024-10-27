@@ -236,38 +236,6 @@ enum Role {
   admin
 }
 
-enum Category {
-  Frame_SingleMat
-  Frame_DoubleMats
-  PictureFrames
-  Collages_SingleMat
-  Collages_DoubleMats
-  DiplomasFrames
-}
-
-enum Color {
-  Aqua
-  Barnwood
-  Black
-  BlondeBurl
-  Brown
-  Bronze
-  Burgundy
-  Charcoal
-  ClearStain
-  Cherry
-  Gold
-  Coffee
-  Green
-  Grey
-  Honey
-}
-
-enum Collection {
-  NaturalWoodCollection
-  CloaseoutPicturesFrames
-}
-
 enum Mirror {
   Beveled
   NonBeveled
@@ -353,6 +321,7 @@ enum PaymentStatus {
   Created
   Attempted
   Paid
+  Failed
 }
 
 enum SubscriptionStatus {
