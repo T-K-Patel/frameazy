@@ -255,10 +255,20 @@ export async function cancelOrderAction(id: string): Promise<ServerActionReturnT
                 id,
                 userId,
             },
+            include: {
+                transaction: {
+                    select: {
+                        status: true
+                    }
+                }
+            }
         });
         if (!order) throw new CustomError("Order not found");
         if (!([OrderStatus.Approved, OrderStatus.Received] as OrderStatus[]).includes(order.order_status))
             throw new CustomError("Order cannot be cancelled");
+        if (order.transaction) {
+            throw new CustomError("Order cannot be cancelled");
+        }
         await db.order.update({
             where: {
                 id,

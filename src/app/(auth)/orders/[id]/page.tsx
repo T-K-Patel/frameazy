@@ -105,7 +105,8 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                         <section className="flex flex-col rounded-lg border border-[#F1F1F1] p-3">
                             <div className="p flex justify-between gap-x-5 border-b border-[#F1F1F1] pb-3 text-2xl font-semibold leading-6">
                                 Order Details
-                                {(order.order_status === "Received" || order.order_status === "Approved") && (
+                                {(order.order_status === "Received" ||
+                                    (order.order_status === "Approved" && order.transaction?.status == null)) && (
                                     <CancelOrderDialog cancelOrder={cancelOrder} cancelingOrder={cancelingOrder} />
                                 )}
                             </div>
