@@ -2,7 +2,7 @@
 import { ServerActionReturnType } from "@/types/serverActionReturnType";
 import { db } from "@/lib/db";
 import { CustomError } from "@/lib/CustomError";
-import { OrderStatus, CartCustomization, Address } from "@prisma/client";
+import { OrderStatus, CartCustomization, Address, PaymentStatus } from "@prisma/client";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import { z } from "zod";
@@ -85,7 +85,7 @@ export type UserOrderDetails = {
     discount: number;
     delivery_date: Date | null;
     transaction: {
-        status: string;
+        status: PaymentStatus;
     } | null;
 };
 export async function getOrderDetailsAction(id: string): Promise<ServerActionReturnType<UserOrderDetails>> {

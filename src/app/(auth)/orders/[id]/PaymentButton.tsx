@@ -4,7 +4,7 @@ import { IoMdOpen } from "react-icons/io";
 import { checkPaymentStatus, initiatePaymentForOrder } from "@/serverActions/payments/payments.action";
 import { useSession } from "next-auth/react";
 
-function PaymentButton({ orderId }: { orderId: string }) {
+function PaymentButton({ orderId, text }: { orderId: string; text?: string }) {
     const [loading, setLoading] = React.useState(false);
     const session = useSession();
     useEffect(() => {
@@ -71,7 +71,7 @@ function PaymentButton({ orderId }: { orderId: string }) {
                 "Processing...."
             ) : (
                 <>
-                    Pay with Razorpay&nbsp;
+                    {text || "Pay with Razorpay"}&nbsp;
                     <IoMdOpen size={20} />
                 </>
             )}

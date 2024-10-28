@@ -293,15 +293,30 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                                 </p>
                                 <div className="flex gap-x-5">
                                     {order?.order_status === "Received" ? (
-                                        <p className={`text-lg font-semibold text-red-500`}>Not Approved yet</p>
+                                        <p className={`text-lg font-semibold text-red-500`}>Order Approval Pending</p>
                                     ) : order.order_status == "Approved" ? (
-                                        <>
-                                            <PaymentButton orderId={order.id} />
-                                        </>
+                                        order.transaction?.status === "Attempted" ? (
+                                            <>
+                                                <p className={`text-lg font-semibold text-[#D68D00]`}>
+                                                    Processing Payment
+                                                </p>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <PaymentButton
+                                                    orderId={order.id}
+                                                    text={
+                                                        order.transaction?.status === "Created"
+                                                            ? "Continue to Payment"
+                                                            : order.transaction?.status === "Failed"
+                                                              ? "Retry Payment"
+                                                              : "Pay with Razorpay"
+                                                    }
+                                                />
+                                            </>
+                                        )
                                     ) : (
-                                        <p
-                                            className={`text-lg font-semibold ${order.transaction?.status === "Attempted" ? "text-[#D68D00]" : "text-[#008C0E]"}`}
-                                        >
+                                        <p className={`text-lg font-semibold text-[#008C0E]`}>
                                             {order.transaction?.status}
                                         </p>
                                     )}
