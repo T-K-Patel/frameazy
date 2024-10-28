@@ -8,6 +8,16 @@ function PaymentButton({ orderId, text }: { orderId: string; text?: string }) {
     const [loading, setLoading] = React.useState(false);
     const session = useSession();
     useEffect(() => {
+        const existingScript = document.querySelectorAll(
+            "script[src='https://checkout.razorpay.com/v1/checkout.js']",
+        ) as NodeListOf<HTMLScriptElement>;
+        if (existingScript && existingScript.length > 0) {
+            return () => {
+                existingScript.forEach((s) => {
+                    s.remove();
+                });
+            };
+        }
         const script = document.createElement("script");
         script.src = "https://checkout.razorpay.com/v1/checkout.js";
         script.async = true;
