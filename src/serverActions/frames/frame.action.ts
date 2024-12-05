@@ -29,32 +29,23 @@ export async function getFiltersOptionsAction(): Promise<
     ServerActionReturnType<{ colors: string[]; collections: string[]; categories: string[] }>
 > {
     try {
-        const colors = (
-            await db.frame.findMany({
-                select: {
-                    color: true,
-                },
-                distinct: ["color"],
-            })
-        ).map((frame) => frame.color);
+        const colors = (await db.color.findMany({
+            select: {
+                name: true,
+            },
+        })).map((color) => color.name);
 
-        const categories = (
-            await db.frame.findMany({
-                select: {
-                    category: true,
-                },
-                distinct: ["category"],
-            })
-        ).map((frame) => frame.category);
+        const categories = (await db.category.findMany({
+            select: {
+                name: true,
+            },
+        })).map((category) => category.name);
 
-        const collections = (
-            await db.frame.findMany({
-                select: {
-                    collection: true,
-                },
-                distinct: ["collection"],
-            })
-        ).map((frame) => frame.collection);
+        const collections = (await db.collection.findMany({
+            select: {
+                name: true,
+            },
+        })).map((collection) => collection.name);
 
         return { success: true, data: { colors, collections, categories } };
     } catch (error) {

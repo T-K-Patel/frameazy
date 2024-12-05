@@ -6,9 +6,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 const AdminTransactionPage = () => {
     const [transactions, setTransactions] = useState<TransactionType[]>([]);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     useEffect(() => {
+        setLoading(true);
         getTransactionsAction()
             .then((data) => {
                 if (data.success) {
@@ -27,10 +28,32 @@ const AdminTransactionPage = () => {
                 setLoading(false);
             });
     }, []);
+    function downloadToCSV() {
+        const csv = transactions.map((t) => {
+            return `${t.id},${t.orderId},${t.paymentOrderId},${t.paymentId || "N/A"},"${Number((t.amount / 100).toFixed(2)).toLocaleString("en-in")}",${t.updatedAt.toDateString()},${t.status}`;
+        });
+        const csvData = ["Id,Order Id,PaymentOrder Id,Payment Id,Amount,Date,Status", ...csv].join("\n");
+        const blob = new Blob([csvData], { type: "text/csv" });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "transactions.csv";
+        a.click();
+    }
     return (
         <div className="mx-auto flex w-11/12 max-w-screen-2xl flex-col gap-y-12 py-12">
             <section className="flex flex-col gap-6 rounded-3xl border border-[#F1F1F1] p-5">
-                <h1 className="leading-12 border-b border-[#F1F1F1] pb-5 text-3xl font-semibold">Transactions</h1>
+                <header className="flex items-center justify-between">
+                    <h1 className="text-2xl font-semibold">Transactions</h1>
+                    {transactions.length > 0 && (
+                        <button
+                            className="rounded-lg bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+                            onClick={downloadToCSV}
+                        >
+                            Download CSV
+                        </button>
+                    )}
+                </header>
                 {loading ? (
                     <div className="flex flex-col gap-2">
                         <Skeleton className="md:h-18 h-10 rounded-xl" />

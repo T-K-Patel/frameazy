@@ -48,11 +48,11 @@ const Navbar = () => {
             setLinks([
                 {
                     name: "Home",
-                    path: "/",
+                    path: "/admin",
                 },
                 {
                     name: "Add Product",
-                    path: "/admin",
+                    path: "/admin/addProduct",
                 },
                 {
                     name: "Orders",
@@ -122,7 +122,7 @@ const Navbar = () => {
                 </ul>
                 {!session.data?.user && (
                     <div className="text-dark-blue hidden items-center gap-5 font-bold md:flex">
-                        <Link href="/auth//login" className="hover:underline">
+                        <Link href="/auth/login" className="hover:underline">
                             Log in
                         </Link>
                     </div>

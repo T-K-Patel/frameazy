@@ -136,6 +136,9 @@ export async function getTransactionsAction(): Promise<ServerActionReturnType<Tr
                 paymentId: true,
                 updatedAt: true,
             },
+            orderBy: {
+                updatedAt: "desc",
+            }
         });
 
         return { success: true, data: transactions };

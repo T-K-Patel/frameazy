@@ -1,27 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-        <loc>http://localhost:3000/</loc>
+        <loc>http://frameazy.com/</loc>
         <lastmod>2024-08-15</lastmod>
         <changefreq>monthly</changefreq>
         <priority>1.0</priority>
     </url>
     <url>
-        <loc>http://localhost:3000/about</loc>
+        <loc>http://frameazy.com/auth/login</loc>
         <lastmod>2024-08-15</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>http://localhost:3000/contact</loc>
+        <loc>http://frameazy.com/frames</loc>
         <lastmod>2024-08-15</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>http://localhost:3000/login</loc>
+        <loc>http://frameazy.com/contact</loc>
         <lastmod>2024-08-15</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>http://frameazy.com/about</loc>
+        <lastmod>2024-08-15</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>http://frameazy.com/privacy-policy</loc>
+        <lastmod>2024-08-15</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    <url>
+        <loc>http://frameazy.com/terms-and-conditions</loc>
+        <lastmod>2024-08-15</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
     </url>
 </urlset>

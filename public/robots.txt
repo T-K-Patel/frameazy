@@ -1,5 +1,9 @@
 User-agent: *
-Disallow: /private/
+Disallow: /_next/
+Disallow: /api/
+Disallow: /customise/
 Disallow: /admin/
-Allow: /public/
-Allow: /images/
+Allow: /
+
+# Sitemap location
+Sitemap: https://frameazy.com/sitemap.xml

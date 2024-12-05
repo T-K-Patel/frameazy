@@ -79,19 +79,40 @@ model Authenticator {
 // Custom Models
 
 model Frame {
-  id          String      @id @default(auto()) @map("_id") @db.ObjectId
-  name        String      @unique
-  image       String
-  borderSrc   String
-  borderWidth Float
-  unit_price  Float
-  category    String
-  color       String
-  collection  String
-  CartItem    CartItem[]
-  OrderItem   OrderItem[]
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  name          String      @unique
+  image         String
+  borderSrc     String
+  borderWidth   Float
+  unit_price    Float
+  category      String
+  color         String
+  collection    String
+  categoryRef   Category    @relation(fields: [category], references: [name])
+  colorRef      Color       @relation(fields: [color], references: [name])
+  collectionRef Collection  @relation(fields: [collection], references: [name])
+  CartItem      CartItem[]
+  OrderItem     OrderItem[]
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model Category {
+  id    String  @id @default(auto()) @map("_id") @db.ObjectId
+  name  String  @unique
+  Frame Frame[]
+}
+
+model Color {
+  id    String  @id @default(auto()) @map("_id") @db.ObjectId
+  name  String  @unique
+  Frame Frame[]
+}
+
+model Collection {
+  id    String  @id @default(auto()) @map("_id") @db.ObjectId
+  name  String  @unique
+  Frame Frame[]
 }
 
 model Message {
