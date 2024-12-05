@@ -129,16 +129,16 @@ model Message {
 model CartCustomization {
   id         String            @id @default(auto()) @map("_id") @db.ObjectId
   type       CustomizationType
-  glazing    Glazing?
+  glazing    String
   width      Float
   height     Float
   mat        MatOptions[]
-  mirror     Mirror?
+  mirror     String
   image      String?
-  printing   Printing?
-  backing    Backing?
-  stretching Stretching?
-  sides      Sides?
+  printing   String
+  backing    String
+  stretching String
+  sides      String
   // Relationship
   CartItem   CartItem?         @relation()
 }
@@ -187,18 +187,25 @@ model Order {
 model OrderCustomization {
   id         String            @id @default(auto()) @map("_id") @db.ObjectId
   type       CustomizationType
-  glazing    Glazing?
+  glazing    String
   width      Float
   height     Float
   mat        MatOptions[]
-  mirror     Mirror?
+  mirror     String
   image      String?
-  printing   Printing?
-  backing    Backing?
-  stretching Stretching?
-  sides      Sides?
+  printing   String
+  backing    String
+  stretching String
+  sides      String
   // Relationship
   OrderItem  OrderItem?        @relation()
+
+  glazingRef    Glazing    @relation(fields: [glazing], references: [name])
+  mirrorRef     Mirror     @relation(fields: [mirror], references: [name])
+  printingRef   Printing   @relation(fields: [printing], references: [name])
+  backingRef    Backing    @relation(fields: [backing], references: [name])
+  stretchingRef Stretching @relation(fields: [stretching], references: [name])
+  sidesRef      Sides      @relation(fields: [sides], references: [name])
 }
 
 model OrderItem {
@@ -257,11 +264,11 @@ enum Role {
   admin
 }
 
-enum Mirror {
-  Beveled
-  NonBeveled
-  Antique
-  Plain
+model Mirror {
+  id                 String               @id @default(auto()) @map("_id") @db.ObjectId
+  name               String               @unique
+  unit_price         Int
+  OrderCustomization OrderCustomization[]
 }
 
 enum MessageStatus {
@@ -269,38 +276,39 @@ enum MessageStatus {
   Resolved
 }
 
-enum Glazing {
-  RegularGlass
-  Acrylic
-  UVGlass
-  NonGlareGlass
-  MuseumGlass
+model Glazing {
+  id                 String               @id @default(auto()) @map("_id") @db.ObjectId
+  name               String               @unique
+  unit_price         Int
+  OrderCustomization OrderCustomization[]
 }
 
-enum Printing {
-  PaperGSM
-  CanvasGSM
+model Printing {
+  id                 String               @id @default(auto()) @map("_id") @db.ObjectId
+  name               String               @unique
+  unit_price         Int
+  OrderCustomization OrderCustomization[]
 }
 
-enum Backing {
-  Cardboard
-  Foamcore
-  MDF
+model Backing {
+  id                 String               @id @default(auto()) @map("_id") @db.ObjectId
+  name               String               @unique
+  unit_price         Int
+  OrderCustomization OrderCustomization[]
 }
 
-enum Stretching {
-  StretcherBar
-  GalleryWrap
-  MuseumWrap
-  FloatFrame
+model Stretching {
+  id                 String               @id @default(auto()) @map("_id") @db.ObjectId
+  name               String               @unique
+  unit_price         Int
+  OrderCustomization OrderCustomization[]
 }
 
-enum Sides {
-  White
-  Black
-  Image
-  Custom
-  Mirror
+model Sides {
+  id                 String               @id @default(auto()) @map("_id") @db.ObjectId
+  name               String               @unique
+  unit_price         Int
+  OrderCustomization OrderCustomization[]
 }
 
 type Address {
