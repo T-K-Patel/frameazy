@@ -45,34 +45,25 @@ function Item({ item, isPopularItem }: { item: FrameDataType | PopularFrameDataT
                     {"color" in item && (
                         <p className="items-center text-xs md:text-sm">
                             <b>Color: </b>
-                            {item.color
-                                .replace(/_/g, " + ")
-                                .replace(/([A-Z])/g, " $1")
-                                .trim()}
+                            {item.color}
                         </p>
                     )}
                     {"category" in item && (
                         <p className="items-center text-xs md:text-sm">
                             <b>Category: </b>
-                            {item.category
-                                .replace(/_/g, " + ")
-                                .replace(/([A-Z])/g, " $1")
-                                .trim()}
+                            {item.category}
                         </p>
                     )}
                     {"collection" in item && (
                         <p className="mb-2 items-center text-xs md:text-sm">
                             <b>Collection: </b>
-                            {item.collection
-                                .replace(/_/g, " + ")
-                                .replace(/([A-Z])/g, " $1")
-                                .trim()}{" "}
+                            {item.collection}{" "}
                         </p>
                     )}
-
-                    <p className="md:text-md mb-2 text-sm md:mb-5">
+                    {/* TODO: Display varients of frame */}
+                    {/* <p className="md:text-md mb-2 text-sm md:mb-5">
                         <b>Price per inch: </b>₹ {(item.unit_price / 100).toFixed(2)}
-                    </p>
+                    </p> */}
                     <form>
                         <Button
                             size={"lg"}
@@ -81,10 +72,12 @@ function Item({ item, isPopularItem }: { item: FrameDataType | PopularFrameDataT
                                 if ("borderSrc" in item && "borderWidth" in item) {
                                     setCustomizingFrame({
                                         borderSrc: item.borderSrc,
-                                        borderWidth: item.borderWidth,
+                                        // borderWidth: item.borderWidth,
+                                        // unit_price: item.unit_price,
+                                        unit_price: 0,
+                                        borderWidth: 1, //TODO: remove this line  and make varient selection here
                                         id: item.id,
                                         name: item.name,
-                                        unit_price: item.unit_price,
                                     });
                                     setDialogOpen(true);
                                 }

@@ -38,7 +38,11 @@ function Page() {
     const { frameOptions, customizingFrame, setCustomizingFrame } = useFrames();
     const [upload, setUpload] = useState<emptyFrameProps>({
         dimensions: { width: 12, height: 9 },
-        glazing: Object.keys(Glazing)[0] as Glazing,
+        glazing: {
+            id: "",
+            name: "",
+            unit_price: 0,
+        },
     });
     const [frames, setFrames] = useState<FramesForCustomizationType[]>([]);
     const [mat, setMat] = useState<matOptionsProps>([{ width: 0.5, color: "#ffffff", id: new Date().toString() }]);
@@ -60,7 +64,11 @@ function Page() {
                 case "paper":
                     setUpload({
                         dimensions: { width: 12, height: 9 },
-                        glazing: Object.keys(Glazing)[0] as Glazing,
+                        glazing: {
+                            id: "",
+                            name: "",
+                            unit_price: 0,
+                        },
                     });
                     break;
             }
@@ -95,7 +103,7 @@ function Page() {
         options: [
             {
                 title: "Glazing",
-                items: Object.keys(Glazing),
+                items: [],
             },
         ],
     };
@@ -138,13 +146,13 @@ function Page() {
         type: custType,
         width: totalSize.width,
         height: totalSize.height,
-        mirror: null,
-        printing: null,
-        stretching: null,
-        backing: null,
-        sides: null,
-        image: null,
-        glazing: upload.glazing || null,
+        mirror: "",
+        printing: "",
+        stretching: "",
+        backing: "",
+        sides: "",
+        image: "",
+        glazing: upload.glazing?.name || "",
         mat: mat.map((m) => ({ color: m.color, width: m.width })),
     };
     const price =
@@ -344,15 +352,13 @@ function Page() {
                                                                 <p>{frame.name}</p>
                                                                 <p>
                                                                     <small>
-                                                                        Price per inch:{" "}
-                                                                        {(frame.unit_price / 100).toFixed(2)}{" "}
+                                                                        Price per inch: {(100 / 100).toFixed(2)}{" "}
                                                                         <strong>&#8377;</strong>
                                                                     </small>
                                                                 </p>
                                                                 <p>
                                                                     <small>
-                                                                        Border Thickness: {frame.borderWidth}{" "}
-                                                                        <strong>In</strong>
+                                                                        Border Thickness: {1} <strong>In</strong>
                                                                     </small>
                                                                 </p>
                                                             </div>
@@ -373,10 +379,12 @@ function Page() {
                                                 const selectedFrame = frames.find((frame) => frame.id === frameId);
                                                 setCustomizingFrame(() => ({
                                                     id: frameId,
-                                                    borderWidth: selectedFrame?.borderWidth || 0,
+                                                    // borderWidth: selectedFrame?.borderWidth || 0,
                                                     borderSrc: selectedFrame?.borderSrc || "",
                                                     name: selectedFrame?.name || "",
-                                                    unit_price: selectedFrame?.unit_price || 0,
+                                                    // unit_price: selectedFrame?.unit_price || 0,
+                                                    borderWidth: 1,
+                                                    unit_price: 100,
                                                 }));
                                             }}
                                         />
@@ -389,7 +397,7 @@ function Page() {
                                         label={<strong>Glazing</strong>}
                                         field={
                                             <DropDown
-                                                value={upload.glazing || ""}
+                                                value={upload.glazing?.name || ""}
                                                 onChange={(status: Glazing) => {
                                                     setUpload({ ...upload, glazing: status });
                                                 }}

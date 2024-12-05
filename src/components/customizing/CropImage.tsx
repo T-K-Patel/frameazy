@@ -22,7 +22,7 @@ function getCroppedImg(imageSrc: string, crop: Area): Promise<string> {
             resolve(canvas.toDataURL("image/jpeg"));
         };
         image.onerror = (error) => {
-            reject(error);
+            reject("Some error occurred");
         };
     });
 }

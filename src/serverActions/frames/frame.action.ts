@@ -14,38 +14,47 @@ export type FramesFilterType = {
 export type PopularFrameDataType = {
     id: string;
     name: string;
-    unit_price: number;
+    varients: {
+        borderWidth: number;
+        unit_price: number;
+    }[];
     image: string;
 };
 export type FrameDataType = PopularFrameDataType & {
     borderSrc: string;
-    borderWidth: number;
     color: string;
     collection: string;
     category: string;
 };
 
+// DEPRECATED
 export async function getFiltersOptionsAction(): Promise<
     ServerActionReturnType<{ colors: string[]; collections: string[]; categories: string[] }>
 > {
     try {
-        const colors = (await db.color.findMany({
-            select: {
-                name: true,
-            },
-        })).map((color) => color.name);
+        const colors = (
+            await db.color.findMany({
+                select: {
+                    name: true,
+                },
+            })
+        ).map((color) => color.name);
 
-        const categories = (await db.category.findMany({
-            select: {
-                name: true,
-            },
-        })).map((category) => category.name);
+        const categories = (
+            await db.category.findMany({
+                select: {
+                    name: true,
+                },
+            })
+        ).map((category) => category.name);
 
-        const collections = (await db.collection.findMany({
-            select: {
-                name: true,
-            },
-        })).map((collection) => collection.name);
+        const collections = (
+            await db.collection.findMany({
+                select: {
+                    name: true,
+                },
+            })
+        ).map((collection) => collection.name);
 
         return { success: true, data: { colors, collections, categories } };
     } catch (error) {
@@ -80,13 +89,12 @@ export async function getFramesAction(
             select: {
                 id: true,
                 name: true,
-                unit_price: true,
                 color: true,
                 collection: true,
                 category: true,
                 image: true,
                 borderSrc: true,
-                borderWidth: true,
+                varients: true,
             },
             skip: page * 18,
             take: 18,
@@ -116,8 +124,10 @@ export type FramesForCustomizationType = {
     id: string;
     name: string;
     borderSrc: string;
-    borderWidth: number;
-    unit_price: number;
+    varients: {
+        borderWidth: number;
+        unit_price: number;
+    }[];
 };
 
 export async function getFramesForCustomizatinAction(): Promise<ServerActionReturnType<FramesForCustomizationType[]>> {
@@ -127,9 +137,8 @@ export async function getFramesForCustomizatinAction(): Promise<ServerActionRetu
             select: {
                 id: true,
                 name: true,
-                unit_price: true,
                 borderSrc: true,
-                borderWidth: true,
+                varients: true,
             },
         });
 
@@ -173,10 +182,29 @@ export async function getPopularFramesAction(): Promise<ServerActionReturnType<P
             select: {
                 id: true,
                 name: true,
-                unit_price: true,
+                varients: true,
                 image: true,
             },
         });
+        if (frames.length < 6) {
+            const remainingFrames = await db.frame.findMany({
+                where: {
+                    NOT: {
+                        id: {
+                            in: frames.map((frame) => frame.id),
+                        },
+                    },
+                },
+                take: 6 - frames.length,
+                select: {
+                    id: true,
+                    name: true,
+                    varients: true,
+                    image: true,
+                },
+            });
+            frames.push(...remainingFrames);
+        }
 
         return { success: true, data: frames };
     } catch (error) {

@@ -1,6 +1,5 @@
 "use client";
 import DefaultImage from "../../../../public/Default.svg";
-import { OrderComponent } from "@/components/Order";
 import { signOut, useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { getOrdersAction, UserOrders } from "@/serverActions/orders/orders.action";
@@ -8,6 +7,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { Img } from "react-image";
+import OrderTable from "@/components/Order/OrderTable";
+import AppPagination from "@/components/AppPagination";
 
 const Dashboard = () => {
     const session = useSession();
@@ -45,9 +46,14 @@ const Dashboard = () => {
                     <h1 className="leading-12 border-b border-[#F1F1F1] pb-3 text-3xl font-semibold">User</h1>
                     <Button
                         onClick={() => {
-                            signOut().then(() => {
-                                router.push("/", { scroll: true });
-                            });
+                            signOut()
+                                .then(() => {
+                                    router.push("/", { scroll: true });
+                                })
+                                .catch((error) => {
+                                    console.error("Sign out error", error);
+                                    alert("Sign out error");
+                                });
                         }}
                     >
                         Sign Out
@@ -99,9 +105,10 @@ const Dashboard = () => {
                 ) : error || orders.length == 0 ? (
                     <p className="text-center text-2xl font-semibold text-red-500">{error ?? "No orders yet"}</p>
                 ) : (
-                    orders.map((order, index) => {
-                        return <OrderComponent key={index} order={order} />;
-                    })
+                    <div className="w-full min-w-full">
+                        <OrderTable orders={orders as any} />
+                        <AppPagination page={1} totalPages={5} setPage={(page) => console.log(page)} />
+                    </div>
                 )}
             </section>
         </div>

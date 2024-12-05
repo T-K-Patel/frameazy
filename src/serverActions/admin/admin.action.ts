@@ -77,13 +77,13 @@ export async function addProduct(state: any, formData: FormData) {
         await db.frame.create({
             data: {
                 name: productName,
-                unit_price: unitPrice * 100,
+                // unit_price: unitPrice * 100,
                 image: imageUrl,
                 category: productCategory.toLowerCase(),
                 color: productColor.toLowerCase(),
                 collection: productCollection.toLowerCase(),
                 borderSrc: borderImageUrl,
-                borderWidth: borderWidth,
+                // borderWidth: borderWidth,
             },
         });
 
@@ -138,7 +138,7 @@ export async function getTransactionsAction(): Promise<ServerActionReturnType<Tr
             },
             orderBy: {
                 updatedAt: "desc",
-            }
+            },
         });
 
         return { success: true, data: transactions };
@@ -187,6 +187,9 @@ export type AdminOrdersType = {
     transaction: {
         status: string;
     } | null;
+    user: {
+        name: string | null;
+    };
 };
 
 // LATER: Add pagination
@@ -207,11 +210,22 @@ export async function getOrdersAction(): Promise<ServerActionReturnType<AdminOrd
                         status: true,
                     },
                 },
+                user: {
+                    select: {
+                        name: true,
+                    },
+                },
+                _count: {
+                    select: {
+                        order_items: true,
+                    },
+                },
             },
             orderBy: {
                 createdAt: "desc",
             },
         });
+        console.log(orders);
         return { success: true, data: orders };
     } catch (error) {
         if (error instanceof CustomError) {

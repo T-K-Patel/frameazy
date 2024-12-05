@@ -103,9 +103,17 @@ const SubmitButton = () => {
     );
 };
 
-const AdminDashboard = () => {
+type AdminDashboardProps = {
+    searchParams: {
+        frame: string;
+    };
+};
+
+const AdminDashboard = ({ searchParams: { frame: customizingFrame } }: AdminDashboardProps) => {
     const formRef = React.useRef<HTMLFormElement>(null);
     const [state, action] = useFormState(addProduct, null);
+
+    console.log(customizingFrame);
 
     const prodImgref = React.useRef<HTMLInputElement>(null);
     const borderImgref = React.useRef<HTMLInputElement>(null);
@@ -147,6 +155,12 @@ const AdminDashboard = () => {
             });
     }, []);
 
+    useEffect(() => {
+        if (customizingFrame) {
+            // TODO: fetch frame data.
+        }
+    }, [customizingFrame]);
+
     const handleSelectionChange = (key: string, value: string) => {
         setSelectedValues((prev) => ({ ...prev, [key]: value }));
     };
@@ -154,7 +168,7 @@ const AdminDashboard = () => {
     return (
         <section className="mx-auto flex max-w-screen-2xl justify-center">
             <div className="flex w-5/6 flex-col gap-y-8 py-6">
-                <h1 className="text-3xl font-semibold">Admin Dashboard</h1>
+                <h1 className="text-3xl font-semibold">{customizingFrame ? "Edit" : "Add"} Frame</h1>
                 {state?.success == false && <p className="mt-3 text-red-500">{state.error}</p>}
                 <form action={action} ref={formRef} className="grid grid-cols-1 gap-10 md:grid-cols-2">
                     <div className="flex flex-col gap-y-7">

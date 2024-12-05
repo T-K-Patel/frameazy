@@ -1,9 +1,7 @@
 /* eslint-disable no-unused-vars */
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTrigger } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import React from "react";
-import { Label } from "@radix-ui/react-label";
 
 function CancelOrderDialog({ cancelOrder, cancelingOrder }: { cancelOrder: () => void; cancelingOrder: boolean }) {
     const [open, setOpen] = React.useState(false);

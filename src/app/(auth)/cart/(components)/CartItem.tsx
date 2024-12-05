@@ -42,7 +42,9 @@ export const CartItem = ({ item, updateState, deleteItem, fetchCartItems }: Cart
                 setUpdating(false);
             }
         }
-        const timeout = setTimeout(updateQty, 500);
+        const timeout = setTimeout(() => {
+            updateQty();
+        }, 500);
         return () => clearTimeout(timeout);
     }, [qty, item.id, item.quantity, updateState, fetchCartItems]);
 
@@ -133,10 +135,7 @@ export const CartItem = ({ item, updateState, deleteItem, fetchCartItems }: Cart
                         return (
                             <p key={key} className="flex-shrink-0 flex-grow" style={{ flexBasis: "200px" }}>
                                 <b className="capitalize">{key}: </b>
-                                {item.customization[key]
-                                    .replace(/_/g, " + ")
-                                    .replace(/([A-Z])/g, " $1")
-                                    .trim()}
+                                {item.customization[key]}
                             </p>
                         );
                     }

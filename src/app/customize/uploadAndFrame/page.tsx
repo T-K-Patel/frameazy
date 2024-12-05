@@ -45,7 +45,11 @@ function Page() {
     const { frameOptions, customizingFrame, setCustomizingFrame } = useFrames();
     const [upload, setUpload] = useState<uploadOptionsProps>({
         dimensions: { width: 0, height: 0 },
-        printing: Object.keys(Printing)[0] as Printing,
+        printing: {
+            id: "",
+            name: "",
+            unit_price: 0,
+        },
     });
 
     const [frames, setFrames] = useState<FramesForCustomizationType[]>([]);
@@ -63,31 +67,71 @@ function Page() {
                 case "printOnly":
                     setUpload({
                         dimensions: { width: frameOptions.data.width!, height: frameOptions.data.height! },
-                        printing: Object.keys(Printing)[0] as Printing,
+                        printing: {
+                            id: "",
+                            name: "",
+                            unit_price: 0,
+                        },
                     });
                     break;
                 case "canvasPrint":
                     setUpload({
                         dimensions: { width: frameOptions.data.width!, height: frameOptions.data.height! },
-                        printing: Object.keys(Printing)[0] as Printing,
-                        backing: Object.keys(Backing)[0] as Backing,
-                        stretching: Object.keys(Stretching)[0] as Stretching,
-                        sides: Object.keys(Sides)[0] as Sides,
+                        printing: {
+                            id: "",
+                            name: "",
+                            unit_price: 0,
+                        },
+                        backing: {
+                            id: "",
+                            name: "",
+                            unit_price: 0,
+                        },
+                        stretching: {
+                            id: "",
+                            name: "",
+                            unit_price: 0,
+                        },
+                        sides: {
+                            id: "",
+                            name: "",
+                            unit_price: 0,
+                        },
                     });
                     break;
                 case "framedWithoutMG":
                     setUpload({
                         dimensions: { width: frameOptions.data.width!, height: frameOptions.data.height! },
-                        printing: Object.keys(Printing)[0] as Printing,
-                        stretching: Object.keys(Stretching)[0] as Stretching,
+                        printing: {
+                            id: "",
+                            name: "",
+                            unit_price: 0,
+                        },
+                        stretching: {
+                            id: "",
+                            name: "",
+                            unit_price: 0,
+                        },
                     });
                     break;
                 case "framedWithMG":
                     setUpload({
                         dimensions: { width: frameOptions.data.width!, height: frameOptions.data.height! },
-                        glazing: Object.keys(Glazing)[0] as Glazing,
-                        printing: Object.keys(Printing)[0] as Printing,
-                        backing: Object.keys(Backing)[0] as Backing,
+                        glazing: {
+                            id: "",
+                            name: "",
+                            unit_price: 0,
+                        },
+                        printing: {
+                            id: "",
+                            name: "",
+                            unit_price: 0,
+                        },
+                        backing: {
+                            id: "",
+                            name: "",
+                            unit_price: 0,
+                        },
                     });
                     break;
             }
@@ -126,15 +170,15 @@ function Page() {
             },
             {
                 title: "Glazing",
-                items: Object.keys(Glazing),
+                items: [],
             },
             {
                 title: "Printing",
-                items: Object.keys(Printing),
+                items: [],
             },
             {
                 title: "Backing",
-                items: Object.keys(Backing),
+                items: [],
             },
         ],
     };
@@ -150,11 +194,11 @@ function Page() {
                 },
                 {
                     title: "Printing",
-                    items: Object.keys(Printing),
+                    items: [],
                 },
                 {
                     title: "Stretching",
-                    items: Object.keys(Stretching),
+                    items: [],
                 },
             ],
         };
@@ -165,7 +209,7 @@ function Page() {
             options: [
                 {
                     title: "Printing",
-                    items: Object.keys(Printing),
+                    items: [],
                 },
             ],
         };
@@ -176,15 +220,15 @@ function Page() {
             options: [
                 {
                     title: "Printing",
-                    items: Object.keys(Printing),
+                    items: [],
                 },
                 {
                     title: "Stretching",
-                    items: Object.keys(Stretching),
+                    items: [],
                 },
                 {
                     title: "Sides",
-                    items: Object.keys(Sides),
+                    items: [],
                 },
             ],
         };
@@ -226,12 +270,12 @@ function Page() {
         width: totalSize.width,
         height: totalSize.height,
         image: frameOptions.data.croppedImage as string,
-        mirror: null,
-        glazing: upload.glazing || null,
-        printing: upload.printing || null,
-        backing: upload.backing || null,
-        stretching: upload.stretching || null,
-        sides: upload.sides || null,
+        mirror: "",
+        glazing: upload.glazing?.name || "",
+        printing: upload.printing?.name || "",
+        backing: upload.backing?.name || "",
+        stretching: upload.stretching?.name || "",
+        sides: upload.sides?.name || "",
         mat: mat.map((m) => ({ color: m.color, width: m.width })),
     };
 
@@ -430,16 +474,16 @@ function Page() {
                                                                             <p>
                                                                                 <small>
                                                                                     Price per inch:{" "}
-                                                                                    {(frame.unit_price / 100).toFixed(
+                                                                                    {/* {(frame.unit_price / 100).toFixed(
                                                                                         2,
-                                                                                    )}{" "}
+                                                                                    )}{" "} */}
                                                                                     <strong>&#8377;</strong>
                                                                                 </small>
                                                                             </p>
                                                                             <p>
                                                                                 <small>
                                                                                     Border Thickness:{" "}
-                                                                                    {frame.borderWidth}{" "}
+                                                                                    {/* {frame.borderWidth}{" "} */}
                                                                                     <strong>In</strong>
                                                                                 </small>
                                                                             </p>
@@ -463,10 +507,10 @@ function Page() {
                                                             );
                                                             setCustomizingFrame(() => ({
                                                                 id: frameId,
-                                                                borderWidth: selectedFrame?.borderWidth || 0,
+                                                                unit_price: 0, // TODO: account for varient
+                                                                borderWidth: 0,
                                                                 borderSrc: selectedFrame?.borderSrc || "",
                                                                 name: selectedFrame?.name || "",
-                                                                unit_price: selectedFrame?.unit_price || 0,
                                                             }));
                                                         }}
                                                     />
@@ -488,7 +532,7 @@ function Page() {
                                                     value={
                                                         upload[
                                                             option.title.toLowerCase() as keyof uploadOptionsProps
-                                                        ] as string
+                                                        ] as any as string //TODO: check this
                                                     }
                                                     onChange={(status: string) => {
                                                         setUpload((upload) => {

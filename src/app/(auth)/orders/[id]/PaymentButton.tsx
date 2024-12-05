@@ -29,7 +29,7 @@ function PaymentButton({ orderId, text }: { orderId: string; text?: string }) {
     if (!session.data?.user) return null;
     const handlePayment = async () => {
         setLoading(true);
-        initiatePaymentForOrder(orderId)
+        await initiatePaymentForOrder(orderId)
             .then((res) => {
                 if (res.success) {
                     if (!session.data?.user) return null;
@@ -41,8 +41,8 @@ function PaymentButton({ orderId, text }: { orderId: string; text?: string }) {
                         name: "Frameazy",
                         description: "Payment for your order with order id " + orderId,
                         order_id: paymentOrderId,
-                        handler: function () {
-                            checkPaymentStatus(orderId)
+                        handler: async function () {
+                            await checkPaymentStatus(orderId)
                                 .then((res) => {
                                     if (res.success) {
                                         if (res.data) {

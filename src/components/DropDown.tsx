@@ -7,10 +7,7 @@ const DropDown = ({ items, value, onChange }: { items: string[]; value: string; 
     const options = items.map((item) => {
         return {
             value: item,
-            label: item
-                .replace(/_/g, " + ")
-                .replace(/([A-Z])/g, " $1")
-                .trim(),
+            label: item,
         };
     });
     const colourStyles: StylesConfig<any> = {
@@ -33,13 +30,7 @@ const DropDown = ({ items, value, onChange }: { items: string[]; value: string; 
             options={options}
             value={{
                 value,
-                label:
-                    !value || value == ""
-                        ? "--Select option--"
-                        : value
-                              .replace(/_/g, " + ")
-                              .replace(/([A-Z])/g, " $1")
-                              .trim(),
+                label: !value || value == "" ? "--Select option--" : value,
             }}
         />
     );

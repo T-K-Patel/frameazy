@@ -11,7 +11,7 @@ import {
 } from "@/serverActions/frames/frame.action";
 import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
 import useDebounce from "@/lib/useDebounce";
-import FramesPagination from "./FramesPagination";
+import AppPagination from "@/components/AppPagination";
 import FramesSideBar from "./FramesSideBar";
 import { Input } from "@/components/ui/input";
 
@@ -176,7 +176,7 @@ function Frames() {
                                 })
                             )}
                         </div>
-                        <FramesPagination page={page} totalPages={totalPages} setPage={setPage} />
+                        <AppPagination page={page} totalPages={totalPages} setPage={setPage} />
                     </div>
                 </div>
             )}

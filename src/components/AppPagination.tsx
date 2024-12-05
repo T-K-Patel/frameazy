@@ -2,13 +2,13 @@ import React from "react";
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem } from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
 
-type FramesPaginationPropType = {
+type AppPaginationPropType = {
     page: number;
     totalPages: number;
     setPage: React.Dispatch<React.SetStateAction<number>>;
 };
 
-function FramesPagination({ page, totalPages, setPage }: FramesPaginationPropType) {
+function AppPagination({ page, totalPages, setPage }: AppPaginationPropType) {
     return (
         <Pagination>
             <PaginationContent>
@@ -120,4 +120,4 @@ function FramesPagination({ page, totalPages, setPage }: FramesPaginationPropTyp
     );
 }
 
-export default FramesPagination;
+export default AppPagination;

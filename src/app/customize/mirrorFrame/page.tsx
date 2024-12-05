@@ -14,7 +14,7 @@ import { calculateTotalPrice } from "@/utils/totalPrice";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Img } from "react-image";
 
-const MirrorOptions: string[] = Object.keys(Mirror);
+const MirrorOptions: string[] = [];
 
 type MirrorOptions = {
     dimensions: { width: number; height: number };
@@ -23,7 +23,11 @@ type MirrorOptions = {
 const Page = () => {
     const [mirror, setMirror] = useState<MirrorOptions>({
         dimensions: { width: 12, height: 9 },
-        mirrorType: MirrorOptions[0] as Mirror,
+        mirrorType: {
+            id: "",
+            name: "",
+            unit_price: 0,
+        },
     });
     const { frameOptions, customizingFrame, setCustomizingFrame } = useFrames();
     const [frames, setFrames] = useState<FramesForCustomizationType[]>([]);
@@ -53,12 +57,12 @@ const Page = () => {
         width: mirror.dimensions.width,
         height: mirror.dimensions.height,
         image: null,
-        mirror: mirror.mirrorType,
-        glazing: null,
-        printing: null,
-        backing: null,
-        stretching: null,
-        sides: null,
+        mirror: mirror.mirrorType.name,
+        glazing: "",
+        printing: "",
+        backing: "",
+        stretching: "",
+        sides: "",
         mat: [],
     };
     const price =
@@ -175,13 +179,13 @@ const Page = () => {
                                                                 <p>{frame.name}</p>
                                                                 <p>
                                                                     <small>
-                                                                        Price per inch: {frame.unit_price / 100}{" "}
+                                                                        {/* Price per inch: {frame.unit_price / 100}{" "} */}
                                                                         <strong>&#8377;</strong>
                                                                     </small>
                                                                 </p>
                                                                 <p>
                                                                     <small>
-                                                                        Border Thickness: {frame.borderWidth}{" "}
+                                                                        {/* Border Thickness: {frame.borderWidth}{" "} */}
                                                                         <strong>In</strong>
                                                                     </small>
                                                                 </p>
@@ -203,10 +207,10 @@ const Page = () => {
                                                 const selectedFrame = frames.find((frame) => frame.id === frameId);
                                                 setCustomizingFrame(() => ({
                                                     id: frameId,
-                                                    borderWidth: selectedFrame?.borderWidth || 0,
+                                                    unit_price: 0, // TODO: account for varients
+                                                    borderWidth: 0,
                                                     borderSrc: selectedFrame?.borderSrc || "",
                                                     name: selectedFrame?.name || "",
-                                                    unit_price: selectedFrame?.unit_price || 0,
                                                 }));
                                             }}
                                         />
@@ -217,7 +221,7 @@ const Page = () => {
                                 label={<strong>Mirror type</strong>}
                                 field={
                                     <DropDown
-                                        value={mirror.mirrorType}
+                                        value={mirror.mirrorType.name}
                                         onChange={(status: Mirror) => {
                                             setMirror({ ...mirror, mirrorType: status });
                                         }}

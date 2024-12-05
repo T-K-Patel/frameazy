@@ -29,8 +29,10 @@ export type UserOrders = {
     } | null;
 };
 
+// DEPRECATED
 export async function getOrdersAction(): Promise<ServerActionReturnType<UserOrders[]>> {
     try {
+        const page = 0;
         const userId = await isAuthenticated();
         const orders = await db.order.findMany({
             where: {
@@ -49,11 +51,27 @@ export async function getOrdersAction(): Promise<ServerActionReturnType<UserOrde
                         status: true,
                     },
                 },
+                _count: {
+                    select: {
+                        order_items: true,
+                    },
+                },
             },
+            take: 20,
+            skip: page * 20,
             orderBy: {
                 createdAt: "desc",
             },
         });
+
+        /**
+         * response format
+         * {
+         * totalPages: number,
+         * page: number,
+         * orders: UserOrders[]
+         * }
+         */
 
         return { success: true, data: orders };
     } catch (error) {
@@ -88,6 +106,8 @@ export type UserOrderDetails = {
         status: PaymentStatus;
     } | null;
 };
+
+// DEPRECATED
 export async function getOrderDetailsAction(id: string): Promise<ServerActionReturnType<UserOrderDetails>> {
     try {
         const userId = await isAuthenticated();
@@ -258,10 +278,10 @@ export async function cancelOrderAction(id: string): Promise<ServerActionReturnT
             include: {
                 transaction: {
                     select: {
-                        status: true
-                    }
-                }
-            }
+                        status: true,
+                    },
+                },
+            },
         });
         if (!order) throw new CustomError("Order not found");
         if (!([OrderStatus.Approved, OrderStatus.Received] as OrderStatus[]).includes(order.order_status))

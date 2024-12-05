@@ -25,19 +25,19 @@ export const authOptions: NextAuthOptions = {
         },
     },
     callbacks: {
-        async signIn({ account }) {
+        signIn({ account }) {
             if (account?.provider === "google") {
                 return true;
             }
             return false;
         },
-        async jwt({ token, user }) {
+        jwt({ token, user }) {
             if (user) {
                 token = { ...token, ...user };
             }
             return token;
         },
-        async session({ session, token, user }) {
+        session({ session, token, user }) {
             session.user = { ...token, ...user };
             return session;
         },

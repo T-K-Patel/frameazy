@@ -200,10 +200,7 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                                                                     style={{ flexBasis: "200px" }}
                                                                 >
                                                                     <b>{capitalizeFirstLetter(key)}: </b>
-                                                                    {item.customization[key]
-                                                                        .replace(/_/g, " + ")
-                                                                        .replace(/([A-Z])/g, " $1")
-                                                                        .trim()}
+                                                                    {item.customization[key]}
                                                                 </p>
                                                             );
                                                         }

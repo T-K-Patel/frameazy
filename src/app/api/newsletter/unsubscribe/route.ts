@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(req: NextRequest) {
+export function GET(req: NextRequest) {
     // Send a html content with a form to unsubscribe
     const token = req.nextUrl.searchParams.get("token");
     if (!token) {

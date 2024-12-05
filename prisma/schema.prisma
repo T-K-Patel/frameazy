@@ -77,24 +77,27 @@ model Authenticator {
 }
 
 // Custom Models
+type FrameVarients {
+  borderWidth Float
+  unit_price  Int
+}
 
 model Frame {
-  id            String      @id @default(auto()) @map("_id") @db.ObjectId
-  name          String      @unique
+  id            String          @id @default(auto()) @map("_id") @db.ObjectId
+  name          String          @unique
   image         String
   borderSrc     String
-  borderWidth   Float
-  unit_price    Float
   category      String
   color         String
   collection    String
-  categoryRef   Category    @relation(fields: [category], references: [name])
-  colorRef      Color       @relation(fields: [color], references: [name])
-  collectionRef Collection  @relation(fields: [collection], references: [name])
+  varients      FrameVarients[]
+  categoryRef   Category        @relation(fields: [category], references: [name])
+  colorRef      Color           @relation(fields: [color], references: [name])
+  collectionRef Collection      @relation(fields: [collection], references: [name])
   CartItem      CartItem[]
   OrderItem     OrderItem[]
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
 }
 
 model Category {
@@ -141,6 +144,13 @@ model CartCustomization {
   sides      String
   // Relationship
   CartItem   CartItem?         @relation()
+
+  glazingRef    Glazing    @relation(fields: [glazing], references: [name])
+  mirrorRef     Mirror     @relation(fields: [mirror], references: [name])
+  printingRef   Printing   @relation(fields: [printing], references: [name])
+  backingRef    Backing    @relation(fields: [backing], references: [name])
+  stretchingRef Stretching @relation(fields: [stretching], references: [name])
+  sidesRef      Sides      @relation(fields: [sides], references: [name])
 }
 
 model CartItem {
@@ -269,6 +279,7 @@ model Mirror {
   name               String               @unique
   unit_price         Int
   OrderCustomization OrderCustomization[]
+  CartCustomization  CartCustomization[]
 }
 
 enum MessageStatus {
@@ -281,6 +292,7 @@ model Glazing {
   name               String               @unique
   unit_price         Int
   OrderCustomization OrderCustomization[]
+  CartCustomization  CartCustomization[]
 }
 
 model Printing {
@@ -288,6 +300,7 @@ model Printing {
   name               String               @unique
   unit_price         Int
   OrderCustomization OrderCustomization[]
+  CartCustomization  CartCustomization[]
 }
 
 model Backing {
@@ -295,6 +308,7 @@ model Backing {
   name               String               @unique
   unit_price         Int
   OrderCustomization OrderCustomization[]
+  CartCustomization  CartCustomization[]
 }
 
 model Stretching {
@@ -302,6 +316,7 @@ model Stretching {
   name               String               @unique
   unit_price         Int
   OrderCustomization OrderCustomization[]
+  CartCustomization  CartCustomization[]
 }
 
 model Sides {
@@ -309,6 +324,7 @@ model Sides {
   name               String               @unique
   unit_price         Int
   OrderCustomization OrderCustomization[]
+  CartCustomization  CartCustomization[]
 }
 
 type Address {

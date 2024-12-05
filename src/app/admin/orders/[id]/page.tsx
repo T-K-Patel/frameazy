@@ -241,10 +241,7 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                                                                     style={{ flexBasis: "200px" }}
                                                                 >
                                                                     <b>{capitalizeFirstLetter(key)}: </b>
-                                                                    {item.customization[key]
-                                                                        .replace(/_/g, " + ")
-                                                                        .replace(/([A-Z])/g, " $1")
-                                                                        .trim()}
+                                                                    {item.customization[key]}
                                                                 </p>
                                                             );
                                                         }
@@ -348,7 +345,7 @@ const OrderDetails = ({ params }: { params: { id: string } }) => {
                                     Payment
                                 </p>
                                 <p
-                                    className={`text-lg font-semibold ${order.transaction == null ? "text-red-400" : order.transaction?.status === "Attempted" || "Created" ? "text-[#D68D00]" : "text-[#008C0E]"}`}
+                                    className={`text-lg font-semibold ${order.transaction == null ? "text-red-400" : ["Attempted", "Created"].includes(order.transaction?.status) ? "text-[#D68D00]" : "text-[#008C0E]"}`}
                                 >
                                     {order.transaction == null ? "Uninitiated" : order.transaction?.status}
                                 </p>

@@ -40,8 +40,13 @@ export default function RootLayout({
                 <div className="_next">
                     <ContextProviders>{children}</ContextProviders>
                 </div>
-                <Analytics />
-                <SpeedInsights />
+                {process.env.NODE_ENV == "production" && (
+                    <>
+                        {" "}
+                        <Analytics />
+                        <SpeedInsights />
+                    </>
+                )}
             </body>
         </html>
     );
