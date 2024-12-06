@@ -2,13 +2,13 @@ import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 
 export function GET(req: NextRequest) {
-    // Send a html content with a form to unsubscribe
-    const token = req.nextUrl.searchParams.get("token");
-    if (!token) {
-        return new NextResponse("Invalid token", { status: 400 });
-    }
-    return new NextResponse(
-        `
+	// Send a html content with a form to unsubscribe
+	const token = req.nextUrl.searchParams.get("token");
+	if (!token) {
+		return new NextResponse("Invalid token", { status: 400 });
+	}
+	return new NextResponse(
+		`
     <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -72,33 +72,33 @@ export function GET(req: NextRequest) {
     </body>
     </html>
 `,
-        { headers: { "Content-Type": "text/html" } },
-    );
+		{ headers: { "Content-Type": "text/html" } },
+	);
 }
 
 export async function POST(req: NextRequest) {
-    // Unsubscribe the user
-    const unsubscribeToken = req.nextUrl.searchParams.get("token");
-    if (!unsubscribeToken) {
-        return new NextResponse("Invalid token", { status: 400 });
-    }
-    // Unsubscribe the user
-    try {
-        const dlt = await db.subscription.update({
-            where: {
-                unsubscribeToken,
-            },
-            data: {
-                status: "Unsubscribed",
-            },
-        });
-        if (dlt) {
-            return new NextResponse("Unsubscribed successfully", { status: 200 });
-        } else {
-            return new NextResponse("Invalid token", { status: 400 });
-        }
-    } catch (error) {
-        console.log("Error unsubscribing", error);
-        return new NextResponse("Error unsubscribing", { status: 500 });
-    }
+	// Unsubscribe the user
+	const unsubscribeToken = req.nextUrl.searchParams.get("token");
+	if (!unsubscribeToken) {
+		return new NextResponse("Invalid token", { status: 400 });
+	}
+	// Unsubscribe the user
+	try {
+		const dlt = await db.subscription.update({
+			where: {
+				unsubscribeToken,
+			},
+			data: {
+				status: "Unsubscribed",
+			},
+		});
+		if (dlt) {
+			return new NextResponse("Unsubscribed successfully", { status: 200 });
+		} else {
+			return new NextResponse("Invalid token", { status: 400 });
+		}
+	} catch (error) {
+		console.log("Error unsubscribing", error);
+		return new NextResponse("Error unsubscribing", { status: 500 });
+	}
 }

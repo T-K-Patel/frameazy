@@ -6,14 +6,14 @@ import PersonalizeFrame from "./(components)/PersonalizeFrame";
 import PopularItems from "./(components)/PopularItems";
 
 export default function Home() {
-    return (
-        <>
-            <Hero />
-            {/* <FrameArt /> */}
-            <PopularItems />
-            <EnhanceArt />
-            <PersonalizeFrame />
-            <FAQ />
-        </>
-    );
+	return (
+		<>
+			<Hero />
+			{/* <FrameArt /> */}
+			<PopularItems />
+			<EnhanceArt />
+			<PersonalizeFrame />
+			<FAQ />
+		</>
+	);
 }
