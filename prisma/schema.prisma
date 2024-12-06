@@ -132,25 +132,25 @@ model Message {
 model CartCustomization {
   id         String            @id @default(auto()) @map("_id") @db.ObjectId
   type       CustomizationType
-  glazing    String
+  glazing    String?
   width      Float
   height     Float
   mat        MatOptions[]
-  mirror     String
+  mirror     String?
   image      String?
-  printing   String
-  backing    String
-  stretching String
-  sides      String
+  printing   String?
+  backing    String?
+  stretching String?
+  sides      String?
   // Relationship
   CartItem   CartItem?         @relation()
 
-  glazingRef    Glazing    @relation(fields: [glazing], references: [name])
-  mirrorRef     Mirror     @relation(fields: [mirror], references: [name])
-  printingRef   Printing   @relation(fields: [printing], references: [name])
-  backingRef    Backing    @relation(fields: [backing], references: [name])
-  stretchingRef Stretching @relation(fields: [stretching], references: [name])
-  sidesRef      Sides      @relation(fields: [sides], references: [name])
+  glazingRef    Glazing?    @relation(fields: [glazing], references: [name])
+  mirrorRef     Mirror?     @relation(fields: [mirror], references: [name])
+  printingRef   Printing?   @relation(fields: [printing], references: [name])
+  backingRef    Backing?    @relation(fields: [backing], references: [name])
+  stretchingRef Stretching? @relation(fields: [stretching], references: [name])
+  sidesRef      Sides?      @relation(fields: [sides], references: [name])
 }
 
 model CartItem {
@@ -197,25 +197,25 @@ model Order {
 model OrderCustomization {
   id         String            @id @default(auto()) @map("_id") @db.ObjectId
   type       CustomizationType
-  glazing    String
+  glazing    String?
   width      Float
   height     Float
   mat        MatOptions[]
-  mirror     String
+  mirror     String?
   image      String?
-  printing   String
-  backing    String
-  stretching String
-  sides      String
+  printing   String?
+  backing    String?
+  stretching String?
+  sides      String?
   // Relationship
   OrderItem  OrderItem?        @relation()
 
-  glazingRef    Glazing    @relation(fields: [glazing], references: [name])
-  mirrorRef     Mirror     @relation(fields: [mirror], references: [name])
-  printingRef   Printing   @relation(fields: [printing], references: [name])
-  backingRef    Backing    @relation(fields: [backing], references: [name])
-  stretchingRef Stretching @relation(fields: [stretching], references: [name])
-  sidesRef      Sides      @relation(fields: [sides], references: [name])
+  glazingRef    Glazing?    @relation(fields: [glazing], references: [name])
+  mirrorRef     Mirror?     @relation(fields: [mirror], references: [name])
+  printingRef   Printing?   @relation(fields: [printing], references: [name])
+  backingRef    Backing?    @relation(fields: [backing], references: [name])
+  stretchingRef Stretching? @relation(fields: [stretching], references: [name])
+  sidesRef      Sides?      @relation(fields: [sides], references: [name])
 }
 
 model OrderItem {
