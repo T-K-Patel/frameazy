@@ -101,7 +101,8 @@ function Frames() {
 			try {
 				const response = await fetch("/api/options/frameOptions", {
 					next: {
-						revalidate: 3600,
+						revalidate: 600,
+						tags: ["frameOptions"],
 					},
 				});
 				const data = await response.json();

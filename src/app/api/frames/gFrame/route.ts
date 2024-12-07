@@ -2,28 +2,11 @@ import { NextResponse, NextRequest } from "next/server";
 import { db } from "@/lib/db";
 import { Prisma } from "@prisma/client";
 import { FRAMES_PER_PAGE } from "@/contants/frames";
-import { FrameDataType } from "./response";
+import { FrameDataType, FramesFilterType } from "./response.d";
 
-type FramesFilterType = {
-	categories: string[];
-	collections: string[];
-	colors: string[];
-	name: string;
-};
-
-export async function GET(req: NextRequest): Promise<
-	NextResponse<
-		| {
-				total: number;
-				page: number;
-				frames: FrameDataType[];
-		  }
-		| {
-				success: false;
-				error: string;
-		  }
-	>
-> {
+export async function GET(
+	req: NextRequest,
+): Promise<NextResponse<{ total: number; page: number; frames: FrameDataType[] } | { success: false; error: string }>> {
 	const filters: FramesFilterType = {
 		categories: req.nextUrl.searchParams.getAll("categories"),
 		collections: req.nextUrl.searchParams.getAll("collections"),

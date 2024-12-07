@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { OrderStatus } from "@prisma/client";
+import { PopularFrameDataType } from "./response.d";
 
-export async function GET() {
+export async function GET(): Promise<NextResponse<PopularFrameDataType[] | { success: false; error: string }>> {
 	try {
 		const frames = await db.frame.findMany({
 			where: {

@@ -11,3 +11,10 @@ export type FrameDataType = {
 	collection: string;
 	category: string;
 };
+
+export type FramesFilterType = {
+	categories: string[];
+	collections: string[];
+	colors: string[];
+	name: string;
+};

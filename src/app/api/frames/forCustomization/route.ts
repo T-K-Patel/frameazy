@@ -1,17 +1,8 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { FramesForCustomizationType } from "./response.d";
 
-type FramesForCustomizationType = {
-	id: string;
-	name: string;
-	borderSrc: string;
-	varients: {
-		borderWidth: number;
-		unit_price: number;
-	}[];
-};
-
-export async function GET() {
+export async function GET(): Promise<NextResponse<FramesForCustomizationType[] | { success: false; error: string }>> {
 	try {
 		const frames: FramesForCustomizationType[] = await db.frame.findMany({
 			select: {

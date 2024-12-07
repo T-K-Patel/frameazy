@@ -8,7 +8,7 @@ import { useFormState, useFormStatus } from "react-dom";
 import { addProduct } from "@/serverActions/admin/admin.action";
 import { Img } from "react-image";
 import DropDown from "@/components/DropDown";
-import { getFiltersOptionsAction } from "@/serverActions/frames/frame.action";
+import { toast } from "react-toastify";
 
 type UploadImageProps = {
 	name: string;
@@ -138,21 +138,35 @@ const AdminDashboard = ({ searchParams: { frame: customizingFrame } }: AdminDash
 	}, [state]);
 
 	useEffect(() => {
-		getFiltersOptionsAction()
-			.then((response) => {
-				if (response.success) {
-					setDropdownOptions({
-						colors: response.data.colors,
-						categories: response.data.categories,
-						collections: response.data.collections,
-					});
+		let fetching = true;
+
+		const init = async () => {
+			try {
+				const response = await fetch("/api/options/frameOptions", {
+					next: {
+						revalidate: 600,
+						tags: ["frameOptions"],
+					},
+				});
+				const data = await response.json();
+				if (response.ok) {
+					if (fetching) {
+						setDropdownOptions(data);
+					}
 				} else {
-					alert("Error fetching dropdown options: " + response.error);
+					toast.error(data?.error ?? "Failed to fetch filters");
 				}
-			})
-			.catch((error) => {
-				console.error("Error fetching dropdown options:", error);
-			});
+			} catch (error) {
+				console.log(error);
+				toast.error("Failed to fetch filters");
+			}
+		};
+
+		init();
+
+		return () => {
+			fetching = false;
+		};
 	}, []);
 
 	useEffect(() => {
