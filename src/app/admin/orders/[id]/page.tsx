@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, use } from "react";
 import DropDown from "@/components/DropDown";
 import { OrderStatus, CartCustomization } from "@prisma/client";
 import {
@@ -29,10 +29,11 @@ const UpdateButton = ({ disabled }: { disabled: boolean }) => {
 	return <Button disabled={disabled || pending}>{pending ? "Updating" : "Update"}</Button>;
 };
 
-const OrderDetails = ({ params }: { params: { id: string } }) => {
+const OrderDetails = ({ params: _params }: { params: Promise<{ id: string }> }) => {
 	const [order, setOrder] = useState<AdminOrderDetailsType | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
+	const params = use(_params);
 
 	const [status, setStatus] = useState<OrderStatus>(OrderStatus.Received);
 	const [deliveryDate, setDeliveryDate] = useState<Date | null>(new Date());

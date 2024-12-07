@@ -1,7 +1,7 @@
 "use client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import React, { ChangeEvent, DragEventHandler, forwardRef, useEffect, useState } from "react";
+import React, { ChangeEvent, DragEventHandler, forwardRef, use, useEffect, useState } from "react";
 import Upload from "../../../assets/upload.svg";
 import { Button } from "@/components/ui/button";
 import { useFormState, useFormStatus } from "react-dom";
@@ -104,12 +104,13 @@ const SubmitButton = () => {
 };
 
 type AdminDashboardProps = {
-	searchParams: {
+	searchParams: Promise<{
 		frame: string;
-	};
+	}>;
 };
 
-const AdminDashboard = ({ searchParams: { frame: customizingFrame } }: AdminDashboardProps) => {
+const AdminDashboard = ({ searchParams }: AdminDashboardProps) => {
+	const { frame: customizingFrame } = use(searchParams);
 	const formRef = React.useRef<HTMLFormElement>(null);
 	const [state, action] = useFormState(addProduct, null);
 

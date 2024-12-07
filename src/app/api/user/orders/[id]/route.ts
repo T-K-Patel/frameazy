@@ -3,7 +3,8 @@ import { isAuthenticated } from "@/utils/auth";
 import { ObjectIdValidation } from "@/utils/validators";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, { params: _params }: { params: Promise<{ id: string }> }) {
+	const params = await _params;
 	const id = params.id;
 	const userId = await isAuthenticated();
 	try {

@@ -1,14 +1,15 @@
 "use client";
 import { signIn, useSession } from "next-auth/react";
 import { RedirectType, redirect } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import Logo from "../../../assets/Logo.svg";
 import { Button } from "@/components/ui/button";
 import Google from "../../../assets/google.svg";
 import Link from "next/link";
 import { Img } from "react-image";
 
-const LoginPage = ({ searchParams }: { searchParams: Record<string, any> }) => {
+const LoginPage = ({ searchParams: sP }: { searchParams: Promise<Record<string, any>> }) => {
+	const searchParams = use(sP);
 	const session = useSession();
 	const [error, setError] = useState<string | null>(null as string | null);
 

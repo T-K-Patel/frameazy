@@ -1,6 +1,6 @@
 "use client";
 import { CartCustomization } from "@prisma/client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, use } from "react";
 import { cancelOrderAction, getOrderDetailsAction, UserOrderDetails } from "@/serverActions/orders/orders.action";
 import { Button } from "@/components/ui/button";
 import { IoMdOpen } from "react-icons/io";
@@ -17,12 +17,13 @@ const capitalizeFirstLetter = (str: string) => {
 	return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
-const OrderDetails = ({ params }: { params: { id: string } }) => {
+const OrderDetails = ({ params: _params }: { params: Promise<{ id: string }> }) => {
 	const [order, setOrder] = useState<UserOrderDetails | null>();
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 	const router = useRouter();
 	const [cancelingOrder, setCancelingOrder] = useState(false);
+	const params = use(_params);
 
 	useEffect(() => {
 		getOrderDetailsAction(params.id)

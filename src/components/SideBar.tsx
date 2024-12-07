@@ -10,7 +10,7 @@ type SideBarPropType = {
 		name: string;
 		path: string;
 	}[];
-	barRef: React.RefObject<HTMLDivElement>;
+	barRef: React.RefObject<HTMLDivElement | null>;
 	showSideBar: boolean;
 	currentUser: any;
 	pathname: string;

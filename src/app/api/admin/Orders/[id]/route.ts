@@ -5,8 +5,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { AdminOrderDetailsType } from "./response.d";
 export async function GET(
 	req: NextRequest,
-	{ params }: { params: { id: string } },
+	{ params: _params }: { params: Promise<{ id: string }> },
 ): Promise<NextResponse<AdminOrderDetailsType | { success: false; error: string }>> {
+	const params = await _params;
 	const id = params.id;
 	try {
 		const regex = /^[0-9a-fA-F]{24}$/;
