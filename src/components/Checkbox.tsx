@@ -1,5 +1,5 @@
 import React from "react";
-import { Input, InputProps } from "./ui/input";
+import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 
 const Checkbox = ({
@@ -9,7 +9,7 @@ const Checkbox = ({
 	checked,
 }: {
 	title: string;
-	props?: InputProps & React.RefAttributes<HTMLInputElement>;
+	props?: React.RefAttributes<HTMLInputElement> & React.ComponentProps<"input">;
 	onChange: any;
 	checked: boolean;
 }) => {
