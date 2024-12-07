@@ -3,23 +3,21 @@ import React, { useEffect, useState } from "react";
 import Item, { FrameLoading } from "../(components)/Item";
 import { Button } from "@/components/ui/button";
 import { RiArrowDropDownLine } from "react-icons/ri";
-import {
-	getFramesAction,
-	FrameDataType,
-	FramesFilterType,
-	getFiltersOptionsAction,
-} from "@/serverActions/frames/frame.action";
+// import { FrameDataType, FramesFilterType } from "@/serverActions/frames/frame.action";
 import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
 import useDebounce from "@/lib/useDebounce";
 import AppPagination from "@/components/AppPagination";
 import FramesSideBar from "./FramesSideBar";
 import { Input } from "@/components/ui/input";
+import { toast } from "react-toastify";
+import { FRAMES_PER_PAGE } from "@/contants/frames";
+import { FrameDataType } from "@/app/api/frames/gFrame/response";
 
 function Frames() {
-	const [filters, setFilters] = useState<FramesFilterType>({
-		categories: [],
-		collections: [],
-		colors: [],
+	const [filters, setFilters] = useState({
+		categories: [] as string[],
+		collections: [] as string[],
+		colors: [] as string[],
 		name: "",
 	});
 	const [totalFrames, setTotalFrames] = useState(0);
@@ -34,30 +32,52 @@ function Frames() {
 
 	const debouncedFilters = useDebounce(filters, 500);
 	const debouncedPage = useDebounce(page, 500);
+
 	useEffect(() => {
 		let fetching = true;
-		getFramesAction(debouncedFilters, debouncedPage - 1)
-			.then((data) => {
-				if (!fetching) return;
-				if (data.success) {
-					if (data.data.page != debouncedPage - 1) {
-						setPage(data.data.page + 1);
+		const init = async () => {
+			setLoading(true);
+			const queryParams = [
+				`page=${debouncedPage - 1}`,
+				debouncedFilters.name ? `name=${debouncedFilters.name}` : "",
+				debouncedFilters.categories.map((cat) => `categories=${cat}`).join("&"),
+				debouncedFilters.collections.map((col) => `collections=${col}`).join("&"),
+				debouncedFilters.colors.map((col) => `colors=${col}`).join("&"),
+			]
+				.filter((q) => !!q)
+				.join("&");
+
+			try {
+				const response = await fetch(`/api/frames/gFrame?${queryParams}`, {
+					next: {
+						revalidate: 3600,
+					},
+				});
+				const data = await response.json();
+				if (response.ok) {
+					if (fetching) {
+						setFrames(data.frames);
+						setTotalFrames(data.total);
+						setPage(data.page + 1);
+						setError(null);
+						window.scrollTo({ top: 0, behavior: "smooth" });
 					}
-					setFrames(data.data.frames);
-					setTotalFrames(data.data.total);
-					setError(null);
-					window.scrollTo({ top: 0, behavior: "smooth" });
 				} else {
-					setError(data.error);
+					toast.error(data?.error ?? "Failed to fetch frames");
 					setFrames([]);
+					setTotalFrames(0);
 				}
-			})
-			.catch((error) => {
+			} catch (error) {
 				console.log(error);
-			})
-			.finally(() => {
+				toast.error("Failed to fetch frames");
+				setError("Failed to fetch frames");
+				setFrames([]);
+			} finally {
 				setLoading(false);
-			});
+			}
+		};
+
+		init();
 		return () => {
 			fetching = false;
 		};
@@ -76,20 +96,39 @@ function Frames() {
 	}, []);
 
 	useEffect(() => {
-		getFiltersOptionsAction()
-			.then((data) => {
-				if (data.success) {
-					setColors(data.data.colors);
-					setCollections(data.data.collections);
-					setCategories(data.data.categories);
+		let fetching = true;
+
+		const init = async () => {
+			try {
+				const response = await fetch("/api/frames/filters", {
+					next: {
+						revalidate: 3600,
+					},
+				});
+				const data = await response.json();
+				if (response.ok) {
+					if (fetching) {
+						setColors(data.colors);
+						setCollections(data.collections);
+						setCategories(data.categories);
+					}
+				} else {
+					toast.error(data?.error ?? "Failed to fetch filters");
 				}
-			})
-			.catch((error) => {
+			} catch (error) {
 				console.log(error);
-			});
+				toast.error("Failed to fetch filters");
+			}
+		};
+
+		init();
+
+		return () => {
+			fetching = false;
+		};
 	}, []);
 
-	const totalPages = Math.ceil(totalFrames / 18);
+	const totalPages = Math.ceil((totalFrames || 1) / FRAMES_PER_PAGE);
 
 	return (
 		<section className="mx-auto w-11/12 max-w-screen-2xl gap-6">
@@ -126,10 +165,12 @@ function Frames() {
 						<div className="flex h-auto w-full justify-between rounded-lg border border-[#F1F1F1] p-3">
 							<div>
 								<p className="pb-3 text-2xl font-semibold">Frames</p>
-								<h4>
-									Showing {totalFrames == 0 ? 0 : (page - 1) * 18 + 1} -{" "}
-									{Math.min(page * 18, totalFrames)} of {totalFrames} frames
-								</h4>
+								{totalFrames > 0 && (
+									<h4>
+										Showing {(page - 1) * FRAMES_PER_PAGE + 1} -{" "}
+										{Math.min(page * FRAMES_PER_PAGE, totalFrames)} of {totalFrames} frames
+									</h4>
+								)}
 							</div>
 							<div className="relative md:hidden">
 								<Dialog
@@ -176,7 +217,7 @@ function Frames() {
 								})
 							)}
 						</div>
-						<AppPagination page={page} totalPages={totalPages} setPage={setPage} />
+						{totalFrames > 0 && <AppPagination page={page} totalPages={totalPages} setPage={setPage} />}
 					</div>
 				</div>
 			)}

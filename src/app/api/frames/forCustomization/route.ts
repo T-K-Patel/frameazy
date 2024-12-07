@@ -11,25 +11,23 @@ type FramesForCustomizationType = {
 	}[];
 };
 
+export async function GET() {
+	try {
+		const frames: FramesForCustomizationType[] = await db.frame.findMany({
+			select: {
+				id: true,
+				name: true,
+				borderSrc: true,
+				varients: true,
+			},
+		});
 
-export async function GET(){
+		const resp = NextResponse.json(frames, { status: 200 });
 
-    try{
-    
-    const frames :  FramesForCustomizationType[] = await db.frame.findMany({
-
-        select: {
-            id: true,
-            name: true,
-            borderSrc: true,
-            varients: true,
-        },
-    });
-
-    return NextResponse.json({success: true,data : frames}, { status: 200 });
-}catch (error) {
-    console.error("Error fetching frames:", error);
-    return NextResponse.json({ success: false, error: "Internal Server Error" },{ status: 500 });
-  }
+		resp.headers.set("Cache-Control", "public, max-age=3600, s-maxage=3600");
+		return resp;
+	} catch (error) {
+		console.error("Error fetching frames:", error);
+		return NextResponse.json({ success: false, error: "Internal Server Error" }, { status: 500 });
+	}
 }
-

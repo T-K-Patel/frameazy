@@ -4,6 +4,8 @@ import ContextProviders from "@/context/ContextProviders";
 import { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const poppins = Poppins({
 	weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
@@ -40,6 +42,7 @@ export default function RootLayout({
 				<div className="_next">
 					<ContextProviders>{children}</ContextProviders>
 				</div>
+				<ToastContainer position="bottom-right" theme="colored" />
 				{process.env.NODE_ENV == "production" && (
 					<>
 						{" "}
