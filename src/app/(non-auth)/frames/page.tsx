@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import Item, { FrameLoading } from "../(components)/Item";
 import { Button } from "@/components/ui/button";
 import { RiArrowDropDownLine } from "react-icons/ri";
-// import { FrameDataType, FramesFilterType } from "@/serverActions/frames/frame.action";
 import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
 import useDebounce from "@/lib/useDebounce";
 import AppPagination from "@/components/AppPagination";
@@ -100,7 +99,7 @@ function Frames() {
 
 		const init = async () => {
 			try {
-				const response = await fetch("/api/frames/filters", {
+				const response = await fetch("/api/options/frameOptions", {
 					next: {
 						revalidate: 3600,
 					},
