@@ -24,7 +24,13 @@ export const authOptions: NextAuthConfig = {
 		},
 	},
 	callbacks: {
-		signIn({ account }) {
+		async signIn({ account, user }) {
+			if (user.email && user.email === process.env.ADMIN_EMAIL && user.role !== "admin") {
+				await db.user.update({
+					where: { id: user.id },
+					data: { role: "admin" },
+				});
+			}
 			if (account?.provider === "google") {
 				return true;
 			}
