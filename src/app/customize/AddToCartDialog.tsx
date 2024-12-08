@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";

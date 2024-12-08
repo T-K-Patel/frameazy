@@ -2,30 +2,28 @@
 import { useSession } from "next-auth/react";
 import { RedirectType, redirect } from "next/navigation";
 import React, { use, useEffect, useState } from "react";
-import Logo from "../../../assets/Logo.svg";
+import Logo from "@/assets/Logo.svg";
 import { Button } from "@/components/ui/button";
-import Google from "../../../assets/google.svg";
+import Google from "@/assets/google.svg";
 import Link from "next/link";
-import { Img } from "react-image";
+import { Img } from "@/components/Img";
 import { signIn } from "next-auth/react";
+import Image from "next/image";
 
-const LoginPage = ({ searchParams: sP }: { searchParams: Promise<Record<string, any>> }) => {
+function LoginPage({ searchParams: sP }: { searchParams: Promise<Record<string, any>> }) {
 	const searchParams = use(sP);
 	const session = useSession();
 	const [error, setError] = useState<string | null>(null as string | null);
 
 	useEffect(() => {
-		if (session.data?.user) {
-			if (searchParams.callbackUrl) {
-				redirect(searchParams.callbackUrl, RedirectType.replace);
-			} else if (searchParams.next) {
-				if (searchParams.next.startsWith("/admin") && session.data.user.role !== "admin") {
-					redirect("/", RedirectType.replace);
+		if (session.data && session.data.user) {
+			const redirectHandler = (url: string) => {
+				if (url.startsWith("/admin") && session.data.user!.role !== "admin") {
+					return redirect("/", RedirectType.replace);
 				}
-				redirect(searchParams.next, RedirectType.replace);
-			} else {
-				redirect("/", RedirectType.replace);
-			}
+				redirect(url, RedirectType.replace);
+			};
+			redirectHandler(searchParams.callbackUrl || searchParams.next || "/");
 		}
 		setError("");
 	}, [session, searchParams]);
@@ -49,10 +47,18 @@ const LoginPage = ({ searchParams: sP }: { searchParams: Promise<Record<string, 
 						variant={"outline"}
 						className="flex h-auto w-full gap-x-3 overflow-hidden rounded-xl border border-black px-3 py-3"
 						onClick={() => {
-							signIn("google", { redirectTo: searchParams.next ?? searchParams.callbackUrl ?? "/" });
+							signIn("google", { redirect: false });
 						}}
 					>
-						<Img src={Google.src} alt="google" />
+						{/* <Img src={Google.src} alt="google" /> */}
+						<Image
+							src={Google.src}
+							alt="google"
+							width={30}
+							height={30}
+							style={{ position: "unset" }}
+							unoptimized
+						/>
 						<div className="w-auto text-xl font-semibold leading-[30px] text-black">
 							Sign in with Google
 						</div>
@@ -62,6 +68,6 @@ const LoginPage = ({ searchParams: sP }: { searchParams: Promise<Record<string, 
 			</div>
 		</div>
 	);
-};
+}
 
 export default LoginPage;

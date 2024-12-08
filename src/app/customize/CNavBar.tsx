@@ -2,7 +2,7 @@
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { BsCart3 } from "react-icons/bs";
-import { Img } from "react-image";
+import { Img } from "@/components/Img";
 import Logo from "@/assets/frameasy-logo.png";
 
 function CNavBar() {

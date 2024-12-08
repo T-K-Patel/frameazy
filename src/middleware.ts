@@ -13,13 +13,27 @@ export default async function middleware(req: NextRequest) {
 			},
 		);
 		session = await session.json();
-		if (req.nextUrl.pathname.startsWith("/admin") && session?.user?.role !== "admin") {
-			const redirUrl = req.nextUrl;
-			redirUrl.searchParams.set("next", req.nextUrl.pathname);
-			redirUrl.pathname = "/auth/login";
-			const resp = NextResponse.redirect(redirUrl, { status: 302 });
-			resp.cookies.delete(cookieName);
-			return resp;
+		if (session?.user) {
+			if (req.nextUrl.pathname.startsWith("/auth")) {
+				const redirUrl = req.nextUrl.clone();
+				redirUrl.pathname = "/";
+				return NextResponse.redirect(redirUrl, { status: 302 });
+			}
+		} else {
+			const isAuthPath = req.nextUrl.pathname.startsWith("/auth");
+			const isAdminPath =
+				req.nextUrl.pathname.startsWith("/admin") || req.nextUrl.pathname.startsWith("/api/admin");
+
+			if (!isAuthPath || (isAdminPath && session?.user?.role !== "admin")) {
+				const redirUrl = req.nextUrl.clone();
+				redirUrl.searchParams.set("next", req.nextUrl.pathname);
+				redirUrl.pathname = "/auth/login";
+				const resp = NextResponse.redirect(redirUrl, { status: 302 });
+				if (isAdminPath) {
+					resp.cookies.delete(cookieName);
+				}
+				return resp;
+			}
 		}
 		return NextResponse.next();
 	} catch (error) {
@@ -29,9 +43,19 @@ export default async function middleware(req: NextRequest) {
 			{ status: 500, headers: { "Content-Type": "text/html" } },
 		);
 	}
-	// return NextResponse.next();
 }
 
 export const config: MiddlewareConfig = {
-	matcher: ["/admin/:path*", "/api/admin/:path*"],
+	matcher: [
+		"/admin/:path*",
+		"/dashboard",
+		"/auth/login",
+		"/cart",
+		"/api/admin/:path*",
+		"/dashboard",
+		"/customize/:path*",
+		"/orders/:path*",
+		"/api/cart/:path*",
+		"/api/user/:path*",
+	],
 };

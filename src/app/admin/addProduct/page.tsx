@@ -6,7 +6,7 @@ import Upload from "../../../assets/upload.svg";
 import { Button } from "@/components/ui/button";
 import { useFormStatus } from "react-dom";
 import { addProduct } from "@/serverActions/admin/admin.action";
-import { Img } from "react-image";
+import { Img } from "@/components/Img";
 import DropDown from "@/components/DropDown";
 import { toast } from "react-toastify";
 
@@ -33,6 +33,7 @@ const UploadImage = forwardRef<HTMLInputElement, { name: string }>(function Uplo
 			return;
 		}
 		setFile(newFile);
+		if (typeof window === "undefined") return;
 		const reader = new FileReader();
 		reader.onloadend = () => {
 			const dataUrl = reader.result as string;
@@ -49,6 +50,7 @@ const UploadImage = forwardRef<HTMLInputElement, { name: string }>(function Uplo
 		const newFile = e.target.files?.length ? e.target.files[0] : null;
 		if (newFile) {
 			setFile(newFile);
+			if (typeof window === "undefined") return;
 			const reader = new FileReader();
 			reader.onloadend = () => {
 				const dataUrl = reader.result as string;

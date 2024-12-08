@@ -3,13 +3,15 @@ import React, { ChangeEvent, DragEvent, useState } from "react";
 import UploadIcon from "@/assets/upload.svg";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
-import { useFrames } from "@/context/frames-context";
 import { Button } from "../ui/button";
-import { Img } from "react-image";
+import { Img } from "@/components/Img";
 
 function UploadImage() {
 	const [error, setError] = useState(null as string | null);
-	const { frameOptions, setFrameOptions } = useFrames();
+	const { frameOptions, setFrameOptions } = {
+		frameOptions: { framingStyle: "uploadAndFrame", data: {} },
+		setFrameOptions: (options: { framingStyle: string; data: any }) => options,
+	};
 	const [imageURL, setImageURL] = useState<string | null>(null);
 
 	React.useEffect(() => {

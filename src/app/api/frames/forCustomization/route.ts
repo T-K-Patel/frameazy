@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { FramesForCustomizationType } from "./response.d";
+import { FramesForCustomizationType } from "./response";
 
 export async function GET(): Promise<NextResponse<FramesForCustomizationType[] | { success: false; error: string }>> {
 	try {

@@ -2,7 +2,6 @@
 import DropDown, { FrameDropdown } from "@/components/DropDown";
 import { Input } from "@/components/ui/input";
 import React, { useEffect, useState } from "react";
-import { useFrames } from "@/context/frames-context";
 import InputField from "../InputField";
 import { BiX } from "react-icons/bi";
 import FrameCanvas from "../FrameCanvas";
@@ -15,7 +14,7 @@ import AddToCartDialog from "../AddToCartDialog";
 import { useRouter } from "next/navigation";
 import { calculateTotalPrice } from "@/utils/totalPrice";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Img } from "react-image";
+import { Img } from "@/components/Img";
 
 type CustomizeOptionsProps = {
 	title: string;
@@ -35,7 +34,11 @@ type matOptionsProps = {
 type ContentType = { title: string; warning: string; mat: boolean; options: CustomizeOptionsProps[] };
 
 function Page() {
-	const { frameOptions, customizingFrame, setCustomizingFrame } = useFrames();
+	const { frameOptions, customizingFrame, setCustomizingFrame } = {
+		frameOptions: { framingStyle: "emptyFrame", data: { frameType: "canvas|panel" } },
+		customizingFrame: { id: "", borderWidth: 0, borderSrc: "", name: "", unit_price: 0 },
+		setCustomizingFrame: (a: () => void) => a,
+	};
 	const [upload, setUpload] = useState<emptyFrameProps>({
 		dimensions: { width: 12, height: 9 },
 		glazing: {

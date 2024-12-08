@@ -17,7 +17,7 @@ import Link from "next/link";
 import { IoMdOpen } from "react-icons/io";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { checkPaymentStatus } from "@/serverActions/payments/payments.action";
-import { Img } from "react-image";
+import { Img } from "@/components/Img";
 
 const capitalizeFirstLetter = (str: string) => {
 	return str.charAt(0).toUpperCase() + str.slice(1);

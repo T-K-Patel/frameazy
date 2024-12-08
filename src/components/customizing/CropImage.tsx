@@ -1,13 +1,14 @@
 "use client";
 import React, { useCallback, useEffect, useState } from "react";
-import { useFrames } from "@/context/frames-context";
 import Cropper, { Area } from "react-easy-crop";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { Img as ReactImage } from "react-image";
+import { Img as ReactImage } from "@/components/Img";
+import { getImagePlaceholder } from "../imagePlaceholder";
 
 function getCroppedImg(imageSrc: string, crop: Area): Promise<string> {
+	if (typeof window === "undefined") return Promise.reject(new Error("Window not available"));
 	const image = new Image();
 	image.src = imageSrc;
 	const canvas = document.createElement("canvas");
@@ -28,7 +29,50 @@ function getCroppedImg(imageSrc: string, crop: Area): Promise<string> {
 }
 
 function CropImage() {
-	const { frameOptions, setFrameOptions } = useFrames();
+	const { frameOptions, setFrameOptions } = {
+		frameOptions: {
+			framingStyle: "uploadAndFrame",
+			data: {
+				image: getImagePlaceholder(),
+				croppedImage: getImagePlaceholder(),
+				width: 0,
+				height: 0,
+				usingExternalImage: false,
+			} as {
+				usingExternalImage: boolean;
+				image: string;
+				croppedImage?: File | string;
+				width?: number;
+				height?: number;
+				customization?:
+					| {
+							type: "printOnly";
+							printing: string;
+					  }
+					| {
+							type: "canvasPrint";
+							printing: string;
+							stretching: string;
+							sides: string;
+					  }
+					| {
+							type: "framedWithoutMG";
+							frame_id: string;
+							printing: string;
+							stretching: string;
+					  }
+					| {
+							type: "framedWithMG";
+							frame_id: string;
+							glazing: string; // LATER: replace this with enum of prisma.
+							printing: string;
+							backing: string;
+							mat: { key: string; width: number; color: string }[];
+					  };
+			},
+		},
+		setFrameOptions: (a: Record<string, any>) => a,
+	};
 
 	const [size, setSize] = useState({ width: 12, height: 9 });
 	const [crop, setCrop] = useState({ x: 0, y: 0 });
@@ -51,7 +95,7 @@ function CropImage() {
 					return;
 				} else if (croppedAreaPixels) {
 					try {
-						const croppedImage = await getCroppedImg(frameOptions.data.image as string, croppedAreaPixels);
+						const croppedImage = await getCroppedImg(frameOptions.data.image, croppedAreaPixels);
 						setFrameOptions({ ...frameOptions, data: { ...frameOptions.data, croppedImage, ...size } });
 					} catch (e) {
 						console.error(e);
@@ -65,8 +109,9 @@ function CropImage() {
 	useEffect(() => {
 		if (frameOptions.framingStyle != "uploadAndFrame") return;
 		if (!frameOptions.data.usingExternalImage) return;
+		if (typeof window === "undefined") return;
 		const image = new Image();
-		image.src = frameOptions.data.image as string;
+		image.src = frameOptions.data.image;
 		image.onload = () => {
 			setSize({ width: 12, height: (12 * image.height) / image.width });
 			setAspect(image.width / image.height);

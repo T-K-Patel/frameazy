@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import { CustomError } from "@/lib/CustomError";
 import { isAdmin } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
-import { AdminOrderDetailsType } from "./response.d";
+import { AdminOrderDetailsType } from "./response";
 export async function GET(
 	req: NextRequest,
 	{ params: _params }: { params: Promise<{ id: string }> },

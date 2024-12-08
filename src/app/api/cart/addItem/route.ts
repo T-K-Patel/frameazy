@@ -13,7 +13,8 @@ export async function POST(req: NextRequest) {
 	const body = (await req.json()) as TData;
 
 	const { externalImage, data } = body;
-	let { frameId, qty } = body;
+	const frameId = body.frameId;
+	let qty = body.qty;
 	try {
 		const userId = await isAuthenticated();
 		qty = Number(qty || 1);

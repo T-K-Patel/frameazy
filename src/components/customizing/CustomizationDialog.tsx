@@ -8,14 +8,13 @@ import Empty from "@/assets/empty.svg";
 import Mirror from "@/assets/mirror.svg";
 import Canvas from "@/assets/canvas.svg";
 import Paper from "@/assets/paper.svg";
-import { useFrames } from "@/context/frames-context";
 import { BiArrowBack, BiRepeat } from "react-icons/bi";
 import { cn } from "@/lib/utils";
 import UploadImage from "./UploadImage";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import CropImage from "./CropImage";
-import { Img } from "react-image";
+import { Img } from "@/components/Img";
 
 type FrameOptionProps = {
 	title: string;
@@ -34,13 +33,21 @@ const FrameOption = ({ title, image, ...props }: FrameOptionProps) => {
 
 type ContentType = { title: string; desc: string; options?: FrameOptionProps[]; component?: ReactNode };
 
+type TCustimizationDialog = {
+	frameOptions: { framingStyle: string; data: any };
+	setFrameOptions: (options: { framingStyle: string; data?: any }) => void;
+	resetFrames: () => void;
+	dialogOpen: boolean;
+	setDialogOpen: (open: boolean) => void;
+};
+
 const CustomizationDialog = ({
 	frameOptions: framing,
 	setFrameOptions,
 	resetFrames,
 	dialogOpen: isOpen,
 	setDialogOpen: setIsOpen,
-}: ReturnType<typeof useFrames>) => {
+}: TCustimizationDialog) => {
 	const router = useRouter();
 	const session = useSession();
 	const contentDivRef = useRef<HTMLDivElement>(null);

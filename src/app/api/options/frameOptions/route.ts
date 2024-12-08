@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { revalidateTag } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 export const revalidate = 600;
 
@@ -29,12 +29,7 @@ export async function GET() {
 		})
 	).map((collection) => collection.name);
 
-	const response = NextResponse.json({ colors, collections, categories }, { status: 200 });
-
-	// Set cache-control headers
-	response.headers.set("Cache-Control", "public, s-maxage=600, stale-while-revalidate=3600");
-
-	return response;
+	return NextResponse.json({ colors, collections, categories }, { status: 200 });
 }
 
 async function _addFrameOption(_dbModel: any, value: string) {
@@ -66,6 +61,7 @@ export async function POST(req: NextRequest) {
 		}
 		const frameOption = await _addFrameOption(db[type], name);
 		revalidateTag("frameOptions");
+		revalidatePath("/api/options/frameOptions");
 		return NextResponse.json({ success: true, frameOption }, { status: 200 });
 	} catch (error) {
 		console.log("Error adding frame option", error);

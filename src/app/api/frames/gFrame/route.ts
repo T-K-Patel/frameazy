@@ -2,7 +2,7 @@ import { NextResponse, NextRequest } from "next/server";
 import { db } from "@/lib/db";
 import { Prisma } from "@prisma/client";
 import { FRAMES_PER_PAGE } from "@/contants/frames";
-import { FrameDataType, FramesFilterType } from "./response.d";
+import { FrameDataType, FramesFilterType } from "./response";
 
 export async function GET(
 	req: NextRequest,

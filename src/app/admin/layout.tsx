@@ -1,10 +1,10 @@
 "use client";
 import React from "react";
-import { useSession, signOut } from "next-auth/react";
-import { redirect, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AdminSidebar";
 import { Separator } from "@/components/ui/separator";
+import { useSession } from "next-auth/react";
 
 const resourseNameMap: { [k: string]: string } = {
 	addProduct: "Add Product",
@@ -20,26 +20,15 @@ const resourseNameMap: { [k: string]: string } = {
 export default function Layout({ children }: { children: React.ReactNode }) {
 	const session = useSession();
 	const pathname = usePathname();
-	if (session.data?.user?.role != "admin") {
-		signOut()
-			.then(() => {
-				redirect(`/auth/login?next=${encodeURIComponent(window.location.href)}`);
-			})
-			.catch((error) => {
-				console.error("Sign out error", error);
-				alert("Sign out error");
-			});
-		return <div>Not authenticated</div>;
-	}
 	const resourceName = resourseNameMap[pathname.split("/")[2]] || "Dashboard";
 	return (
 		<>
 			<SidebarProvider className="h-full w-full">
 				<AppSidebar
 					user={{
-						name: session.data.user.name!,
-						email: session.data.user.email!,
-						avatar: session.data.user.image!,
+						name: session?.data?.user?.name || "---",
+						email: session?.data?.user?.email || "---",
+						avatar: session?.data?.user?.image || "",
 					}}
 				/>
 				<SidebarInset>

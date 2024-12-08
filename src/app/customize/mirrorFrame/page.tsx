@@ -6,13 +6,12 @@ import InputField from "../InputField";
 import FrameCanvas from "../FrameCanvas";
 import { CartCustomization, Mirror } from "@prisma/client";
 import { getFramesForCustomizatinAction, FramesForCustomizationType } from "@/serverActions/frames/frame.action";
-import { useFrames } from "@/context/frames-context";
 import { addCartItemAction } from "@/serverActions/cart/addCartItem.action";
 import AddToCartDialog from "../AddToCartDialog";
 import { useRouter } from "next/navigation";
 import { calculateTotalPrice } from "@/utils/totalPrice";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Img } from "react-image";
+import { Img } from "@/components/Img";
 
 const MirrorOptions: string[] = [];
 
@@ -29,7 +28,11 @@ const Page = () => {
 			unit_price: 0,
 		},
 	});
-	const { frameOptions, customizingFrame, setCustomizingFrame } = useFrames();
+	const { frameOptions, customizingFrame, setCustomizingFrame } = {
+		frameOptions: { framingStyle: "mirrorFrame" },
+		customizingFrame: { id: "", borderWidth: 0, borderSrc: "", name: "", unit_price: 0 },
+		setCustomizingFrame: (a: () => void) => a,
+	};
 	const [frames, setFrames] = useState<FramesForCustomizationType[]>([]);
 	const [error, setError] = useState<string | null>(null);
 	const router = useRouter();

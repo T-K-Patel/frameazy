@@ -1,7 +1,7 @@
 import Google from "next-auth/providers/google";
 import { NextAuthConfig } from "next-auth";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import crypto from "node:crypto";
+import crypto from "crypto";
 import { db } from "@/lib/db";
 
 if (!process.env.NEXTAUTH_SECRET) {

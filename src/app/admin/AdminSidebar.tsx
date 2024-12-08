@@ -27,6 +27,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
 import { BiLeftArrowAlt, BiPlus } from "react-icons/bi";
+import { Button } from "@/components/ui/button";
 
 const data = {
 	navMain: [
@@ -139,15 +140,15 @@ export function NavUser({
 			</SidebarMenuItem>
 			<SidebarMenuItem>
 				<SidebarMenuButton asChild className="justify-center bg-red-600 text-white hover:bg-red-500">
-					<Link href="/admin">
+					<Button>
 						<LogOut />
 						<span>Logout</span>
-					</Link>
+					</Button>
 				</SidebarMenuButton>
 			</SidebarMenuItem>
 			<SidebarMenuItem>
 				<SidebarMenuButton className="justify-center bg-slate-900 text-white" asChild>
-					<Link href="/admin">
+					<Link href="/">
 						<BiLeftArrowAlt />
 						<span>Go to Main Site</span>
 					</Link>

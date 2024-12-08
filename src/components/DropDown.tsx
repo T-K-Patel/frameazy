@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { Img } from "react-image";
+import { Img } from "@/components/Img";
 import Select, { StylesConfig } from "react-select";
 
 const DropDown = ({ items, value, onChange }: { items: string[]; value: string; onChange: any }) => {

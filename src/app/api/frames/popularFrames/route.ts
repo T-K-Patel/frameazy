@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { OrderStatus } from "@prisma/client";
-import { PopularFrameDataType } from "./response.d";
+import { PopularFrameDataType } from "./response";
 
 export async function GET(): Promise<NextResponse<PopularFrameDataType[] | { success: false; error: string }>> {
 	try {

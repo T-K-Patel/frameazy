@@ -1,3 +1,4 @@
+"use client";
 import React, { useCallback, useMemo } from "react";
 
 const CANVAS_WIDTH = 2048;
@@ -69,17 +70,23 @@ class WorkLocation {
 
 const FrameCanvas = ({ image, totalSize, frameBorder, matOptions }: FrameCanvasProps) => {
 	const cis = useMemo(() => {
-		const _cis = new Image();
-		_cis.src = image?.src || "";
-		_cis.loading = "eager";
-		return _cis;
+		if (typeof window !== "undefined") {
+			const _cis = new Image();
+			_cis.src = image?.src || "";
+			_cis.loading = "eager";
+			return _cis;
+		}
+		return null; // Return null or a placeholder for SSR
 	}, [image?.src]);
 
 	const frameCIS = useMemo(() => {
-		const _cis = new Image();
-		_cis.src = frameBorder?.src || "";
-		_cis.loading = "eager";
-		return _cis;
+		if (typeof window !== "undefined") {
+			const _cis = new Image();
+			_cis.src = frameBorder?.src || "";
+			_cis.loading = "eager";
+			return _cis;
+		}
+		return null;
 	}, [frameBorder?.src]);
 
 	const SCALE_FACTOR =
@@ -147,7 +154,9 @@ const FrameCanvas = ({ image, totalSize, frameBorder, matOptions }: FrameCanvasP
 						fWL.x + frameThickness,
 						fWL.y + frameThickness,
 					);
-					ctx.drawImage(frameCIS, fWL.x, fWL.y, fWL.w, frameThickness);
+					if (frameCIS) {
+						ctx.drawImage(frameCIS, fWL.x, fWL.y, fWL.w, frameThickness);
+					}
 					ctx.restore();
 
 					// Left border
@@ -167,7 +176,7 @@ const FrameCanvas = ({ image, totalSize, frameBorder, matOptions }: FrameCanvasP
 						fWL.y + frameThickness,
 						fWL.x + frameThickness,
 					);
-					ctx.drawImage(frameCIS, fWL.y, fWL.x, fWL.h, frameThickness);
+					if (frameCIS) ctx.drawImage(frameCIS, fWL.y, fWL.x, fWL.h, frameThickness);
 					ctx.restore();
 
 					// Bottom border
@@ -186,7 +195,7 @@ const FrameCanvas = ({ image, totalSize, frameBorder, matOptions }: FrameCanvasP
 						fWL.x + frameThickness,
 						fWL.y + frameThickness,
 					);
-					ctx.drawImage(frameCIS, fWL.x, fWL.y, fWL.w, frameThickness);
+					if (frameCIS) ctx.drawImage(frameCIS, fWL.x, fWL.y, fWL.w, frameThickness);
 					ctx.restore();
 
 					// Right border
@@ -205,13 +214,15 @@ const FrameCanvas = ({ image, totalSize, frameBorder, matOptions }: FrameCanvasP
 						fWL.y + frameThickness,
 						fWL.x + frameThickness,
 					);
-					ctx.drawImage(frameCIS, fWL.y, fWL.x, fWL.h, frameThickness);
+					if (frameCIS) ctx.drawImage(frameCIS, fWL.y, fWL.x, fWL.h, frameThickness);
 					ctx.restore();
 					ctx.save();
 				};
 
 				drawFrame();
-				frameCIS.onload = drawFrame;
+				if (frameCIS) {
+					frameCIS.onload = drawFrame;
+				}
 			}
 
 			function drawMat(color: string, width: number) {
@@ -225,7 +236,7 @@ const FrameCanvas = ({ image, totalSize, frameBorder, matOptions }: FrameCanvasP
 			});
 			ctx.fillStyle = "white";
 			ctx.fillRect(wL.x, wL.y, wL.w, wL.h);
-			if (image?.src) {
+			if (image?.src && cis) {
 				// Draw Image
 				ctx.drawImage(cis, wL.x, wL.y, wL.w, wL.h);
 				cis.onload = () => {

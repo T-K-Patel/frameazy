@@ -1,24 +1,34 @@
 "use client";
 import React from "react";
 import AuthImage from "@/assets/frame-sign.png";
-import { getImagePlaceholder } from "@/components/imagePlaceholder";
-import { Img } from "react-image";
+import Image from "next/image";
 
-const layout = async ({ children }: { children: React.ReactNode }) => {
-	await new Promise((resolve) => setTimeout(resolve, 1000));
+function Layout({ children }: { children: React.ReactNode }) {
 	return (
 		<div className="grid h-screen grid-cols-1 md:grid-cols-2">
 			<div className="h-screen w-full pb-4">{children}</div>
-			<div className="max-md:hidden">
-				<Img
+			<div className="relative max-md:hidden">
+				{/* <Img
 					src={AuthImage.src}
 					alt="Auth Image"
 					loader={<Img src={getImagePlaceholder()} className="h-screen w-full object-cover" />}
+					className="h-screen w-full object-cover"
+				/> */}
+				<Image
+					src={AuthImage.src}
+					alt="Auth Image"
+					// loader={<Img src={getImagePlaceholder()} className="h-screen w-full object-cover" />}
+					blurDataURL={AuthImage.blurDataURL}
+					quality={100}
+					priority={true}
+					loading="eager"
+					fill={true}
+					placeholder="blur"
 					className="h-screen w-full object-cover"
 				/>
 			</div>
 		</div>
 	);
-};
+}
 
-export default layout;
+export default Layout;
