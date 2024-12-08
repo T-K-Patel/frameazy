@@ -18,7 +18,7 @@ export async function PATCH(req: NextRequest) {
 		}
 		const prevStatus = await db.order
 			.findFirst({ where: { id: orderId }, select: { order_status: true } })
-			.then((order) => order?.order_status);
+			.then((order) => order?.order_status || null);
 		if (!prevStatus) {
 			throw new CustomError("Order not found");
 		}
