@@ -3,7 +3,7 @@ import { NextRequest, NextResponse, type MiddlewareConfig } from "next/server";
 export default async function middleware(req: NextRequest) {
 	const cookies = req.cookies;
 	const secureCookie = process.env.NEXTAUTH_URL?.startsWith("https://") ?? !!process.env.VERCEL;
-	const cookieName = secureCookie ? "__Secure-next-auth.session-token" : "next-auth.session-token";
+	const cookieName = secureCookie ? "__Secure-authjs.session-token" : "authjs.session-token";
 	try {
 		let session: any = await fetch(
 			`${process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000"}/api/auth/session`,
@@ -29,8 +29,9 @@ export default async function middleware(req: NextRequest) {
 			{ status: 500, headers: { "Content-Type": "text/html" } },
 		);
 	}
+	// return NextResponse.next();
 }
 
 export const config: MiddlewareConfig = {
-	matcher: ["/admin/:path*"],
+	matcher: ["/admin/:path*", "/api/admin/:path*"],
 };

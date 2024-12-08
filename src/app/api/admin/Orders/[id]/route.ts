@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { CustomError } from "@/lib/CustomError";
-import { isAdmin } from "@/utils/auth";
+import { isAdmin } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 import { AdminOrderDetailsType } from "./response.d";
 export async function GET(

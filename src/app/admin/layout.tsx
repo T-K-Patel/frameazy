@@ -37,9 +37,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 			<SidebarProvider className="h-full w-full">
 				<AppSidebar
 					user={{
-						name: session.data.user.name,
-						email: session.data.user.email,
-						avatar: session.data.user.image,
+						name: session.data.user.name!,
+						email: session.data.user.email!,
+						avatar: session.data.user.image!,
 					}}
 				/>
 				<SidebarInset>

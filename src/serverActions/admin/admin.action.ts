@@ -4,11 +4,10 @@ import { db } from "@/lib/db";
 import { CustomError } from "@/lib/CustomError";
 import { Message, Subscription, OrderStatus, Role, PaymentStatus, Address, CartCustomization } from "@prisma/client";
 import { CloudinaryStorage } from "@/lib/Cloudinary.storage";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
+import { auth } from "@/lib/auth";
 
 async function isAdmin() {
-	const session = await getServerSession(authOptions);
+	const session = await auth();
 	if (!session?.user?.id) {
 		throw new CustomError("Unauthorized");
 	}
@@ -225,7 +224,7 @@ export async function getOrdersAction(): Promise<ServerActionReturnType<AdminOrd
 				createdAt: "desc",
 			},
 		});
-		console.log(orders);
+
 		return { success: true, data: orders };
 	} catch (error) {
 		if (error instanceof CustomError) {

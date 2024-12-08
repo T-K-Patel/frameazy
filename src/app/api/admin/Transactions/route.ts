@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { CustomError } from "@/lib/CustomError";
-import { isAdmin } from "@/utils/auth";
+import { isAdmin } from "@/lib/auth";
 import { NextResponse } from "next/server";
 import { TransactionType } from "./response.d";
 export async function GET(): Promise<NextResponse<TransactionType[] | { success: false; error: string }>> {

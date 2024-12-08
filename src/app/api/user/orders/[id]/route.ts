@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { isAuthenticated } from "@/utils/auth";
+import { isAuthenticated } from "@/lib/auth";
 import { ObjectIdValidation } from "@/utils/validators";
 import { NextRequest, NextResponse } from "next/server";
 

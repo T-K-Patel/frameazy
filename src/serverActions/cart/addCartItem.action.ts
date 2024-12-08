@@ -1,5 +1,4 @@
 "use server";
-import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import { CloudinaryStorage } from "@/lib/Cloudinary.storage";
 import { CustomError } from "@/lib/CustomError";
 import { db } from "@/lib/db";
@@ -7,10 +6,11 @@ import { ServerActionReturnType } from "@/types/serverActionReturnType";
 import { calculateTotalPrice } from "@/utils/totalPrice";
 import { ObjectIdValidation } from "@/utils/validators";
 import { CartCustomization, CustomizationType } from "@prisma/client";
-import { getServerSession } from "next-auth";
+
+import { auth } from "@/lib/auth";
 
 async function isAuthenticated() {
-	const session = await getServerSession(authOptions);
+	const session = await auth();
 	if (!session?.user?.id) {
 		throw new CustomError("Unauthorized");
 	}

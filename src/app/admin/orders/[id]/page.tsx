@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, use } from "react";
+import React, { useState, useEffect, use, useActionState } from "react";
 import DropDown from "@/components/DropDown";
 import { OrderStatus, CartCustomization } from "@prisma/client";
 import {
@@ -11,7 +11,6 @@ import {
 import { Button } from "@/components/ui/button";
 
 import { LoadingSkeleton } from "./LoadingSkeleton";
-import { useFormState } from "react-dom";
 import { useFormStatus } from "react-dom";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
@@ -41,8 +40,8 @@ const OrderDetails = ({ params: _params }: { params: Promise<{ id: string }> }) 
 	const [updateStatusError, setUpdateStatusError] = useState<string | null>(null);
 	const [deliveryStatusError, setDeliveryStatusError] = useState<string | null>(null);
 
-	const [statusUpdateState, statusUpdateAction] = useFormState(updateOrderStatusAction, null);
-	const [deliveryUpdateState, deliveryUpdateAction] = useFormState(updateDeliveryDateAction, null);
+	const [statusUpdateState, statusUpdateAction] = useActionState(updateOrderStatusAction, null);
+	const [deliveryUpdateState, deliveryUpdateAction] = useActionState(updateDeliveryDateAction, null);
 
 	useEffect(() => {
 		if (!statusUpdateState) return;

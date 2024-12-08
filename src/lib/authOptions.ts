@@ -1,15 +1,14 @@
 import Google from "next-auth/providers/google";
-import { PrismaClient } from "@prisma/client";
-import { NextAuthOptions } from "next-auth";
+import { NextAuthConfig } from "next-auth";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import crypto from "node:crypto";
+import { db } from "@/lib/db";
 
 if (!process.env.NEXTAUTH_SECRET) {
 	throw new Error("NEXTAUTH_SECRET is not defined");
 }
-const db = new PrismaClient();
 
-export const authOptions: NextAuthOptions = {
+export const authOptions: NextAuthConfig = {
 	adapter: PrismaAdapter(db),
 	providers: [
 		Google({

@@ -1,4 +1,4 @@
-import { isAdmin } from "@/utils/auth";
+import { isAdmin } from "@/lib/auth";
 import { OrderStatus } from "@prisma/client";
 import { CustomError } from "@/lib/CustomError";
 import { db } from "@/lib/db";

@@ -1,5 +1,5 @@
 "use client";
-import { signIn, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { RedirectType, redirect } from "next/navigation";
 import React, { use, useEffect, useState } from "react";
 import Logo from "../../../assets/Logo.svg";
@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import Google from "../../../assets/google.svg";
 import Link from "next/link";
 import { Img } from "react-image";
+import { signIn } from "next-auth/react";
 
 const LoginPage = ({ searchParams: sP }: { searchParams: Promise<Record<string, any>> }) => {
 	const searchParams = use(sP);
@@ -48,7 +49,7 @@ const LoginPage = ({ searchParams: sP }: { searchParams: Promise<Record<string, 
 						variant={"outline"}
 						className="flex h-auto w-full gap-x-3 overflow-hidden rounded-xl border border-black px-3 py-3"
 						onClick={() => {
-							signIn("google", { redirect: false });
+							signIn("google", { redirectTo: searchParams.next ?? searchParams.callbackUrl ?? "/" });
 						}}
 					>
 						<Img src={Google.src} alt="google" />

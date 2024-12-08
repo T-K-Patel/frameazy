@@ -1,9 +1,16 @@
-import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
+import NextAuth from "next-auth";
+import { authOptions } from "./authOptions";
 import { CustomError } from "@/lib/CustomError";
-import { getServerSession } from "next-auth";
+
+export const {
+	handlers: { GET, POST },
+	auth,
+	signIn,
+	signOut,
+} = NextAuth(authOptions);
 
 export async function isAuthenticated() {
-	const session = await getServerSession(authOptions);
+	const session = await auth();
 	if (!session?.user?.id) {
 		throw new CustomError("Unauthorized");
 	}
@@ -11,7 +18,7 @@ export async function isAuthenticated() {
 }
 
 export async function isAdmin() {
-	const session = await getServerSession(authOptions);
+	const session = await auth();
 	if (!session?.user?.role || session.user.role !== "admin") {
 		throw new CustomError("Unauthorized");
 	}

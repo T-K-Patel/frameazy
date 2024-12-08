@@ -1,13 +1,12 @@
 "use server";
-
-import { getServerSession } from "next-auth";
 import { db } from "../lib/db";
 import { CustomError } from "@/lib/CustomError";
 import { ServerActionReturnType } from "@/types/serverActionReturnType";
+import { auth } from "@/lib/auth";
 
 export async function contactUsAction(state: any, formData: FormData): Promise<ServerActionReturnType<string>> {
 	try {
-		const session = await getServerSession();
+		const session = await auth();
 		const name = formData.get("name")?.toString();
 		const email = formData.get("email")?.toString();
 		const message = formData.get("message")?.toString();

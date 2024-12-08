@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState, useActionState } from "react";
 import { CartItem } from "./(components)/CartItem";
 import { Button } from "@/components/ui/button";
 import RazorpayLogo from "@/assets/Razorpay_logo.svg";
@@ -7,7 +7,7 @@ import { useSession } from "next-auth/react";
 import { getImagePlaceholder } from "@/components/imagePlaceholder";
 import { CartItemType, clearCartAction, getCartItems } from "@/serverActions/cart/cart.actions";
 import { placeOrderAction } from "@/serverActions/orders/orders.action";
-import { useFormState, useFormStatus } from "react-dom";
+import { useFormStatus } from "react-dom";
 import LoadingCart from "./(components)/LoadingCart";
 import { useRouter } from "next/navigation";
 import { getDeliveryCharge } from "@/utils/totalPrice";
@@ -36,9 +36,9 @@ function Cart() {
 	const session = useSession();
 	const [error, setError] = useState(null as string | null);
 	const [loading, setLoading] = useState(true);
-	const [clearCartState, clearCart] = useFormState(clearCartAction, null);
+	const [clearCartState, clearCart] = useActionState(clearCartAction, null);
 	const [showDialog, setShowDialog] = useState(false);
-	const [placeOrderState, placeOrder] = useFormState(placeOrderAction, null);
+	const [placeOrderState, placeOrder] = useActionState(placeOrderAction, null);
 	const addressFormRef = useRef<HTMLFormElement>(null);
 
 	const router = useRouter();

@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { isAuthenticated } from "@/utils/auth";
+import { isAuthenticated } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {

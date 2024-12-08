@@ -1,6 +1,6 @@
 import { CustomError } from "@/lib/CustomError";
 import { db } from "@/lib/db";
-import { isAdmin } from "@/utils/auth";
+import { isAdmin } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function PATCH(req: NextRequest) {

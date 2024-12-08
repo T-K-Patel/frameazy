@@ -3,13 +3,13 @@ import { ServerActionReturnType } from "@/types/serverActionReturnType";
 import { db } from "@/lib/db";
 import { CustomError } from "@/lib/CustomError";
 import { OrderStatus, CartCustomization, Address, PaymentStatus } from "@prisma/client";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import { z } from "zod";
 import { ObjectIdValidation } from "@/utils/validators";
 import { getDeliveryCharge } from "@/utils/totalPrice";
+import { auth } from "@/lib/auth";
+
 async function isAuthenticated() {
-	const session = await getServerSession(authOptions);
+	const session = await auth();
 	if (!session?.user?.id) {
 		throw new CustomError("Unauthorized");
 	}

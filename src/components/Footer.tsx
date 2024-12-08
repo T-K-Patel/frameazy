@@ -2,9 +2,9 @@
 import { BsFacebook, BsInstagram, BsTelephoneFill, BsTwitter } from "react-icons/bs";
 import { FaEnvelope, FaLocationDot } from "react-icons/fa6";
 import { Button } from "./ui/button";
-import { useFormState, useFormStatus } from "react-dom";
+import { useFormStatus } from "react-dom";
 import { subscribeNewsLetterAction } from "@/serverActions/subscribe-news-letter";
-import { useEffect, useRef } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Logo from "@/assets/frameasy-logo.png";
 import { Img } from "react-image";
@@ -26,7 +26,7 @@ const SubscribeButton = () => {
 
 const Footer = () => {
 	const formRef = useRef<HTMLFormElement>(null);
-	const [state, action] = useFormState(subscribeNewsLetterAction, null);
+	const [state, action] = useActionState(subscribeNewsLetterAction, null);
 
 	useEffect(() => {
 		if (!state) return;

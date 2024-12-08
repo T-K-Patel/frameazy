@@ -1,13 +1,12 @@
 "use server";
-import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
+import { auth } from "@/lib/auth";
 import { CustomError } from "@/lib/CustomError";
 import { db } from "@/lib/db";
 import { ServerActionReturnType } from "@/types/serverActionReturnType";
-import { getServerSession } from "next-auth";
 import { CartCustomization } from "@prisma/client";
 
 async function isAuthenticated() {
-	const session = await getServerSession(authOptions);
+	const session = await auth();
 	if (!session?.user?.id) {
 		throw new CustomError("Unauthorized");
 	}

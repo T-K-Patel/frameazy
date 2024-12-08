@@ -1,18 +1,17 @@
 "use server";
-import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
+import { auth } from "@/lib/auth";
 import { CustomError } from "@/lib/CustomError";
 import { db } from "@/lib/db";
 import { ServerActionReturnType } from "@/types/serverActionReturnType";
 import { ObjectIdValidation } from "@/utils/validators";
 import { OrderStatus, PaymentStatus } from "@prisma/client";
-import { getServerSession } from "next-auth";
 import Razorpay from "razorpay";
 
 if (!process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
 	throw new Error("Razorpay key and secret not found");
 }
 async function isAuthenticated() {
-	const session = await getServerSession(authOptions);
+	const session = await auth();
 	if (!session?.user?.id) {
 		throw new CustomError("Unauthorized");
 	}
@@ -20,7 +19,7 @@ async function isAuthenticated() {
 }
 
 async function isAuthUserAdmin() {
-	const session = await getServerSession(authOptions);
+	const session = await auth();
 	if (!session?.user?.id) {
 		throw new CustomError("Unauthorized");
 	}

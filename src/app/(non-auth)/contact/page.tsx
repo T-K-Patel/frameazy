@@ -1,10 +1,10 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import React, { useEffect, useRef } from "react";
+import React, { useActionState, useEffect, useRef } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useFormState, useFormStatus } from "react-dom";
+import { useFormStatus } from "react-dom";
 import { contactUsAction } from "@/serverActions/contact-us";
 
 const SubmitButton = () => {
@@ -19,7 +19,7 @@ const SubmitButton = () => {
 const ContactPage = () => {
 	const formRef = useRef<HTMLFormElement>(null);
 
-	const [state, action] = useFormState(contactUsAction, null);
+	const [state, action] = useActionState(contactUsAction, null);
 
 	useEffect(() => {
 		if (state?.success) {

@@ -1,10 +1,10 @@
 "use client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import React, { ChangeEvent, DragEventHandler, forwardRef, use, useEffect, useState } from "react";
+import React, { ChangeEvent, DragEventHandler, forwardRef, use, useActionState, useEffect, useState } from "react";
 import Upload from "../../../assets/upload.svg";
 import { Button } from "@/components/ui/button";
-import { useFormState, useFormStatus } from "react-dom";
+import { useFormStatus } from "react-dom";
 import { addProduct } from "@/serverActions/admin/admin.action";
 import { Img } from "react-image";
 import DropDown from "@/components/DropDown";
@@ -112,7 +112,7 @@ type AdminDashboardProps = {
 const AdminDashboard = ({ searchParams }: AdminDashboardProps) => {
 	const { frame: customizingFrame } = use(searchParams);
 	const formRef = React.useRef<HTMLFormElement>(null);
-	const [state, action] = useFormState(addProduct, null);
+	const [state, action] = useActionState(addProduct, null);
 
 	console.log(customizingFrame);
 

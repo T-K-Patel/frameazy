@@ -1,7 +1,7 @@
 import { CloudinaryStorage } from "@/lib/Cloudinary.storage";
 import { CustomError } from "@/lib/CustomError";
 import { db } from "@/lib/db";
-import { isAdmin } from "@/utils/auth";
+import { isAdmin } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest): Promise<NextResponse> {

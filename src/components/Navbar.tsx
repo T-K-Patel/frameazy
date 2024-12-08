@@ -103,9 +103,9 @@ const Navbar = () => {
 	return (
 		<header className="mx-auto max-w-screen-2xl">
 			<nav className="mx-auto flex h-[100px] w-11/12 items-center justify-between">
-				<a href="/">
+				<Link href="/">
 					<Img src={Logo.src} alt="logo" loading="eager" />
-				</a>
+				</Link>
 				<ul className="hidden gap-5 md:flex">
 					{links.map((link, ind) => (
 						<li
