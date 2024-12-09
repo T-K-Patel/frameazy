@@ -59,7 +59,7 @@ function Item({ item, isPopularItem }: { item: FrameDataType | PopularFrameDataT
 							{item.collection}{" "}
 						</p>
 					)}
-					{/* TODO: Display varients of frame */}
+					{/* TODO: Display variants of frame */}
 					{/* <p className="md:text-md mb-2 text-sm md:mb-5">
                         <b>Price per inch: </b>₹ {(item.unit_price / 100).toFixed(2)}
                     </p> */}
@@ -74,7 +74,7 @@ function Item({ item, isPopularItem }: { item: FrameDataType | PopularFrameDataT
 							// 			// borderWidth: item.borderWidth,
 							// 			// unit_price: item.unit_price,
 							// 			unit_price: 0,
-							// 			borderWidth: 1, //TODO: remove this line  and make varient selection here
+							// 			borderWidth: 1, //TODO: remove this line  and make variant selection here
 							// 			id: item.id,
 							// 			name: item.name,
 							// 		});

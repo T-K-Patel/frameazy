@@ -41,7 +41,7 @@ const Footer = () => {
 
 	const pathname = usePathname();
 	if (pathname == "/auth/login") return null;
-	if (pathname.startsWith("/admin")) return null;
+	if (pathname.startsWith("/admin") || pathname.startsWith("/customize")) return null;
 
 	return (
 		<footer className="mx-auto max-w-screen-2xl">

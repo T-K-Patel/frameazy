@@ -1,29 +1,24 @@
 "use client";
 import DropDown, { FrameDropdown } from "@/components/DropDown";
 import { Input } from "@/components/ui/input";
-import React, { useEffect, useState } from "react";
+import React, { use, useMemo, useState } from "react";
 import InputField from "../InputField";
-import { BiX } from "react-icons/bi";
 import FrameCanvas from "../FrameCanvas";
 import { IoCloseSharp } from "react-icons/io5";
 import useDebounce from "@/lib/useDebounce";
-import { CartCustomization, CustomizationType, Glazing } from "@prisma/client";
-import { FramesForCustomizationType, getFramesForCustomizatinAction } from "@/serverActions/frames/frame.action";
-import { addCartItemAction } from "@/serverActions/cart/addCartItem.action";
 import AddToCartDialog from "../AddToCartDialog";
-import { useRouter } from "next/navigation";
-import { calculateTotalPrice } from "@/utils/totalPrice";
+import { unstable_calculateTotalPrice } from "@/utils/totalPrice";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Img } from "@/components/Img";
-
-type CustomizeOptionsProps = {
-	title: string;
-	items: string[];
-};
+import { EMPTY_FRAME_FOR_CANVAS_OR_PANEL, EMPTY_FRAME_FOR_PAPER_ITEMS } from "@/contants/customizations";
+import { useFrames } from "../_hooks/useFrames";
+import { IOptions, useOptions } from "../_hooks/useOptions";
+import { useCustomizingFrame } from "../_hooks/useCustomizingFrame";
+import { VariantSelector } from "../VarientSelector";
+import { toast } from "react-toastify";
 
 type emptyFrameProps = {
 	dimensions: { width: number; height: number };
-	glazing?: Glazing;
+	glazing?: string;
 };
 
 type matOptionsProps = {
@@ -31,98 +26,58 @@ type matOptionsProps = {
 	color: string;
 	id: string;
 }[];
-type ContentType = { title: string; warning: string; mat: boolean; options: CustomizeOptionsProps[] };
 
-function Page() {
-	const { frameOptions, customizingFrame, setCustomizingFrame } = {
-		frameOptions: { framingStyle: "emptyFrame", data: { frameType: "canvas|panel" } },
-		customizingFrame: { id: "", borderWidth: 0, borderSrc: "", name: "", unit_price: 0 },
-		setCustomizingFrame: (a: () => void) => a,
-	};
-	const [upload, setUpload] = useState<emptyFrameProps>({
-		dimensions: { width: 12, height: 9 },
-		glazing: {
-			id: "",
-			name: "",
-			unit_price: 0,
-		},
-	});
-	const [frames, setFrames] = useState<FramesForCustomizationType[]>([]);
-	const [mat, setMat] = useState<matOptionsProps>([{ width: 0.5, color: "#ffffff", id: new Date().toString() }]);
-	const debouncedFrame = useDebounce<emptyFrameProps>(upload, 300);
-	const debouncedMat = useDebounce<matOptionsProps>(mat, 1000);
-	const [error, setError] = useState<string | null>(null);
-	const router = useRouter();
-	const [addingToCart, setAddingToCart] = useState(false);
-	const [loading, setLoading] = useState(true);
+type TSearchParams = {
+	frameType: string | undefined;
+	frameId: string | undefined;
+};
 
-	useEffect(() => {
-		if (frameOptions.framingStyle === "emptyFrame") {
-			switch (frameOptions.data.frameType) {
-				case "canvas|panel":
-					setUpload({
-						dimensions: { width: 12, height: 9 },
-					});
-					break;
-				case "paper":
-					setUpload({
-						dimensions: { width: 12, height: 9 },
-						glazing: {
-							id: "",
-							name: "",
-							unit_price: 0,
-						},
-					});
-					break;
-			}
-		}
-		setError(null);
-	}, [frameOptions, frames]);
+function Page({ searchParams }: { searchParams: Promise<TSearchParams> }) {
+	const sp = use(searchParams);
+	const { frameType: _fT, frameId } = sp;
+	const customizeOptions =
+		_fT === EMPTY_FRAME_FOR_CANVAS_OR_PANEL ? EMPTY_FRAME_FOR_CANVAS_OR_PANEL : EMPTY_FRAME_FOR_PAPER_ITEMS;
 
-	useEffect(() => {
-		if (frameOptions.framingStyle === "emptyFrame") {
-			getFramesForCustomizatinAction()
-				.then((res) => {
-					if (res.success) {
-						setFrames(res.data);
-					}
-				})
-				.catch((err) => {
-					console.log(err);
-				})
-				.finally(() => {
-					setLoading(false);
-				});
-		}
-	}, [frameOptions]);
+	const arr: IOptions[] = useMemo(() => {
+		return customizeOptions === EMPTY_FRAME_FOR_PAPER_ITEMS ? ["glazing"] : ([] as IOptions[]);
+	}, [customizeOptions]);
 
-	if (frameOptions.framingStyle != "emptyFrame") return <></>;
-	const customizeOptions = frameOptions.data.frameType;
-	let content: ContentType = {
-		title: "Empty frame for paper items",
-		warning:
-			"Important! The opening will be cut exactly as typed. we recommend making opening smaller than art size so it does not fall through cutout",
-		mat: true,
-		options: [
-			{
-				title: "Glazing",
-				items: [],
-			},
-		],
-	};
+	const [options, gLoading] = useOptions(arr);
 
-	if (customizeOptions === "canvas|panel") {
-		content = {
+	const _content = {
+		[EMPTY_FRAME_FOR_CANVAS_OR_PANEL]: {
 			title: "Empty frame for canvas or panel",
 			warning: "Important! As shown, the frame will be cut to leave 3/8” between your subject and the floater.",
 			mat: false,
 			options: [],
-		};
-	}
+		},
+		[EMPTY_FRAME_FOR_PAPER_ITEMS]: {
+			title: "Empty frame for paper items",
+			warning:
+				"Important! The opening will be cut exactly as typed. we recommend making opening smaller than art size so it does not fall through cutout",
+			mat: true,
+			options: [
+				{
+					title: "Glazing",
+					items: options.glazing,
+				},
+			],
+		},
+	};
 
-	if (!content.mat && mat.length > 0) {
-		setMat([]);
-	}
+	const content = _content[customizeOptions];
+	const [addingToCart, setAddingToCart] = useState(false);
+	const [upload, setUpload] = useState<emptyFrameProps>({
+		dimensions: { width: 12, height: 9 },
+	});
+
+	const [frames, loading] = useFrames();
+	const { customizingFrame, setCustomizingFrame, selectedvariant, selectVariant, selectedvariantInd } =
+		useCustomizingFrame(frames, frameId);
+
+	const [mat, setMat] = useState<matOptionsProps>(content.mat ? [{ width: 0.5, color: "#ffffff", id: "1" }] : []);
+	const debouncedFrame = useDebounce<emptyFrameProps>(upload, 300);
+	const debouncedMat = useDebounce<matOptionsProps>(mat, 1000);
 
 	const totalSize = debouncedMat.reduce(
 		(acc, m) => {
@@ -131,66 +86,41 @@ function Page() {
 			return { ...acc };
 		},
 		{
-			width: debouncedFrame.dimensions.width + 2 * (customizingFrame?.borderWidth || 0),
-			height: debouncedFrame.dimensions.height + 2 * (customizingFrame?.borderWidth || 0),
+			width: debouncedFrame.dimensions.width + 2 * (selectedvariant?.borderWidth || 0),
+			height: debouncedFrame.dimensions.height + 2 * (selectedvariant?.borderWidth || 0),
 		},
 	);
 
-	let custType: CustomizationType = "EmptyForCanvas";
-	switch (frameOptions.data.frameType) {
-		case "canvas|panel":
-			custType = "EmptyForCanvas";
-			break;
-		case "paper":
-			custType = "EmptyForPaper";
-			break;
-	}
-	const data: Omit<CartCustomization, "id"> = {
-		type: custType,
-		width: totalSize.width,
-		height: totalSize.height,
-		mirror: "",
-		printing: "",
-		stretching: "",
-		backing: "",
-		sides: "",
-		image: "",
-		glazing: upload.glazing?.name || "",
-		mat: mat.map((m) => ({ color: m.color, width: m.width })),
-	};
 	const price =
-		calculateTotalPrice(data, {
-			unit_price: customizingFrame?.unit_price || 0,
-			borderWidth: customizingFrame?.borderWidth || 0,
+		unstable_calculateTotalPrice({
+			frame: { unit_price: selectedvariant.unit_price, borderWidth: selectedvariant.borderWidth },
+			height: totalSize.height,
+			width: totalSize.width,
+			mat: mat,
+			glazingRate:
+				customizeOptions === EMPTY_FRAME_FOR_PAPER_ITEMS
+					? options.glazing.find((g) => g.name === upload.glazing)?.unit_price
+					: 0,
 		}) / 100;
+
 	const addToCart = (qty: number) => {
-		if (!data.glazing && customizeOptions === "paper") {
-			setError("Please select a glazing option");
+		if (!upload?.glazing && customizeOptions === EMPTY_FRAME_FOR_PAPER_ITEMS) {
+			toast.error("Please select a glazing option");
 			return;
 		}
 
 		if (customizingFrame && !customizingFrame.id) {
-			setError("Please select a frame");
+			toast.error("Please select a frame");
 			return;
 		}
 
 		setAddingToCart(true);
-		addCartItemAction(data, {
-			frameId: customizingFrame ? customizingFrame.id : "",
-			qty,
-		})
-			.then((data) => {
-				if (data.success) {
-					console.log("Added to cart");
-					router.push("/cart");
-				} else {
-					setError(data.error);
-				}
-			})
-			.catch((error) => {
-				console.log(error);
-				setError("Something went wrong");
-			});
+		// TODO: Extract add to cart logic to a separate function
+		setTimeout(() => {
+			setAddingToCart(false);
+			console.log(qty);
+			toast.success("Added to cart");
+		}, 2000);
 	};
 
 	return (
@@ -201,8 +131,8 @@ function Page() {
 				frameBorder={
 					customizingFrame
 						? {
-								borderWidth: customizingFrame.borderWidth || 0,
-								src: customizingFrame.borderSrc || "",
+								borderWidth: selectedvariant.borderWidth,
+								src: customizingFrame.borderSrc,
 							}
 						: undefined
 				}
@@ -211,7 +141,7 @@ function Page() {
 				<h1 className="leading-auto text-3xl font-semibold">{content.title}</h1>
 				<div className="mb-3 flex flex-col gap-y-5">
 					<div className="flex gap-3 rounded-lg bg-yellow-300 p-3 px-5">
-						<BiX className="flex-shrink-0" />
+						{/* <BiX className="flex-shrink-0" /> */}
 						<p className="text-justify">{content.warning}</p>
 					</div>
 					<div className="flex flex-col gap-y-8">
@@ -339,73 +269,50 @@ function Page() {
 										<Skeleton className="h-8 rounded-xl md:h-24" />
 									) : (
 										<FrameDropdown
-											items={frames.map((frame) => {
-												return {
-													value: frame.id,
-													label: (
-														<div className="flex gap-3" key={frame.name}>
-															<Img
-																src={frame.borderSrc}
-																width={100}
-																height={50}
-																alt="frame"
-																className="max-w-28 object-cover"
-															/>
-															<div>
-																<p>{frame.name}</p>
-																<p>
-																	<small>
-																		Price per inch: {(100 / 100).toFixed(2)}{" "}
-																		<strong>&#8377;</strong>
-																	</small>
-																</p>
-																<p>
-																	<small>
-																		Border Thickness: {1} <strong>In</strong>
-																	</small>
-																</p>
-															</div>
-														</div>
-													),
-												};
-											})}
+											items={frames}
 											value={
 												customizingFrame || {
 													id: "",
 													borderSrc: "",
 													name: "",
-													unit_price: 0,
-													borderWidth: 0,
+													variants: [],
 												}
 											}
-											onChange={(frameId: string) => {
-												const selectedFrame = frames.find((frame) => frame.id === frameId);
-												setCustomizingFrame(() => ({
-													id: frameId,
-													// borderWidth: selectedFrame?.borderWidth || 0,
-													borderSrc: selectedFrame?.borderSrc || "",
-													name: selectedFrame?.name || "",
-													// unit_price: selectedFrame?.unit_price || 0,
-													borderWidth: 1,
-													unit_price: 100,
-												}));
-											}}
+											onChangeAction={setCustomizingFrame}
 										/>
 									)
 								}
 							/>
-							{content.title === "Empty frame for paper items" && (
+							{customizingFrame?.variants.length ? (
+								<InputField
+									label={<strong>Frame Variant</strong>}
+									field={
+										<VariantSelector
+											selectedVariant={selectedvariantInd}
+											variants={customizingFrame?.variants || []}
+											onSelect={selectVariant}
+										/>
+									}
+								/>
+							) : (
+								<></>
+							)}
+							{customizeOptions === EMPTY_FRAME_FOR_PAPER_ITEMS && (
 								<>
 									<InputField
 										label={<strong>Glazing</strong>}
 										field={
-											<DropDown
-												value={upload.glazing?.name || ""}
-												onChange={(status: Glazing) => {
-													setUpload({ ...upload, glazing: status });
-												}}
-												items={content.options[0].items}
-											/>
+											gLoading ? (
+												<Skeleton className="h-8 rounded-xl md:h-24" />
+											) : (
+												<DropDown
+													value={upload.glazing || ""}
+													onChange={(status: string) => {
+														setUpload({ ...upload, glazing: status });
+													}}
+													items={content.options[0].items.map((item) => item.name)}
+												/>
+											)
 										}
 									/>
 								</>
@@ -422,20 +329,18 @@ function Page() {
 							}
 						/>
 					</div>
-					{error && (
-						<div className="flex flex-col gap-y-2">
-							<p className="text-red-500">{error}</p>
-						</div>
-					)}
 					<div className="grid items-center gap-4 md:grid-cols-2">
 						<div className="grid justify-between max-md:grid-cols-3 md:flex">
 							<span>
 								<strong>Price</strong>
 							</span>
-							<span className="text-2xl font-bold max-md:col-span-2">₹ {price.toFixed(2)}</span>
+							<span className="text-2xl font-bold max-md:col-span-2">
+								₹ {price > 0 ? price.toFixed(2) : "--"}
+							</span>
 						</div>
-						<div></div>
-						<AddToCartDialog addToCart={addToCart} addingToCart={addingToCart} />
+						<div>
+							<AddToCartDialog addToCart={addToCart} addingToCart={addingToCart} />
+						</div>
 					</div>
 				</div>
 			</div>

@@ -1,8 +1,8 @@
 "use client";
-import { redirect } from "next/navigation";
 import React from "react";
 import CNavBar from "./CNavBar";
 import { useSession } from "next-auth/react";
+import { redirect } from "next/navigation";
 
 function Layout({ children }: { children: React.ReactNode }) {
 	const session = useSession();

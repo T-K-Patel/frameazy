@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import React from "react";
 import { Label } from "@radix-ui/react-label";
@@ -16,7 +16,7 @@ function AddToCartDialog({ addToCart, addingToCart }: { addToCart: (qty: number)
 			</DialogTrigger>
 			<DialogContent className="flex w-fit flex-col gap-4 pt-3">
 				<DialogHeader>
-					<h1 className="me-4 text-xl font-bold">Enter quantity to proceed</h1>
+					<DialogTitle className="text-xl">Enter Quantity to proceed</DialogTitle>
 				</DialogHeader>
 				<div className="grid gap-2">
 					<Label className="font-semibold">Quantity</Label>

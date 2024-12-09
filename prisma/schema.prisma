@@ -77,7 +77,7 @@ model Authenticator {
 }
 
 // Custom Models
-type FrameVarients {
+type Framevariants {
   borderWidth Float
   unit_price  Int
 }
@@ -90,7 +90,7 @@ model Frame {
   category      String
   color         String
   collection    String
-  varients      FrameVarients[]
+  variants      Framevariants[]
   categoryRef   Category        @relation(fields: [category], references: [name])
   colorRef      Color           @relation(fields: [color], references: [name])
   collectionRef Collection      @relation(fields: [collection], references: [name])

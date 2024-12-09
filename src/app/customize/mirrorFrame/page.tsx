@@ -1,60 +1,48 @@
 "use client";
 import DropDown, { FrameDropdown } from "@/components/DropDown";
 import { Input } from "@/components/ui/input";
-import React, { useState, useEffect } from "react";
+import React, { useState, use } from "react";
 import InputField from "../InputField";
 import FrameCanvas from "../FrameCanvas";
-import { CartCustomization, Mirror } from "@prisma/client";
-import { getFramesForCustomizatinAction, FramesForCustomizationType } from "@/serverActions/frames/frame.action";
-import { addCartItemAction } from "@/serverActions/cart/addCartItem.action";
+import { CartCustomization } from "@prisma/client";
 import AddToCartDialog from "../AddToCartDialog";
-import { useRouter } from "next/navigation";
-import { calculateTotalPrice } from "@/utils/totalPrice";
+import { unstable_calculateTotalPrice } from "@/utils/totalPrice";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Img } from "@/components/Img";
-
-const MirrorOptions: string[] = [];
+import { useFrames } from "../_hooks/useFrames";
+import { toast } from "react-toastify";
+import { useCustomizingFrame } from "../_hooks/useCustomizingFrame";
+import { useOptions } from "../_hooks/useOptions";
+import { VariantSelector } from "../VarientSelector";
 
 type MirrorOptions = {
 	dimensions: { width: number; height: number };
-	mirrorType: Mirror;
+	mirrorType: {
+		name: string;
+		unit_price: number;
+	};
 };
-const Page = () => {
+
+type TSearchParams = {
+	frameId: string | undefined;
+};
+
+function Page({ searchParams }: { searchParams: Promise<TSearchParams> }) {
+	const sP = use(searchParams);
+	const { frameId } = sP;
 	const [mirror, setMirror] = useState<MirrorOptions>({
 		dimensions: { width: 12, height: 9 },
 		mirrorType: {
-			id: "",
 			name: "",
 			unit_price: 0,
 		},
 	});
-	const { frameOptions, customizingFrame, setCustomizingFrame } = {
-		frameOptions: { framingStyle: "mirrorFrame" },
-		customizingFrame: { id: "", borderWidth: 0, borderSrc: "", name: "", unit_price: 0 },
-		setCustomizingFrame: (a: () => void) => a,
-	};
-	const [frames, setFrames] = useState<FramesForCustomizationType[]>([]);
-	const [error, setError] = useState<string | null>(null);
-	const router = useRouter();
+	const [frames, loading] = useFrames();
+	const { customizingFrame, setCustomizingFrame, selectedvariant, selectVariant, selectedvariantInd } =
+		useCustomizingFrame(frames, frameId);
 	const [addingToCart, setAddingToCart] = useState(false);
-	const [loading, setLoading] = useState(true);
 
-	useEffect(() => {
-		if (frameOptions.framingStyle == "mirrorFrame") {
-			getFramesForCustomizatinAction()
-				.then((data) => {
-					if (data.success) setFrames(data.data);
-				})
-				.catch((e) => {
-					console.error(e);
-				})
-				.finally(() => {
-					setLoading(false);
-				});
-		}
-	}, [frameOptions]);
+	const [{ mirror: MirrorOptions }, mLoading] = useOptions(["mirror"]);
 
-	if (frameOptions.framingStyle != "mirrorFrame") return <></>;
 	const data: Omit<CartCustomization, "id"> = {
 		type: "FramedMirror",
 		width: mirror.dimensions.width,
@@ -69,33 +57,25 @@ const Page = () => {
 		mat: [],
 	};
 	const price =
-		calculateTotalPrice(data, {
-			unit_price: customizingFrame?.unit_price || 0,
-			borderWidth: customizingFrame?.borderWidth || 0,
+		unstable_calculateTotalPrice({
+			height: data.height,
+			width: data.width,
+			frame: selectedvariant,
+			mirrorRate: mirror.mirrorType.unit_price,
 		}) / 100;
+
 	const addToCart = (qty: number) => {
 		if (!data.mirror) {
-			setError("Please select mirror type");
+			toast.error("Please select mirror type");
 			return;
 		}
-
 		setAddingToCart(true);
-		addCartItemAction(data, {
-			frameId: customizingFrame ? customizingFrame.id : "",
-			qty,
-		})
-			.then((data) => {
-				if (data.success) {
-					console.log("Added to cart");
-					router.push("/cart");
-				} else {
-					setError(data.error);
-				}
-			})
-			.catch((error) => {
-				console.log(error);
-				setError("Something went wrong");
-			});
+		// TODO: Extract this to a  separate function
+		setTimeout(() => {
+			setAddingToCart(false);
+			console.log(qty);
+			toast.success("Added to cart");
+		}, 2000);
 	};
 
 	return (
@@ -106,7 +86,7 @@ const Page = () => {
 					frameBorder={
 						customizingFrame
 							? {
-									borderWidth: customizingFrame.borderWidth || 0,
+									borderWidth: selectedvariant.borderWidth || 0,
 									src: customizingFrame.borderSrc || "",
 								}
 							: undefined
@@ -122,7 +102,7 @@ const Page = () => {
 									<div className="flex items-center gap-4">
 										<Input
 											type="number"
-											min={(customizingFrame?.borderWidth || 1 / 3) * 3}
+											min={(selectedvariant.borderWidth || 1 / 3) * 3}
 											step={1}
 											className="w-20 border border-gray-2 p-3 px-2 text-center"
 											placeholder="0"
@@ -140,7 +120,7 @@ const Page = () => {
 										<p>X</p>
 										<Input
 											type="number"
-											min={(customizingFrame?.borderWidth || 1 / 3) * 3}
+											min={(selectedvariant.borderWidth || 1 / 3) * 3}
 											step={1}
 											className="w-20 border border-gray-2 p-3 px-2 text-center"
 											placeholder="0"
@@ -166,84 +146,63 @@ const Page = () => {
 										<Skeleton className="h-8 rounded-xl md:h-24" />
 									) : (
 										<FrameDropdown
-											items={frames.map((frame) => {
-												return {
-													value: frame.id,
-													label: (
-														<div className="flex gap-3" key={frame.name}>
-															<Img
-																src={frame.borderSrc}
-																width={100}
-																height={50}
-																alt="frame"
-																className="max-w-28 object-cover"
-															/>
-															<div>
-																<p>{frame.name}</p>
-																<p>
-																	<small>
-																		{/* Price per inch: {frame.unit_price / 100}{" "} */}
-																		<strong>&#8377;</strong>
-																	</small>
-																</p>
-																<p>
-																	<small>
-																		{/* Border Thickness: {frame.borderWidth}{" "} */}
-																		<strong>In</strong>
-																	</small>
-																</p>
-															</div>
-														</div>
-													),
-												};
-											})}
+											items={frames}
 											value={
 												customizingFrame || {
 													id: "",
-													borderSrc: "",
 													name: "",
-													unit_price: 0,
-													borderWidth: 0,
+													borderSrc: "",
+													variants: [],
 												}
 											}
-											onChange={(frameId: string) => {
-												const selectedFrame = frames.find((frame) => frame.id === frameId);
-												setCustomizingFrame(() => ({
-													id: frameId,
-													unit_price: 0, // TODO: account for varients
-													borderWidth: 0,
-													borderSrc: selectedFrame?.borderSrc || "",
-													name: selectedFrame?.name || "",
-												}));
-											}}
+											onChangeAction={setCustomizingFrame}
 										/>
 									)
 								}
 							/>
+							{customizingFrame?.variants.length ? (
+								<InputField
+									label={<strong>Frame Variant</strong>}
+									field={
+										<VariantSelector
+											selectedVariant={selectedvariantInd}
+											variants={customizingFrame?.variants || []}
+											onSelect={selectVariant}
+										/>
+									}
+								/>
+							) : (
+								<></>
+							)}
 							<InputField
 								label={<strong>Mirror type</strong>}
 								field={
-									<DropDown
-										value={mirror.mirrorType.name}
-										onChange={(status: Mirror) => {
-											setMirror({ ...mirror, mirrorType: status });
-										}}
-										items={MirrorOptions}
-									/>
+									mLoading ? (
+										<Skeleton className="h-8 rounded-xl" />
+									) : (
+										<DropDown
+											value={mirror.mirrorType.name}
+											onChange={(status: string) => {
+												const mirrorType = MirrorOptions.find((m) => m.name === status) || {
+													name: "",
+													unit_price: 0,
+												};
+												setMirror({ ...mirror, mirrorType });
+											}}
+											items={MirrorOptions.map((m) => m.name)}
+										/>
+									)
 								}
 							/>
 						</div>
-						{error && (
-							<div className="flex flex-col gap-y-2">
-								<p className="text-red-500">{error}</p>
-							</div>
-						)}
 						<div className="grid items-center gap-4 md:grid-cols-2">
 							<div className="grid justify-between max-md:grid-cols-3 md:flex">
 								<span>
 									<strong>Price</strong>
 								</span>
-								<span className="text-2xl font-bold max-md:col-span-2">(₹){price.toFixed(2)}</span>
+								<span className="text-2xl font-bold max-md:col-span-2">
+									₹ {price > 0 ? price.toFixed(2) : "--"}
+								</span>
 							</div>
 							<div>
 								<AddToCartDialog addToCart={addToCart} addingToCart={addingToCart} />
@@ -254,6 +213,6 @@ const Page = () => {
 			</div>
 		</>
 	);
-};
+}
 
 export default Page;

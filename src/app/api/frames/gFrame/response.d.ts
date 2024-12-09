@@ -1,7 +1,7 @@
 export type FrameDataType = {
 	id: string;
 	name: string;
-	varients: {
+	variants: {
 		borderWidth: number;
 		unit_price: number;
 	}[];

@@ -193,9 +193,9 @@ export async function addCartItemAction(
 				(
 					await db.frame.findFirst({
 						where: { id: frameId },
-						select: { varients: true },
+						select: { variants: true },
 					})
-				)?.varients[0] || undefined;
+				)?.variants[0] || undefined;
 			if (frame === null) {
 				throw new CustomError("Invalid frame id");
 			}

@@ -9,7 +9,7 @@ export async function GET(): Promise<NextResponse<FramesForCustomizationType[] |
 				id: true,
 				name: true,
 				borderSrc: true,
-				varients: true,
+				variants: true,
 			},
 		});
 

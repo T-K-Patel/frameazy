@@ -31,7 +31,7 @@ export async function GET(): Promise<NextResponse<PopularFrameDataType[] | { suc
 			select: {
 				id: true,
 				name: true,
-				varients: true,
+				variants: true,
 				image: true,
 			},
 		});
@@ -48,7 +48,7 @@ export async function GET(): Promise<NextResponse<PopularFrameDataType[] | { suc
 				select: {
 					id: true,
 					name: true,
-					varients: true,
+					variants: true,
 					image: true,
 				},
 			});

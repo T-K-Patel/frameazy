@@ -14,7 +14,7 @@ export type FramesFilterType = {
 export type PopularFrameDataType = {
 	id: string;
 	name: string;
-	varients: {
+	variants: {
 		borderWidth: number;
 		unit_price: number;
 	}[];
@@ -94,7 +94,7 @@ export async function getFramesAction(
 				category: true,
 				image: true,
 				borderSrc: true,
-				varients: true,
+				variants: true,
 			},
 			skip: page * 18,
 			take: 18,
@@ -124,7 +124,7 @@ export type FramesForCustomizationType = {
 	id: string;
 	name: string;
 	borderSrc: string;
-	varients: {
+	variants: {
 		borderWidth: number;
 		unit_price: number;
 	}[];
@@ -138,7 +138,7 @@ export async function getFramesForCustomizatinAction(): Promise<ServerActionRetu
 				id: true,
 				name: true,
 				borderSrc: true,
-				varients: true,
+				variants: true,
 			},
 		});
 
@@ -182,7 +182,7 @@ export async function getPopularFramesAction(): Promise<ServerActionReturnType<P
 			select: {
 				id: true,
 				name: true,
-				varients: true,
+				variants: true,
 				image: true,
 			},
 		});
@@ -199,7 +199,7 @@ export async function getPopularFramesAction(): Promise<ServerActionReturnType<P
 				select: {
 					id: true,
 					name: true,
-					varients: true,
+					variants: true,
 					image: true,
 				},
 			});

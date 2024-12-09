@@ -44,7 +44,7 @@ export async function GET(
 				category: true,
 				image: true,
 				borderSrc: true,
-				varients: true,
+				variants: true,
 			},
 			skip: page * FRAMES_PER_PAGE,
 			take: FRAMES_PER_PAGE,
