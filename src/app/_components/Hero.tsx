@@ -1,10 +1,13 @@
+"use client";
 import React from "react";
 import heroImage from "@/assets/Hero.jpg";
 import { Button } from "@/components/ui/button";
 import { BsArrowRight } from "react-icons/bs";
 import Image from "next/image";
+import { useDialog } from "@/context/DialogContext";
 
 function Hero() {
+	const { openDialog } = useDialog();
 	return (
 		<>
 			<section className="bg-blue-1">
@@ -24,6 +27,7 @@ function Hero() {
 						<Button
 							size={"sm"}
 							variant={"secondary"}
+							onClick={() => openDialog()}
 							className="mt-8 h-min w-min px-8 py-4 text-xl font-semibold text-black transition-all duration-200 active:scale-90"
 						>
 							Start Framing&nbsp;

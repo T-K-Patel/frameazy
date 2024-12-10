@@ -1,8 +1,7 @@
 "use client";
-import React from "react";
+import { FramesForCustomizationType } from "@/app/api/frames/forCustomization/response";
 import { Img } from "@/components/Img";
 import Select, { StylesConfig } from "react-select";
-import { FramesForCustomizationType } from "@/app/api/frames/forCustomization/response";
 
 const DropDown = ({ items, value, onChange }: { items: string[]; value: string; onChange: any }) => {
 	const options = items.map((item) => {
@@ -32,7 +31,8 @@ const DropDown = ({ items, value, onChange }: { items: string[]; value: string; 
 			options={options}
 			value={{
 				value,
-				label: !value || value == "" ? "--Select option--" : value,
+				label:
+					!value || value == "" ? (items.length > 0 ? "--Select option--" : "No Options available") : value,
 			}}
 		/>
 	);
@@ -74,7 +74,7 @@ export const FrameDropdown = ({
 						width={500}
 						height={150}
 						alt="frame"
-						className="max-h-16 max-w-36 object-fill"
+						className="max-h-16 max-w-32 object-fill"
 					/>
 					<div className="my-auto">
 						<p>{item.name}</p>
@@ -113,19 +113,8 @@ export const FrameDropdown = ({
 								<p>
 									<strong>{value.name}</strong>
 								</p>
-								{/* <p>
-									<small>
-										<>Inch Price</>: {(value.unit_price / 100).toFixed(2)} <strong>&#8377;</strong>
-									</small>
-								</p>
-								<p>
-									<small>
-										<>Border Thickness</>: {value.borderWidth} <strong>In</strong>
-									</small>
-								</p> */}
 							</div>
 						</div>
-						{/* {value.borderSrc} */}
 					</>
 				) : (
 					"--Select option--"

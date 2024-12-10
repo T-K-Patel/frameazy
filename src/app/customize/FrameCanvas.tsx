@@ -250,7 +250,7 @@ const FrameCanvas = ({ image, totalSize, frameBorder, matOptions }: FrameCanvasP
 
 	return (
 		<>
-			<Canvas className="my-auto- mx-auto w-full max-w-[600px]" draw={draw} />
+			<Canvas className="mx-auto w-full max-w-[600px]" draw={draw} />
 		</>
 	);
 };

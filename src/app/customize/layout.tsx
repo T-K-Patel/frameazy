@@ -7,7 +7,9 @@ import { redirect } from "next/navigation";
 function Layout({ children }: { children: React.ReactNode }) {
 	const session = useSession();
 	if (session.status == "unauthenticated") {
-		redirect("/auth/login");
+		const url = window.location.pathname + window.location.search;
+		const next = encodeURIComponent(url);
+		redirect("/auth/login?next=" + next);
 	}
 	return (
 		<>

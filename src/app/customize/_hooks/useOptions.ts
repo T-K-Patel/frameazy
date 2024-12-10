@@ -26,10 +26,10 @@ export function useOptions(name: IOptions[]) {
 		sides: [],
 	});
 	const [loading, setLoading] = useState(true);
+	const query = name.map((n) => `${n}=true`).join("&");
 
 	useEffect(() => {
-		if (name.length > 0) {
-			const query = name.map((n) => `${n}=true`).join("&");
+		if (query) {
 			fetch(`/api/options/customizationOptions?${query}`)
 				.then((res) => res.json())
 				.then((data) => {
@@ -44,7 +44,7 @@ export function useOptions(name: IOptions[]) {
 		} else {
 			setLoading(false);
 		}
-	}, [name]);
+	}, [query]);
 
 	return [options, loading] as [TOptions, boolean];
 }

@@ -1,26 +1,29 @@
 "use client";
 import DropDown, { FrameDropdown } from "@/components/DropDown";
+import { getImagePlaceholder } from "@/components/imagePlaceholder";
 import { Input } from "@/components/ui/input";
-import React, { use, useEffect, useState } from "react";
-import InputField from "../InputField";
-import FrameCanvas from "../FrameCanvas";
-import { IoCloseSharp } from "react-icons/io5";
-import { Glazing, Printing, Backing, Stretching, Sides, CartCustomization } from "@prisma/client";
-import { FramesForCustomizationType } from "@/serverActions/frames/frame.action";
-import AddToCartDialog from "../AddToCartDialog";
-import { unstable_calculateTotalPrice } from "@/utils/totalPrice";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useFrames } from "../_hooks/useFrames";
-import { useCustomizingFrame } from "../_hooks/useCustomizingFrame";
 import {
+	INDEXED_DB_UAF_DATA_KEY,
 	UPLOAD_AND_FRAME_PRINT_ONLY,
 	UPLOAD_AND_FRAME_STRECTCHED_CANVAS_PRINT,
 	UPLOAD_AND_FRAME_WITH_MAT_AND_GLAZING,
 	UPLOAD_AND_FRAME_WITHOUT_MAT_AND_GLAZING,
 } from "@/contants/customizations";
-import { IOptions, useOptions } from "../_hooks/useOptions";
+import { FramesForCustomizationType } from "@/serverActions/frames/frame.action";
+import { unstable_calculateTotalPrice } from "@/utils/totalPrice";
+import { redirect } from "next/navigation";
+import { use, useEffect, useState } from "react";
+import { IoCloseSharp } from "react-icons/io5";
 import { toast } from "react-toastify";
+import AddToCartDialog from "../AddToCartDialog";
+import FrameCanvas from "../FrameCanvas";
+import InputField from "../InputField";
 import { VariantSelector } from "../VarientSelector";
+import { useCustomizingFrame } from "../_hooks/useCustomizingFrame";
+import { useFrames } from "../_hooks/useFrames";
+import useIndexedDBObjectStorage from "../_hooks/useIndexedDBObjectStorage";
+import { IOptions, useOptions } from "../_hooks/useOptions";
 
 type CustomizeOptionsProps =
 	| {
@@ -34,11 +37,11 @@ type CustomizeOptionsProps =
 
 type uploadOptionsProps = {
 	dimensions: { width: number; height: number };
-	glazing?: Glazing;
-	printing: Printing;
-	backing?: Backing;
-	stretching?: Stretching;
-	sides?: Sides;
+	glazing?: { name: string; unit_price: number };
+	printing: { name: string; unit_price: number };
+	backing?: { name: string; unit_price: number };
+	stretching?: { name: string; unit_price: number };
+	sides?: { name: string; unit_price: number };
 };
 
 type matOptionsProps = {
@@ -52,10 +55,6 @@ type ContentType = { title: string; mat: boolean; options: CustomizeOptionsProps
 type TSearchParams = {
 	frameId: string | undefined;
 	frameType: string | undefined;
-	w: number | undefined;
-	h: number | undefined;
-	ci: string | undefined;
-	ext: string | undefined;
 };
 
 type TFrameType =
@@ -66,7 +65,7 @@ type TFrameType =
 
 function Page({ searchParams }: { searchParams: Promise<TSearchParams> }) {
 	const sP = use(searchParams);
-	const { frameId, frameType: _fT, w, h, ci, ext } = sP;
+	const { frameId, frameType: _fT } = sP;
 	const frameType: TFrameType = [
 		UPLOAD_AND_FRAME_PRINT_ONLY,
 		UPLOAD_AND_FRAME_STRECTCHED_CANVAS_PRINT,
@@ -75,104 +74,28 @@ function Page({ searchParams }: { searchParams: Promise<TSearchParams> }) {
 	].includes(_fT || "")
 		? (_fT as TFrameType)
 		: UPLOAD_AND_FRAME_PRINT_ONLY;
-	const width = Number(w) > 0 ? Number(w) : 0;
-	const height = Number(h) > 0 ? Number(h) : 0;
-	const croppedImage = ci;
-	const usingExternalImage = ext === "true";
-	console.log(usingExternalImage);
+	const { retrieveObject, storedObject, initialized } = useIndexedDBObjectStorage();
 
-	const [upload, setUpload] = useState<uploadOptionsProps>({
-		dimensions: { width: 0, height: 0 },
-		printing: {
-			id: "",
-			name: "",
-			unit_price: 0,
-		},
-	});
-
-	const [frames, fLoading] = useFrames(
-		frameType === UPLOAD_AND_FRAME_PRINT_ONLY || frameType === UPLOAD_AND_FRAME_STRECTCHED_CANVAS_PRINT,
-	);
-	const { customizingFrame, setCustomizingFrame, selectVariant, selectedvariant, selectedvariantInd } =
-		useCustomizingFrame(frames, frameId);
-	const [mat, setMat] = useState<matOptionsProps>([{ width: 0.75, color: "#ffffff", id: "1" }]);
-
-	const [addingToCart, setAddingToCart] = useState(false);
+	const croppedImage = storedObject?.isExt ? storedObject.src : storedObject?.image || getImagePlaceholder();
+	const width = storedObject?.width || 12;
+	const height = storedObject?.height || 9;
 
 	useEffect(() => {
-		switch (frameType) {
-			case UPLOAD_AND_FRAME_PRINT_ONLY:
-				setUpload({
-					dimensions: { width, height },
-					printing: {
-						id: "",
-						name: "",
-						unit_price: 0,
-					},
+		if (initialized) {
+			retrieveObject(INDEXED_DB_UAF_DATA_KEY)
+				.then((res) => {
+					if (!res) {
+						toast.error("Select an image to customize before proceeding");
+						redirect("/");
+					}
+				})
+				.catch((e) => {
+					console.log(e);
+					toast.error("Select an image to customize before proceeding");
+					redirect("/");
 				});
-				break;
-			case UPLOAD_AND_FRAME_STRECTCHED_CANVAS_PRINT:
-				setUpload({
-					dimensions: { width, height },
-					printing: {
-						id: "",
-						name: "",
-						unit_price: 0,
-					},
-					backing: {
-						id: "",
-						name: "",
-						unit_price: 0,
-					},
-					stretching: {
-						id: "",
-						name: "",
-						unit_price: 0,
-					},
-					sides: {
-						id: "",
-						name: "",
-						unit_price: 0,
-					},
-				});
-				break;
-			case UPLOAD_AND_FRAME_WITHOUT_MAT_AND_GLAZING:
-				setUpload({
-					dimensions: { width, height },
-					printing: {
-						id: "",
-						name: "",
-						unit_price: 0,
-					},
-					stretching: {
-						id: "",
-						name: "",
-						unit_price: 0,
-					},
-				});
-				break;
-			case UPLOAD_AND_FRAME_WITH_MAT_AND_GLAZING:
-				setUpload({
-					dimensions: { width, height },
-					glazing: {
-						id: "",
-						name: "",
-						unit_price: 0,
-					},
-					printing: {
-						id: "",
-						name: "",
-						unit_price: 0,
-					},
-					backing: {
-						id: "",
-						name: "",
-						unit_price: 0,
-					},
-				});
-				break;
 		}
-	}, [frames, frameType, width, height]);
+	}, [initialized, retrieveObject]);
 
 	const _optionsKey: IOptions[] = [];
 
@@ -192,6 +115,27 @@ function Page({ searchParams }: { searchParams: Promise<TSearchParams> }) {
 	}
 
 	const [options, oLoading] = useOptions(_optionsKey);
+
+	const [upload, setUpload] = useState<uploadOptionsProps>({
+		dimensions: { width: 0, height: 0 },
+		printing: {
+			name: "",
+			unit_price: 0,
+		},
+		glazing: _optionsKey.includes("glazing") ? { name: "", unit_price: 0 } : undefined,
+		backing: _optionsKey.includes("backing") ? { name: "", unit_price: 0 } : undefined,
+		stretching: _optionsKey.includes("stretching") ? { name: "", unit_price: 0 } : undefined,
+		sides: _optionsKey.includes("sides") ? { name: "", unit_price: 0 } : undefined,
+	});
+
+	const [frames, fLoading] = useFrames(
+		!(frameType === UPLOAD_AND_FRAME_PRINT_ONLY || frameType === UPLOAD_AND_FRAME_STRECTCHED_CANVAS_PRINT),
+	);
+	const { customizingFrame, setCustomizingFrame, selectVariant, selectedvariant, selectedvariantInd } =
+		useCustomizingFrame(frames, frameId);
+	const [mat, setMat] = useState<matOptionsProps>([{ width: 0.75, color: "#ffffff", id: "1" }]);
+
+	const [addingToCart, setAddingToCart] = useState(false);
 
 	const customizeOptions = frameType;
 	let content: ContentType = {
@@ -268,9 +212,11 @@ function Page({ searchParams }: { searchParams: Promise<TSearchParams> }) {
 		};
 	}
 
-	if (!content.mat && mat.length > 0) {
-		setMat([]);
-	}
+	useEffect(() => {
+		if (!content.mat && mat.length > 0) {
+			setMat([]);
+		}
+	}, [content.mat, mat.length]);
 
 	const totalSize = mat.reduce(
 		(acc, m) => {
@@ -283,50 +229,41 @@ function Page({ searchParams }: { searchParams: Promise<TSearchParams> }) {
 			height: height + 2 * (selectedvariant?.borderWidth || 0),
 		},
 	);
-	const data: Omit<CartCustomization, "id"> = {
-		type: frameType,
-		width: totalSize.width,
-		height: totalSize.height,
-		image: croppedImage as string,
-		mirror: "",
-		glazing: upload.glazing?.name || "",
-		printing: upload.printing?.name || "",
-		backing: upload.backing?.name || "",
-		stretching: upload.stretching?.name || "",
-		sides: upload.sides?.name || "",
-		mat: mat.map((m) => ({ color: m.color, width: m.width })),
-	};
 
 	const price =
 		unstable_calculateTotalPrice({
 			frame: selectedvariant,
-			height: height,
-			width: width,
-			// TODO: account for options rate
+			height: totalSize.height,
+			width: totalSize.width,
+			glazingRate: upload.glazing?.unit_price || 0,
+			printingRate: upload.printing.unit_price,
+			backingRate: upload.backing?.unit_price || 0,
+			stretchingRate: upload.stretching?.unit_price || 0,
+			sidesRate: upload.sides?.unit_price || 0,
 		}) / 100;
 
 	const addToCart = (qty: number) => {
-		if (!data.glazing && customizeOptions === UPLOAD_AND_FRAME_WITH_MAT_AND_GLAZING) {
+		if (!upload.glazing?.name && customizeOptions === UPLOAD_AND_FRAME_WITH_MAT_AND_GLAZING) {
 			toast.error("Please select a glazing option");
 			return;
 		}
-		if (!data.printing) {
+		if (!upload.printing?.name) {
 			toast.error("Please select a printing option");
 			return;
 		}
-		if (!data.backing && customizeOptions === UPLOAD_AND_FRAME_WITH_MAT_AND_GLAZING) {
+		if (!upload.backing?.name && customizeOptions === UPLOAD_AND_FRAME_WITH_MAT_AND_GLAZING) {
 			toast.error("Please select a backing option");
 			return;
 		}
 		if (
-			!data.stretching &&
+			!upload.stretching?.name &&
 			(customizeOptions === UPLOAD_AND_FRAME_STRECTCHED_CANVAS_PRINT ||
 				customizeOptions === UPLOAD_AND_FRAME_WITHOUT_MAT_AND_GLAZING)
 		) {
 			toast.error("Please select a stretching option");
 			return;
 		}
-		if (!data.sides && customizeOptions === UPLOAD_AND_FRAME_STRECTCHED_CANVAS_PRINT) {
+		if (!upload.sides?.name && customizeOptions === UPLOAD_AND_FRAME_STRECTCHED_CANVAS_PRINT) {
 			toast.error("Please select a sides option");
 			return;
 		}
@@ -353,7 +290,7 @@ function Page({ searchParams }: { searchParams: Promise<TSearchParams> }) {
 		<>
 			<div className="grid min-h-[calc(100vh-150px)] gap-5 pb-4 pt-10 md:grid-cols-2">
 				<FrameCanvas
-					image={{ src: croppedImage as string, ...upload.dimensions }}
+					image={{ src: croppedImage, ...upload.dimensions }}
 					matOptions={mat}
 					totalSize={totalSize}
 					frameBorder={
@@ -369,7 +306,7 @@ function Page({ searchParams }: { searchParams: Promise<TSearchParams> }) {
 					}
 				/>
 				<div className="mx-auto flex w-11/12 flex-col gap-6">
-					<h1 className="leading-auto text-3xl font-semibold">{content.title}</h1>
+					<h1 className="leading-auto text-xl font-semibold md:text-3xl">{content.title}</h1>
 					<div className="mb-3 flex flex-col gap-y-5">
 						<div className="flex flex-col gap-y-8">
 							<InputField
@@ -466,29 +403,28 @@ function Page({ searchParams }: { searchParams: Promise<TSearchParams> }) {
 							<div className="flex flex-col gap-y-5">
 								{(customizeOptions === UPLOAD_AND_FRAME_WITH_MAT_AND_GLAZING ||
 									customizeOptions == UPLOAD_AND_FRAME_WITHOUT_MAT_AND_GLAZING) && (
-									<>
-										<InputField
-											label={<strong>Frame</strong>}
-											field={
-												fLoading ? (
-													<Skeleton className="h-8 rounded-xl md:h-24" />
-												) : (
-													<FrameDropdown
-														items={frames}
-														onChangeAction={setCustomizingFrame}
-														value={
-															customizingFrame || {
-																id: "",
-																name: "",
-																borderSrc: "",
-																variants: [],
-															}
+									<InputField
+										key={customizeOptions}
+										label={<strong>Frame</strong>}
+										field={
+											fLoading ? (
+												<Skeleton className="h-8 rounded-xl md:h-24" />
+											) : (
+												<FrameDropdown
+													items={frames}
+													onChangeAction={setCustomizingFrame}
+													value={
+														customizingFrame || {
+															id: "",
+															name: "",
+															borderSrc: "",
+															variants: [],
 														}
-													/>
-												)
-											}
-										/>
-									</>
+													}
+												/>
+											)
+										}
+									/>
 								)}
 								{customizingFrame?.variants.length ? (
 									<InputField

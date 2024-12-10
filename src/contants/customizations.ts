@@ -7,3 +7,7 @@ export const UPLOAD_AND_FRAME_WITHOUT_MAT_AND_GLAZING = "ImageWithoutMatAndGlazi
 export const UPLOAD_AND_FRAME_STRECTCHED_CANVAS_PRINT = "ImageCanvasPrint";
 
 export const MIRROR_FRAME = "FramedMirror";
+
+export const INDEXED_DB_NAME = "objectDB";
+export const INDEXED_DB_STORE_NAME = "objects";
+export const INDEXED_DB_UAF_DATA_KEY = "uaf";

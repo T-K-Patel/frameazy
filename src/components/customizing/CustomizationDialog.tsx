@@ -1,20 +1,29 @@
 "use client";
-import React, { ReactNode, useEffect, useRef } from "react";
-import { Button } from "../ui/button";
-import { DialogContent, Dialog, DialogHeader } from "../ui/dialog";
-import { StaticImageData } from "next/image";
-import Upload from "@/assets/uploadImage.svg";
+import useIndexedDBObjectStorage from "@/app/customize/_hooks/useIndexedDBObjectStorage";
+import Canvas from "@/assets/canvas.svg";
 import Empty from "@/assets/empty.svg";
 import Mirror from "@/assets/mirror.svg";
-import Canvas from "@/assets/canvas.svg";
 import Paper from "@/assets/paper.svg";
-import { BiArrowBack, BiRepeat } from "react-icons/bi";
+import Upload from "@/assets/uploadImage.svg";
+import {
+	EMPTY_FRAME_FOR_CANVAS_OR_PANEL,
+	EMPTY_FRAME_FOR_PAPER_ITEMS,
+	MIRROR_FRAME,
+	UPLOAD_AND_FRAME_PRINT_ONLY,
+	UPLOAD_AND_FRAME_STRECTCHED_CANVAS_PRINT,
+	UPLOAD_AND_FRAME_WITH_MAT_AND_GLAZING,
+	UPLOAD_AND_FRAME_WITHOUT_MAT_AND_GLAZING,
+} from "@/contants/customizations";
 import { cn } from "@/lib/utils";
-import UploadImage from "./UploadImage";
+import Image, { StaticImageData } from "next/image";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
+import React, { ReactNode, useEffect, useRef, useState } from "react";
+import { BiArrowBack, BiRepeat } from "react-icons/bi";
+import { toast } from "react-toastify";
+import { Button } from "../ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import CropImage from "./CropImage";
-import { Img } from "@/components/Img";
+import UploadImage from "./UploadImage";
 
 type FrameOptionProps = {
 	title: string;
@@ -26,134 +35,196 @@ const FrameOption = ({ title, image, ...props }: FrameOptionProps) => {
 	return (
 		<button className="h-full gap-4 rounded-2xl border-2 border-[#d0d0d0] p-4 md:p-6" {...props}>
 			<p className="w-full pb-3 text-left font-bold">{title}</p>
-			<Img src={image.src} alt="canvas object-contain" />
+			<Image
+				src={image.src}
+				width={200}
+				height={200}
+				alt="frame option"
+				className="canvas h-auto w-auto object-contain"
+				unoptimized
+				style={{ position: "unset" }}
+			/>
 		</button>
 	);
 };
 
 type ContentType = { title: string; desc: string; options?: FrameOptionProps[]; component?: ReactNode };
+type TFrameType =
+	| typeof UPLOAD_AND_FRAME_PRINT_ONLY
+	| typeof UPLOAD_AND_FRAME_STRECTCHED_CANVAS_PRINT
+	| typeof UPLOAD_AND_FRAME_WITHOUT_MAT_AND_GLAZING
+	| typeof UPLOAD_AND_FRAME_WITH_MAT_AND_GLAZING
+	| typeof EMPTY_FRAME_FOR_CANVAS_OR_PANEL
+	| typeof EMPTY_FRAME_FOR_PAPER_ITEMS
+	| typeof MIRROR_FRAME;
+
+type TFraming = {
+	framingStyle: "none" | "uploadAndFrame" | "emptyFrame" | "mirrorFrame";
+	data: {
+		image?: string;
+		croppedImage?: string;
+		isExternal?: boolean;
+		width?: number;
+		height?: number;
+		frameType?: TFrameType;
+	};
+};
 
 type TCustimizationDialog = {
-	frameOptions: { framingStyle: string; data: any };
-	setFrameOptions: (options: { framingStyle: string; data?: any }) => void;
-	resetFrames: () => void;
+	frameId?: string;
 	dialogOpen: boolean;
 	setDialogOpen: (open: boolean) => void;
 };
 
-const CustomizationDialog = ({
-	frameOptions: framing,
-	setFrameOptions,
-	resetFrames,
-	dialogOpen: isOpen,
-	setDialogOpen: setIsOpen,
-}: TCustimizationDialog) => {
+const CustomizationDialog = ({ dialogOpen: isOpen, setDialogOpen: setIsOpen, frameId }: TCustimizationDialog) => {
 	const router = useRouter();
-	const session = useSession();
+	const [framing, setFrameOptions] = useState<TFraming>({
+		framingStyle: "none",
+		data: {},
+	});
+
+	const { storeObject } = useIndexedDBObjectStorage();
+
+	const resetFrames = () => {
+		setFrameOptions({ framingStyle: "none", data: {} });
+	};
 	const contentDivRef = useRef<HTMLDivElement>(null);
-	if (isOpen && session.status == "unauthenticated") {
-		router.push("/auth/login");
-		setIsOpen(false);
-	}
+
+	const generateQuery = (obj: Record<string, string | number | boolean | undefined>) => {
+		const query = new URLSearchParams();
+		Object.entries(obj).forEach(([key, value]) => {
+			if (value) query.append(key, value.toString());
+		});
+		return query.toString();
+	};
 
 	useEffect(() => {
 		// on re-render, scroll content div to top
 		contentDivRef.current?.scrollTo({ top: 0, behavior: "smooth" });
 	}, [framing]);
 
-	let onBack = () => {};
-
-	let content: ContentType = {
-		title: "Select your style of frame",
-		desc: "Welcome to frame selection, choose the style that best suits your taste and needs",
-		options: [
-			{
-				title: "Upload and frame an image",
-				image: Upload,
-				props: {
-					onClick() {
-						setFrameOptions({ framingStyle: "uploadAndFrame", data: {} });
-					},
-				},
-			},
-			{
-				title: "Order Empty Frame",
-				image: Empty,
-				props: {
-					onClick() {
-						setFrameOptions({ framingStyle: "emptyFrame", data: {} });
-					},
-				},
-			},
-			{
-				title: "Design a mirror",
-				image: Mirror,
-				props: {
-					onClick() {
-						setFrameOptions({ framingStyle: "mirrorFrame", data: {} });
-						router.push("/customize/mirrorFrame");
-						setIsOpen(false);
-					},
-				},
-			},
-		],
+	const storeToIDB = () => {
+		if (framing.data.isExternal) {
+			return storeObject("uaf", {
+				isExt: true,
+				src: framing.data.image!,
+				width: framing.data.width!,
+				height: framing.data.height!,
+			});
+		} else {
+			return storeObject("uaf", {
+				isExt: false,
+				width: framing.data.width!,
+				height: framing.data.height!,
+				image: framing.data.croppedImage!,
+			});
+		}
 	};
 
-	if (!framing) return <></>;
+	// Helper function for navigation and error handling
+	async function navigateTo(
+		route: string,
+		query: Record<string, string | boolean | number | undefined>,
+		closeModal = true,
+	) {
+		const queryString = generateQuery(query);
+		await storeToIDB()
+			.then(() => {
+				router.push(`${route}?${queryString}`);
+				if (closeModal) setIsOpen(false);
+			})
+			.catch((err) => {
+				console.error(err);
+				toast.error("Something went wrong, please try again later");
+			});
+	}
 
-	if (framing.framingStyle == "emptyFrame") {
-		content = {
+	// Helper function for updating frame options
+	function updateFrameOptions(style: typeof framing.framingStyle, data: typeof framing.data = {}) {
+		setFrameOptions((s) => ({ framingStyle: style, data: { ...s.data, ...data } }));
+	}
+
+	// Define content based on framingStyle
+	const framingStyles = {
+		none: {
+			title: "Select your style of frame",
+			desc: "Welcome to frame selection, choose the style that best suits your taste and needs",
+			options: [
+				{
+					title: "Upload and frame an image",
+					image: Upload,
+					props: { onClick: () => updateFrameOptions("uploadAndFrame") },
+				},
+				{
+					title: "Order Empty Frame",
+					image: Empty,
+					props: { onClick: () => updateFrameOptions("emptyFrame") },
+				},
+				{
+					title: "Design a mirror",
+					image: Mirror,
+					props: {
+						onClick: () => {
+							const query = generateQuery({ frameId });
+							router.push(`/customize/mirrorFrame?${query}`);
+							setIsOpen(false);
+						},
+					},
+				},
+			],
+		},
+		emptyFrame: {
 			title: "Please select the type of frame you want to create",
-			desc: "Choose the type of  empty frame your want to create",
+			desc: "Choose the type of empty frame you want to create",
 			options: [
 				{
 					title: "Empty frame for canvas or panel",
 					image: Canvas,
 					props: {
-						onClick() {
-							setFrameOptions({ framingStyle: "emptyFrame", data: { frameType: "canvas|panel" } });
-							router.push("/customize/emptyFrame");
-							setIsOpen(false);
-						},
+						onClick: () =>
+							navigateTo("/customize/emptyFrame", {
+								frameType: EMPTY_FRAME_FOR_CANVAS_OR_PANEL,
+								frameId,
+							}),
 					},
 				},
 				{
 					title: "Empty frame for paper item",
 					image: Paper,
 					props: {
-						onClick() {
-							setFrameOptions({ framingStyle: "emptyFrame", data: { frameType: "paper" } });
-							router.push("/customize/emptyFrame");
-							setIsOpen(false);
-						},
+						onClick: () =>
+							navigateTo("/customize/emptyFrame", { frameType: EMPTY_FRAME_FOR_PAPER_ITEMS, frameId }),
 					},
 				},
 			],
-		};
-		onBack = () => {
-			setFrameOptions({ framingStyle: "none" });
-		};
-	} else if (framing.framingStyle == "uploadAndFrame") {
-		if (!framing.data.image) {
-			content = {
+		},
+		uploadAndFrame: {
+			default: {
 				title: "Image of the subject",
 				desc: "Please select the image file to be uploaded",
-				component: <UploadImage />,
-			};
-			onBack = () => {
-				setFrameOptions({ framingStyle: "none" });
-			};
-		} else if (!framing.data.croppedImage) {
-			content = {
+				component: (
+					<UploadImage
+						setImage={(img, isExt) =>
+							updateFrameOptions("uploadAndFrame", { image: img, isExternal: isExt })
+						}
+					/>
+				),
+			},
+			crop: {
 				title: "Adjustment of image",
 				desc: "What is the desired size of the printed image (inches)?",
-				component: <CropImage />,
-			};
-			onBack = () => {
-				setFrameOptions({ framingStyle: "uploadAndFrame", data: { ...framing.data, image: undefined } });
-			};
-		} else {
-			content = {
+				component: (
+					<CropImage
+						image={framing.data.image!}
+						onError={() => updateFrameOptions("uploadAndFrame", { image: undefined })}
+						setImage={(img, width, height) =>
+							updateFrameOptions("uploadAndFrame", { croppedImage: img, width, height })
+						}
+						isExt={framing.data.isExternal}
+					/>
+				),
+			},
+			finalize: {
 				title: "Type of frame",
 				desc: "Please select the type of product you want to create.",
 				options: [
@@ -161,66 +232,70 @@ const CustomizationDialog = ({
 						title: "Print only",
 						image: Upload,
 						props: {
-							onClick() {
-								setFrameOptions({
-									framingStyle: "uploadAndFrame",
-									data: { ...framing.data, frameType: "printOnly" },
-								});
-								router.push("/customize/uploadAndFrame");
-								setIsOpen(false);
-							},
+							onClick: () =>
+								navigateTo("/customize/uploadAndFrame", {
+									frameType: UPLOAD_AND_FRAME_PRINT_ONLY,
+									w: framing.data.width,
+								}),
 						},
 					},
 					{
 						title: "Stretched Canvas print",
 						image: Upload,
 						props: {
-							onClick() {
-								setFrameOptions({
-									framingStyle: "uploadAndFrame",
-									data: { ...framing.data, frameType: "canvasPrint" },
-								});
-								router.push("/customize/uploadAndFrame");
-								setIsOpen(false);
-							},
+							onClick: () =>
+								navigateTo("/customize/uploadAndFrame", {
+									frameType: UPLOAD_AND_FRAME_STRECTCHED_CANVAS_PRINT,
+									w: framing.data.width,
+								}),
 						},
 					},
 					{
 						title: "Framed print without mat & glazing",
 						image: Upload,
 						props: {
-							onClick() {
-								setFrameOptions({
-									framingStyle: "uploadAndFrame",
-									data: { ...framing.data, frameType: "framedWithoutMG" },
-								});
-								router.push("/customize/uploadAndFrame");
-								setIsOpen(false);
-							},
+							onClick: () =>
+								navigateTo("/customize/uploadAndFrame", {
+									frameType: UPLOAD_AND_FRAME_WITHOUT_MAT_AND_GLAZING,
+									w: framing.data.width,
+									frameId,
+								}),
 						},
 					},
 					{
 						title: "Framed print with mat & glazing",
 						image: Upload,
 						props: {
-							onClick() {
-								setFrameOptions({
-									framingStyle: "uploadAndFrame",
-									data: { ...framing.data, frameType: "framedWithMG" },
-								});
-								router.push("/customize/uploadAndFrame");
-								setIsOpen(false);
-							},
+							onClick: () =>
+								navigateTo("/customize/uploadAndFrame", {
+									frameType: UPLOAD_AND_FRAME_WITH_MAT_AND_GLAZING,
+									w: framing.data.width,
+									frameId,
+								}),
 						},
 					},
 				],
-			};
-			onBack = () => {
-				setFrameOptions({
-					framingStyle: "uploadAndFrame",
-					data: { ...framing.data, croppedImage: undefined },
-				});
-			};
+			},
+		},
+	};
+
+	let content: ContentType = framingStyles.none;
+	let onBack = () => {};
+
+	// Determine content dynamically
+	if (framing.framingStyle === "emptyFrame") {
+		content = framingStyles.emptyFrame;
+		onBack = () => updateFrameOptions("none");
+	} else if (framing.framingStyle === "uploadAndFrame") {
+		if (!framing.data.image) {
+			content = framingStyles.uploadAndFrame.default;
+			onBack = () => updateFrameOptions("none");
+		} else if (!framing.data.croppedImage) {
+			content = framingStyles.uploadAndFrame.crop;
+			onBack = () => updateFrameOptions("uploadAndFrame", { image: undefined });
+		} else {
+			content = framingStyles.uploadAndFrame.finalize;
+			onBack = () => updateFrameOptions("uploadAndFrame", { croppedImage: undefined });
 		}
 	}
 
@@ -234,6 +309,7 @@ const CustomizationDialog = ({
 						: "py-6 pt-10 md:py-14",
 				)}
 			>
+				<DialogTitle className="sr-only">Customization Style Dialog</DialogTitle>
 				{framing.framingStyle != "none" && framing.framingStyle != "mirrorFrame" && (
 					<DialogHeader className="flex h-min flex-row gap-4 space-y-0 text-center">
 						<Button

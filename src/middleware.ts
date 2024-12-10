@@ -16,7 +16,8 @@ export default async function middleware(req: NextRequest) {
 		if (session?.user) {
 			if (req.nextUrl.pathname.startsWith("/auth")) {
 				const redirUrl = req.nextUrl.clone();
-				redirUrl.pathname = "/";
+				redirUrl.pathname = req.nextUrl.searchParams.get("next") ?? "/";
+				redirUrl.searchParams.delete("next");
 				return NextResponse.redirect(redirUrl, { status: 302 });
 			}
 		} else {

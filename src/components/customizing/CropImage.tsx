@@ -1,11 +1,10 @@
 "use client";
-import React, { useCallback, useEffect, useState } from "react";
-import Cropper, { Area } from "react-easy-crop";
-import { Label } from "../ui/label";
-import { Input } from "../ui/input";
-import { Button } from "../ui/button";
 import { Img as ReactImage } from "@/components/Img";
-import { getImagePlaceholder } from "../imagePlaceholder";
+import { useCallback, useEffect, useState } from "react";
+import Cropper, { Area } from "react-easy-crop";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
 
 function getCroppedImg(imageSrc: string, crop: Area): Promise<string> {
 	if (typeof window === "undefined") return Promise.reject(new Error("Window not available"));
@@ -28,52 +27,17 @@ function getCroppedImg(imageSrc: string, crop: Area): Promise<string> {
 	});
 }
 
-function CropImage() {
-	const { frameOptions, setFrameOptions } = {
-		frameOptions: {
-			framingStyle: "uploadAndFrame",
-			data: {
-				image: getImagePlaceholder(),
-				croppedImage: getImagePlaceholder(),
-				width: 0,
-				height: 0,
-				usingExternalImage: false,
-			} as {
-				usingExternalImage: boolean;
-				image: string;
-				croppedImage?: File | string;
-				width?: number;
-				height?: number;
-				customization?:
-					| {
-							type: "printOnly";
-							printing: string;
-					  }
-					| {
-							type: "canvasPrint";
-							printing: string;
-							stretching: string;
-							sides: string;
-					  }
-					| {
-							type: "framedWithoutMG";
-							frame_id: string;
-							printing: string;
-							stretching: string;
-					  }
-					| {
-							type: "framedWithMG";
-							frame_id: string;
-							glazing: string; // LATER: replace this with enum of prisma.
-							printing: string;
-							backing: string;
-							mat: { key: string; width: number; color: string }[];
-					  };
-			},
-		},
-		setFrameOptions: (a: Record<string, any>) => a,
-	};
-
+function CropImage({
+	image,
+	isExt,
+	setImage,
+	onError,
+}: {
+	image: string;
+	isExt?: boolean;
+	setImage: (image: string, width: number, height: number) => void;
+	onError: () => void;
+}) {
 	const [size, setSize] = useState({ width: 12, height: 9 });
 	const [crop, setCrop] = useState({ x: 0, y: 0 });
 	const [zoom, setZoom] = useState(1);
@@ -86,56 +50,39 @@ function CropImage() {
 
 	const onProceed = useCallback(() => {
 		(async () => {
-			if (frameOptions.framingStyle === "uploadAndFrame") {
-				if (frameOptions.data.usingExternalImage) {
-					setFrameOptions({
-						...frameOptions,
-						data: { ...frameOptions.data, ...size, croppedImage: frameOptions.data.image },
-					});
-					return;
-				} else if (croppedAreaPixels) {
-					try {
-						const croppedImage = await getCroppedImg(frameOptions.data.image, croppedAreaPixels);
-						setFrameOptions({ ...frameOptions, data: { ...frameOptions.data, croppedImage, ...size } });
-					} catch (e) {
-						console.error(e);
-						alert("Failed to crop image");
-					}
+			if (isExt) {
+				setImage(image, size.width, size.height);
+				return;
+			} else if (croppedAreaPixels) {
+				try {
+					const croppedImage = await getCroppedImg(image, croppedAreaPixels);
+					setImage(croppedImage, size.width, size.height);
+				} catch (e) {
+					console.error(e);
+					alert("Failed to crop image");
 				}
 			}
 		})();
-	}, [croppedAreaPixels, frameOptions, setFrameOptions, size]);
+	}, [setImage, croppedAreaPixels, isExt, image, size]);
 
 	useEffect(() => {
-		if (frameOptions.framingStyle != "uploadAndFrame") return;
-		if (!frameOptions.data.usingExternalImage) return;
+		if (!isExt) return;
 		if (typeof window === "undefined") return;
-		const image = new Image();
-		image.src = frameOptions.data.image;
-		image.onload = () => {
-			setSize({ width: 12, height: (12 * image.height) / image.width });
-			setAspect(image.width / image.height);
+		const _image = new Image();
+		_image.src = image;
+		_image.onload = () => {
+			setSize({ width: 12, height: (12 * _image.height) / _image.width });
+			setAspect(_image.width / _image.height);
 		};
-		image.onerror = (error) => {
+		_image.onerror = (error) => {
 			console.error(error);
-			alert("Failed to load image");
-			setFrameOptions({
-				...frameOptions,
-				data: { ...frameOptions.data, image: undefined, usingExternalImage: undefined },
-			});
+			onError();
 		};
-	}, [frameOptions, setFrameOptions]);
-
-	if (frameOptions.framingStyle != "uploadAndFrame") return null;
+	}, [isExt, image, onError]);
 
 	function onCancel() {
-		if (frameOptions.framingStyle == "uploadAndFrame") {
-			setFrameOptions({ ...frameOptions, data: { ...frameOptions.data, image: undefined } });
-		}
+		onError();
 	}
-
-	if (!frameOptions.data.image) return null;
-
 	return (
 		<div className="flex h-full w-full flex-col items-center justify-items-stretch">
 			<div className="mb-4 flex gap-4 *:text-sm *:font-normal">
@@ -170,7 +117,7 @@ function CropImage() {
 						onChange={(e) => {
 							setSize((s) => ({ ...s, height: Number(e.target.value) }));
 						}}
-						disabled={frameOptions.data.usingExternalImage}
+						disabled={isExt}
 						step={0.5}
 						placeholder="9"
 						className="no-buttons-input w-16"
@@ -179,17 +126,13 @@ function CropImage() {
 			</div>
 			<div className="h-full w-full">
 				<div className="relative mx-auto aspect-square w-full max-w-[42rem] md:aspect-video md:w-5/6">
-					{frameOptions.data.usingExternalImage ? (
+					{isExt ? (
 						<>
-							<ReactImage
-								src={frameOptions.data.image}
-								className="h-full w-full object-contain"
-								alt="image"
-							/>
+							<ReactImage src={image} className="h-full w-full object-contain" alt="image" />
 						</>
 					) : (
 						<Cropper
-							image={frameOptions.data.image}
+							image={image}
 							crop={crop}
 							zoom={zoom}
 							aspect={size.width / size.height}

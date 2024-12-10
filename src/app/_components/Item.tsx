@@ -8,9 +8,10 @@ import { getImagePlaceholder } from "@/components/imagePlaceholder";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Img } from "@/components/Img";
 import { cn } from "@/lib/utils";
+import { useDialog } from "@/context/DialogContext";
 
 function Item({ item, isPopularItem }: { item: FrameDataType | PopularFrameDataType; isPopularItem?: boolean }) {
-	// const { setDialogOpen, setCustomizingFrame } = useFrames();
+	const { openDialog } = useDialog();
 	return (
 		<>
 			<div
@@ -67,20 +68,9 @@ function Item({ item, isPopularItem }: { item: FrameDataType | PopularFrameDataT
 						<Button
 							size={"lg"}
 							variant={"outline"}
-							// onClick={() => {
-							// 	if ("borderSrc" in item && "borderWidth" in item) {
-							// 		setCustomizingFrame({
-							// 			borderSrc: item.borderSrc,
-							// 			// borderWidth: item.borderWidth,
-							// 			// unit_price: item.unit_price,
-							// 			unit_price: 0,
-							// 			borderWidth: 1, //TODO: remove this line  and make variant selection here
-							// 			id: item.id,
-							// 			name: item.name,
-							// 		});
-							// 		setDialogOpen(true);
-							// 	}
-							// }}
+							onClick={() => {
+								openDialog(item.id);
+							}}
 							type="button"
 							className="h-min w-full border border-black bg-transparent px-2 py-2 font-semibold text-black transition-all duration-200 active:scale-90 md:px-4 md:py-3 md:text-lg"
 						>
