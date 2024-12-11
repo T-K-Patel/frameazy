@@ -4,10 +4,10 @@ import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function PATCH(req: NextRequest) {
-	const body = await req.json();
-	const itemId = body.itemId;
-	let qty = body.qty;
 	try {
+		const body = await req.json();
+		const itemId = body.itemId;
+		let qty = body.qty;
 		const userId = await isAuthenticated();
 		qty = Number(qty);
 		if (isNaN(qty) || qty < 1 || !Number.isInteger(qty)) throw new CustomError("Quantity must be at least 1");
@@ -18,6 +18,11 @@ export async function PATCH(req: NextRequest) {
 			},
 			data: {
 				quantity: qty,
+			},
+			select: {
+				id: true,
+				userId: true,
+				quantity: true,
 			},
 		});
 		if (!updatedItem) throw new CustomError("Item not found in cart");

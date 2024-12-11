@@ -27,6 +27,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 		if (!order) throw new CustomError("Order not found");
 		if (!([OrderStatus.Approved, OrderStatus.Received] as OrderStatus[]).includes(order.order_status))
 			throw new CustomError("Order cannot be cancelled");
+
+		// REVIEW: Should we allow cancelling orders that are in the process of being delivered?
 		if (order.transaction) {
 			throw new CustomError("Order cannot be cancelled");
 		}

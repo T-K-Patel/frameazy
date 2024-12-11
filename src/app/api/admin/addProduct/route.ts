@@ -16,6 +16,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 		const productColor = formData.get("productColor")?.toString().trim();
 		const productCollection = formData.get("productCollection")?.toString().trim();
 
+		// REFACTOR: Take Variants array instead of single value
 		const borderWidth = Number(formData.get("borderWidth"));
 
 		if (!productName || productName.length < 3) {

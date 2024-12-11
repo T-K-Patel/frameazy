@@ -77,7 +77,7 @@ model Authenticator {
 }
 
 // Custom Models
-type Framevariants {
+type FrameVariants {
   borderWidth Float
   unit_price  Int
 }
@@ -90,7 +90,7 @@ model Frame {
   category      String
   color         String
   collection    String
-  variants      Framevariants[]
+  variants      FrameVariants[]
   categoryRef   Category        @relation(fields: [category], references: [name])
   colorRef      Color           @relation(fields: [color], references: [name])
   collectionRef Collection      @relation(fields: [collection], references: [name])
@@ -158,6 +158,7 @@ model CartItem {
   userId            String            @db.ObjectId
   user              User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   frameId           String?           @db.ObjectId
+  frameVariant      FrameVariants?
   frame             Frame?            @relation(fields: [frameId], references: [id], onDelete: Restrict)
   customizationId   String            @unique @db.ObjectId
   customization     CartCustomization @relation(fields: [customizationId], references: [id], onDelete: Cascade)
@@ -221,6 +222,7 @@ model OrderCustomization {
 model OrderItem {
   id                String             @id @default(auto()) @map("_id") @db.ObjectId
   frameId           String?            @db.ObjectId
+  frameVariant      FrameVariants?
   frame             Frame?             @relation(fields: [frameId], references: [id], onDelete: Restrict)
   quantity          Int
   single_unit_price Int

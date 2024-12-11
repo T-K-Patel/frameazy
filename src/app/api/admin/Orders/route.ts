@@ -37,7 +37,7 @@ export async function GET(): Promise<NextResponse<AdminOrdersType[] | { success:
 			},
 		});
 		console.log(orders);
-		return NextResponse.json(orders, { status: 200 });
+		return NextResponse.json<AdminOrdersType[]>(orders, { status: 200 });
 	} catch (error) {
 		if (error instanceof CustomError) {
 			return NextResponse.json({ success: false, error: error.message }, { status: 400 });

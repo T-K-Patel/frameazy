@@ -29,6 +29,7 @@ export async function GET(req: NextRequest, { params: _params }: { params: Promi
 							image: true,
 						},
 					},
+					frameVariant: true,
 					quantity: true,
 					single_unit_price: true,
 				},

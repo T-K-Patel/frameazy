@@ -7,4 +7,8 @@ export type CartItemType = {
 		name: string;
 	} | null;
 	single_unit_price: number;
+	frameVariant: {
+		borderWidth: number;
+		unit_price: number;
+	} | null;
 };

@@ -2,6 +2,7 @@ import { isAuthenticated } from "@/lib/auth";
 import { CustomError } from "@/lib/CustomError";
 import { db } from "@/lib/db";
 import { NextResponse } from "next/server";
+import { CartItemType } from "./response";
 
 export async function GET() {
 	try {
@@ -21,10 +22,11 @@ export async function GET() {
 						name: true,
 					},
 				},
+				frameVariant: true,
 			},
 		});
 
-		return NextResponse.json({ data: cartItems }, { status: 200 });
+		return NextResponse.json<{ data: CartItemType[] }>({ data: cartItems }, { status: 200 });
 	} catch (error) {
 		if (error instanceof CustomError) {
 			return NextResponse.json({ success: false, error: error.message }, { status: 400 });

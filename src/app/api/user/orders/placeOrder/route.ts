@@ -65,6 +65,20 @@ export async function POST(req: NextRequest) {
 							where: {
 								id: item.customizationId,
 							},
+							select: {
+								id: false,
+								backing: true,
+								glazing: true,
+								sides: true,
+								stretching: true,
+								printing: true,
+								height: true,
+								width: true,
+								image: true,
+								mat: true,
+								mirror: true,
+								type: true,
+							},
 						});
 
 						if (cutomization) {
@@ -76,11 +90,13 @@ export async function POST(req: NextRequest) {
 						}
 						await transaction.cartCustomization.delete({
 							where: {
-								id: cutomization?.id,
+								id: item.customizationId,
 							},
 						});
 					}),
 				);
+
+				// TODO: If allowing frame edit option then check here for pricing update before placing order.
 
 				const orderItemsArr = cart.map((item) => ({
 					orderId: order.id,
@@ -101,7 +117,10 @@ export async function POST(req: NextRequest) {
 				});
 				return order.id;
 			})
-			.catch(() => {
+			.catch((err: any) => {
+				if (err instanceof CustomError) {
+					throw err;
+				}
 				throw new CustomError("Failed to place order");
 			});
 		if (!orderId) throw new CustomError("Failed to place order");

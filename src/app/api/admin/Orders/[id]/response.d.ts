@@ -13,6 +13,10 @@ export type AdminOrderDetailsType = {
 			name: string;
 			image: string;
 		} | null;
+		frameVariant: {
+			borderWidth: number;
+			unit_price: number;
+		} | null;
 		quantity: number;
 		customization: CartCustomization;
 		single_unit_price: number;

@@ -37,6 +37,7 @@ export async function GET(
 								image: true,
 							},
 						},
+						frameVariant: true,
 						quantity: true,
 						customization: true,
 						single_unit_price: true,
@@ -60,7 +61,7 @@ export async function GET(
 			throw new CustomError("Order not found");
 		}
 
-		return NextResponse.json(order, { status: 200 });
+		return NextResponse.json<AdminOrderDetailsType>(order, { status: 200 });
 	} catch (error) {
 		if (error instanceof CustomError) {
 			return NextResponse.json({ success: false, error: error.message }, { status: 400 });

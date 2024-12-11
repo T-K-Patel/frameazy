@@ -1,8 +1,8 @@
-import Google from "next-auth/providers/google";
-import { NextAuthConfig } from "next-auth";
+import { db } from "@/lib/db";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import crypto from "crypto";
-import { db } from "@/lib/db";
+import { NextAuthConfig } from "next-auth";
+import Google from "next-auth/providers/google";
 
 if (!process.env.NEXTAUTH_SECRET) {
 	throw new Error("NEXTAUTH_SECRET is not defined");

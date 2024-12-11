@@ -8,10 +8,28 @@ export async function DELETE(req: NextRequest) {
 	try {
 		const userId = await isAuthenticated();
 
-		// TODO: delete customization also
-		const deletedItem = await db.cartItem.delete({ where: { id: itemId, userId } });
+		const deleted = await db.$transaction(async (txn) => {
+			await txn.cartCustomization.deleteMany({
+				where: {
+					CartItem: {
+						userId,
+						id: itemId,
+					},
+				},
+			});
+			const deletedItem = await txn.cartItem.delete({
+				where: {
+					id: itemId,
+					userId,
+				},
+			});
 
-		if (!deletedItem) throw new CustomError("Item not found in cart");
+			if (!deletedItem) {
+				throw new CustomError("Item not found in cart");
+			}
+			return deletedItem;
+		});
+		if (!deleted) throw new CustomError("Item not found in cart");
 		return NextResponse.json({ data: "Item deleted from cart" }, { status: 200 });
 	} catch (error: any) {
 		if (error instanceof CustomError) {
