@@ -68,32 +68,28 @@ function Cart() {
 	// 	fetchCartItems();
 	// }, [fetchCartItems]);
 
-	useEffect( () => {
-		let fetching = true;
-
+	useEffect(() => {
 		const init = async () => {
-			try{
+			try {
 				const response = await fetch("http://localhost:3000/api/cart/cartItems");
 				const data = await response.json();
 				console.log(data);
-				
-				if(response.ok){
+
+				if (response.ok) {
 					setCartItems(data.data);
-				}else{
+				} else {
 					setCartItems([]);
 					setError("An error occurred while fetching cart items");
 				}
-			}catch(error){
-				setError("An error occurred while fetching cart items");
-				
+			} catch (error) {
+				if (error instanceof Error) {
+					setError(error.message);
+				} else {
+					setError("An unknown error occurred");
+				}
 			}
-		}
-		init();
-
-		return () => {
-			fetching = false;
 		};
-
+		init();
 	}, []);
 
 	// LATER: Implement feature to fetch cart on pooling basis.
@@ -146,7 +142,7 @@ function Cart() {
 
 	if (loading || session.status === "loading" || !session.data?.user) {
 		return <LoadingCart />;
-	}	
+	}
 
 	const orderTotal = cartItems.reduce((acc, item) => acc + item.quantity * (item.single_unit_price || 0), 0);
 	const deliveryCharge = getDeliveryCharge(orderTotal);
