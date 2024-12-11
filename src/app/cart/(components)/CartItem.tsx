@@ -1,7 +1,7 @@
 "use client";
 import { IoIosClose } from "react-icons/io";
 import { FaMinus, FaPlus } from "react-icons/fa6";
-import React from "react";
+import React, { use } from "react";
 import { CartCustomization } from "@prisma/client";
 import { CartItemType, deleteCartItem, updateCartItemQty } from "@/serverActions/cart/cart.actions";
 import { Button } from "@/components/ui/button";
@@ -48,6 +48,49 @@ export const CartItem = ({ item, updateState, deleteItem, fetchCartItems }: Cart
 		return () => clearTimeout(timeout);
 	}, [qty, item.id, item.quantity, updateState, fetchCartItems]);
 
+	React.useEffect(() => {
+		async function updateQty() {
+			if (qty !== item.quantity) {
+				setUpdating(true);
+				try {
+					
+					const response = await fetch(`/api/cart/updateCartItemQty`, {
+						method: "PATCH",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify({
+							itemId: item.id,
+							quantity: qty,
+						}),
+					});
+		
+					const updatedData = await response.json();
+		
+					if (response.ok) {
+					
+						updateState(updatedData.data, item.id);
+					} else {
+						fetchCartItems();
+					}
+				} catch (error) {
+					
+					console.error("Failed to update quantity:", error);
+					fetchCartItems(); 
+				} finally {
+					setUpdating(false);
+				}
+			}
+		}
+		
+		const timeout = setTimeout(() => {
+			updateQty();
+		}, 500);
+		
+		return () => clearTimeout(timeout);
+		
+	}, [qty, item.id, item.quantity, updateState, fetchCartItems]);
+	
 	return (
 		<div className="flex flex-col gap-1 rounded-lg border border-[#F1F1F1]" key={item.id}>
 			<div className="flex items-center justify-between border-b border-[#F1F1F1] p-3 text-center">

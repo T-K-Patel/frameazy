@@ -64,9 +64,37 @@ function Cart() {
 			});
 	}, []);
 
-	useEffect(() => {
-		fetchCartItems();
-	}, [fetchCartItems]);
+	// useEffect(() => {
+	// 	fetchCartItems();
+	// }, [fetchCartItems]);
+
+	useEffect( () => {
+		let fetching = true;
+
+		const init = async () => {
+			try{
+				const response = await fetch("http://localhost:3000/api/cart/cartItems");
+				const data = await response.json();
+				console.log(data);
+				
+				if(response.ok){
+					setCartItems(data.data);
+				}else{
+					setCartItems([]);
+					setError("An error occurred while fetching cart items");
+				}
+			}catch(error){
+				setError("An error occurred while fetching cart items");
+				
+			}
+		}
+		init();
+
+		return () => {
+			fetching = false;
+		};
+
+	}, []);
 
 	// LATER: Implement feature to fetch cart on pooling basis.
 
@@ -118,7 +146,7 @@ function Cart() {
 
 	if (loading || session.status === "loading" || !session.data?.user) {
 		return <LoadingCart />;
-	}
+	}	
 
 	const orderTotal = cartItems.reduce((acc, item) => acc + item.quantity * (item.single_unit_price || 0), 0);
 	const deliveryCharge = getDeliveryCharge(orderTotal);
